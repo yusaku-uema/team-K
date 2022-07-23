@@ -22,10 +22,13 @@ const int TAKARA_TIME = 100;
 int g_OldKey;  // 前回の入力キー 
 int g_NowKey;  // 今回の入力キー 
 int g_KeyFlg;  // 入力キー情報 
+
 int g_GameState = 0;  // ゲームモード 
 int g_TitleImage; // 画像用変数 
 int g_Menu; //メニュー画面
+
 int g_Score = 0; //スコア
+
 int g_WaitTime = 0; //待ち時間
 int g_StartTime;   // スタート時間
 int Time;   // 現在時間
@@ -34,25 +37,7 @@ int g_TakaraBako[4]; //宝箱の画像
 int g_Arrow;  //プレイヤーの矢印の画像
 int g_Applec; //タイトルカーソル変数　消さないで
 
-int g_StageImage;
-
-//ステック
-int AX, AY;
-struct DINPUT_JOYSTATE
-{
-    int		X;		// スティックのＸ軸パラメータ( -1000～1000 )
-    int		Y;		// スティックのＹ軸パラメータ( -1000～1000 )
-    int		Z;		// スティックのＺ軸パラメータ( -1000～1000 )
-    int		Rx;		// スティックのＸ軸回転パラメータ( -1000～1000 )
-    int		Ry;		// スティックのＹ軸回転パラメータ( -1000～1000 )
-    int		Rz;		// スティックのＺ軸回転パラメータ( -1000～1000 )
-    int		Slider[2];	// スライダー二つ
-    unsigned int	POV[4];	// ハットスイッチ４つ
-                    // ( 0xffffffff:入力なし 0:上 4500:右上 9000:右 13500:右下
-                    //		 18000:下 22500:左下 27000:左 31500:左上 )
-    unsigned char	Buttons[32];	// ボタン３２個( 押されたボタンは 128 になる )
-};
-
+int g_StageImage;   //ゲームメイン背景
 
 //プレイヤー矢印の構造体
 struct ARROW
@@ -117,9 +102,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
         g_OldKey = g_NowKey;
         g_NowKey = GetJoypadInputState(DX_INPUT_KEY_PAD1); //ゲームパッドを持ってきていない人用に後でゲームパッドのみに変更
         g_KeyFlg = g_NowKey & ~g_OldKey;
-
-        //左右のアナログ入力状態を取得する
-        GetJoypadAnalogInput(&AX, &AY, DX_INPUT_PAD1);
 
         // 画面の初期化 
         ClearDrawScreen();

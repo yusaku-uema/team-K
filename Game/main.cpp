@@ -99,7 +99,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
     LPSTR lpCmdLine, int nCmdShow)
 {
     //タイトルを設定
-    SetMainWindowText("Drive&Avoid");
+    SetMainWindowText("宝箱をあけろ");
     //ウィンドウモードで起動する 
     ChangeWindowMode(TRUE);
 

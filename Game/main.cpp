@@ -26,6 +26,8 @@ int g_KeyFlg;  // 入力キー情報
 int g_GameState = 0;  // ゲームモード 
 int g_TitleImage; // 画像用変数 
 int g_Menu; //メニュー画面
+int	g_MenuNumber = 0;		// メニューカーソル位置
+int g_MenuY;				// メニューカーソルのＹ座標
 
 int g_Score = 0; //スコア
 
@@ -68,6 +70,8 @@ struct TAKARA g_enemy00 = { TRUE,0,0,30,200,0, TAKARA_TIME };
  ***********************************************/
 void GameInit(void); //ゲーム初期処理
 void GameMain(void); //ゲームメイン処理
+void DrawEnd(void); //ゲームエンド
+void DrawHelp(void); //ヘルプ画面
 void DrawGameTitle(void); //タイトル描画処理
 void DrawGameOver(void); //ゲームオーバ
 int LoadImages(); //画像読み込み
@@ -117,10 +121,10 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
             //DrawRanking();
             break;
         case 3:
-            //DrawHelp();
+            DrawHelp();
             break;
         case 4:
-            //DrawEnd();
+            DrawEnd();
             break;
         case 5:
             GameMain();
@@ -147,28 +151,36 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
  * ゲームタイトル表示
  ***********************************************/
 void DrawGameTitle(void) {
-    //static int MenuNo = 0;
+  
+    //メニューカーソル移動処理
+    if (g_KeyFlg & PAD_INPUT_DOWN) {
+        if (++g_MenuNumber > 3) g_MenuNumber = 0;
+    }
+    if (g_KeyFlg & PAD_INPUT_UP) {
+        if (--g_MenuNumber < 0) g_MenuNumber = 2;
+    }
 
-    ////メニューカーソル移動処理
-    //if (g_KeyFlg & PAD_INPUT_DOWN) {
-    //    if (++MenuNo > 3)MenuNo = 0;
-    //}
-    //if (g_KeyFlg & PAD_INPUT_UP) {
-    //    if (--MenuNo < 0)MenuNo = 3;
-    //}
-    ////zキー、Aボタンでメニュー選択
-    //if (g_KeyFlg & PAD_INPUT_A && MenuNo == 0)g_GameState = MenuNo + 1; //作ってないからスタート以外押せません
-    // //メニュー
-    //DrawGraph(310, 220 + MenuNo * 50, g_Applec, TRUE);
+    //Ｚキーでメニュー選択
+    if (g_KeyFlg & PAD_INPUT_A) g_GameState = g_MenuNumber + 1;
 
     //タイトル画像表示
     DrawGraph(0, 0, g_TitleImage, FALSE);
 
-    SetFontSize(20);
-    DrawString(150, 200, "---ZキーやAボタンを押してゲームスタート---", 0xffffff, 0);
-    if (g_KeyFlg & PAD_INPUT_A) {
-        g_GameState = 1;
-    }
+    //メニューカーソル（三角形）の表示
+    g_MenuY = g_MenuNumber * 52;
+    DrawTriangle(240, 255 + g_MenuY, 260, 270 + g_MenuY, 240, 285 + g_MenuY, GetColor(255, 0, 0), TRUE);
+
+    SetFontSize(40);
+    //ゲームタイトルを載せる予定
+    DrawString(100, 0, "ゲームタイトル決定後反映", 0xffffff, 0);
+
+    //ステージ選択
+    SetFontSize(30);
+    DrawString(265, 255, "ゲームスタート", 0xffffff, 0);
+    DrawString(265, 307, "ランキング", 0xffffff, 0);
+    DrawString(265, 359, "ヘルプ", 0xffffff, 0);
+    DrawString(265, 411, "エンド", 0xffffff, 0);
+
 }
 
 /***********************************************
@@ -338,6 +350,37 @@ void UIView(void)
     DrawString(510, 320, "SCORE", 0xffffff, 0);
     DrawFormatString(510, 360, 0x00ffff, "%d", g_Score);
 }
+
+/***********************************************
+ * ゲームエンド描画処理
+ ***********************************************/
+void DrawEnd(void)
+{
+    ////エンド画像表示予定
+    //DrawGraph(0, 0, g_EndImage, FALSE);
+
+    SetFontSize(40);
+    DrawString(100, 255,"Thank you for Playing", 0xffffff, 0);
+
+    //タイムの加算処理＆終了（3秒後）
+    if (++g_WaitTime > 180)g_GameState = 99;
+}
+
+/***********************************************
+ * ゲームヘルプ描画処理
+ ***********************************************/
+void DrawHelp(void)
+{
+    //スペースキーでメニューに戻る
+    if (g_KeyFlg & PAD_INPUT_M) g_GameState = 0;
+
+    //タイトル画像表示
+    //DrawGraph(0, 0, g_TitleImage, FALSE);
+    SetFontSize(20);
+    DrawString(100, 120, "ヘルプ画面仮", 0xffffff, 0);
+    DrawString(100, 255, "スペースキーを押してタイトルへ戻る ", 0xffffff, 0);
+}
+
 /***********************************************
  * 画像読み込み
  ***********************************************/

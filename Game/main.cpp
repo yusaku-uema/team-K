@@ -15,7 +15,8 @@ const int TIMELIMIT = 30000;
 //宝箱の個数
 const int ENEMY_MAX = 6;
 const int TAKARA_TIME = 100;
-
+//ランキング表示数
+const int MAX_RANKING_DATA = 5;
 /***********************************************
  * 変数の宣言
  ***********************************************/
@@ -65,6 +66,16 @@ struct TAKARA {
 struct TAKARA g_takara[ENEMY_MAX];
 struct TAKARA g_enemy00 = { TRUE,0,0,30,200,0, TAKARA_TIME };
 
+//ランキングデータ 構造体
+struct RankingData
+{
+    int no;          //順位
+    char name[10];   //name は10byte(9文字)
+    long score;      //スコア
+};
+//ランキングデータ
+RankingData g_Ranking[MAX_RANKING_DATA];
+
 /***********************************************
  * 関数のプロトタイプ宣言
  ***********************************************/
@@ -74,6 +85,12 @@ void DrawEnd(void); //ゲームエンド
 void DrawHelp(void); //ヘルプ画面
 void DrawGameTitle(void); //タイトル描画処理
 void DrawGameOver(void); //ゲームオーバ
+
+void DrawRanking(void);  //ランキング表示画面
+int ReadRanking();       //ランキング読み込み
+int SaveRanking();       //ランキング保存
+void SortRanking();      //ランキング並べ替え
+
 int LoadImages(); //画像読み込み
 void UIView();
 void TimeCount();
@@ -99,6 +116,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
     SetDrawScreen(DX_SCREEN_BACK);
 
     if (LoadImages() == -1) return -1; //画像読込み関数を呼び出し
+    if (ReadRanking() == -1) return -1;//ランキング読込み関数を呼び出し
 
       //ゲームループ 
     while (ProcessMessage() == 0 && g_GameState != 99) {
@@ -118,7 +136,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
             GameInit();
             break;
         case 2:
-            //DrawRanking();
+            DrawRanking();
             break;
         case 3:
             DrawHelp();
@@ -379,6 +397,133 @@ void DrawHelp(void)
     SetFontSize(20);
     DrawString(100, 120, "ヘルプ画面仮", 0xffffff, 0);
     DrawString(100, 255, "スペースキーを押してタイトルへ戻る ", 0xffffff, 0);
+}
+
+/***********************************************
+ * ランキング描画処理
+ ***********************************************/
+void DrawRanking(void)
+{
+    //スペースキーでメニューに戻る
+    if (g_KeyFlg & PAD_INPUT_M) g_GameState = 0;
+
+    //ランキング画像表示
+    //DrawGraph(0, 0, g_RankingImage, FALSE);
+
+    // ランキング一覧を表示
+    SetFontSize(30);
+    DrawString(50, 100, "ランキング画面仮", 0xffffff);
+    for (int i = 0; i < MAX_RANKING_DATA; i++)
+    {
+        DrawFormatString(50, 170 + i * 35, 0xffffff, "%2d   %10s     %10d", g_Ranking[i].no, g_Ranking[i].name, g_Ranking[i].score);
+    }
+
+    // 文字の表示(点滅)
+    if (++g_WaitTime < 30)
+    {
+        SetFontSize(24);
+        DrawString(60, 450, "--  スペースキーを押してタイトルへ戻る  --", 0xffffff);
+    }
+    else if (g_WaitTime > 60) g_WaitTime = 0; //メニューへ
+}
+
+/***********************************************
+ * ランキング読み込み
+ ***********************************************/
+int ReadRanking()
+{
+    //ファイルポインタ
+    FILE* fp;
+
+    //ファイルオープン
+    if ((fopen_s(&fp, "dat/rankingdata.txt", "r")) != 0)
+    {
+        //エラー処理
+        printf("Ranking Data Error\n");
+        return -1;
+    }
+
+    //ランキングデータ配分列データを読み込む
+    for (int i = 0; i < MAX_RANKING_DATA; i++)
+    {
+        fscanf_s(fp, "%2d %10s %10d", &g_Ranking[i].no, g_Ranking[i].name, 10, &g_Ranking[i].score);
+    }
+
+    //ファイルクローズ
+    fclose(fp);
+
+    return 0;
+}
+
+/***********************************************
+ * ランキング保存
+ ***********************************************/
+int SaveRanking()
+{
+    //ファイルポインタ
+    FILE* fp;
+
+    //ファイルオープン
+    if ((fopen_s(&fp, "dat/rankingdata.txt", "w")) != 0)
+    {
+        //エラー処理
+        printf("Ranking Data Error\n");
+        return -1;
+    }
+
+    // ランキングデータ分配列データを書き込む
+    for (int i = 0; i < MAX_RANKING_DATA; i++)
+    {
+        fprintf(fp, "%2d %10s %10d\n", g_Ranking[i].no, g_Ranking[i].name, g_Ranking[i].score);
+    }
+
+    //ファイルクローズ
+    fclose(fp);
+
+    return 0;
+}
+
+/***********************************************
+ * ランキング並べ替え
+ ***********************************************/
+void SortRanking()
+{
+    //並べ替え用
+    RankingData work;
+    int i, j;
+
+    //選択法ソート
+    for (i = 0; i < MAX_RANKING_DATA - 1; i++)
+    {
+        for (j = i + 1; j < MAX_RANKING_DATA; j++)
+        {
+            if (g_Ranking[i].score <= g_Ranking[j].score)
+            {
+                work = g_Ranking[i];
+                g_Ranking[i] = g_Ranking[j];
+                g_Ranking[j] = work;
+            }
+        }
+    }
+
+    // 順位付け
+    for (i = 0; i < MAX_RANKING_DATA; i++)
+    {
+        g_Ranking[i].no = 1;
+    }
+
+    // 得点が同じ場合は、同じ順位とする
+    // 同順位があった場合の次の順位はデータ個数が加算された順位とする
+    for (i = 0; i < MAX_RANKING_DATA - 1; i++)
+    {
+        for (j = i + 1; j < MAX_RANKING_DATA; j++)
+        {
+            if (g_Ranking[i].score > g_Ranking[j].score)
+            {
+                g_Ranking[j].no++;
+            }
+        }
+    }
 }
 
 /***********************************************

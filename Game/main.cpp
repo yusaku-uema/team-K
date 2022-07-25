@@ -16,6 +16,13 @@ const int TIMELIMIT = 30000;
 const int ENEMY_MAX = 6;
 const int TAKARA_TIME = 100;
 
+//プレイヤーのやつ
+const int PLAYER_SPEED = 3;
+const int PLAYER_IMAGE_TIME = 8;
+
+//背景のやつ
+const int STAGE_NO = 2; //背景の廊下の長さ
+
 /***********************************************
  * 変数の宣言
  ***********************************************/
@@ -24,6 +31,9 @@ int g_NowKey;  // 今回の入力キー
 int g_KeyFlg;  // 入力キー情報 
 
 int g_GameState = 0;  // ゲームモード 
+
+int g_GameMode = 0; //ゲームモード（神里が作った）
+
 int g_TitleImage; // 画像用変数 
 int g_Menu; //メニュー画面
 int	g_MenuNumber = 0;		// メニューカーソル位置
@@ -55,6 +65,26 @@ struct ARROW
 //プレイヤー
 struct ARROW g_arrow;
 
+//プレイヤーの構造体
+struct PLAYER
+{
+    int x, y;      //座標x,y
+    int img;
+    int imgtime;
+};
+//プレイヤー
+struct PLAYER g_player;
+
+//廊下の背景画像の構造体（神里が使う）
+struct STAGE
+{
+    int no;
+    int img;
+    int y;
+    int x;
+};
+struct STAGE g_stage;
+
 
 //宝箱の構造体
 struct TAKARA {
@@ -81,8 +111,10 @@ void DrawGameOver(void); //ゲームオーバ
 int LoadImages(); //画像読み込み
 void UIView();
 void TimeCount();
-void BackScrool(); //背景画像スクロール処理
+void BackScrool(int a); //背景画像スクロール処理
+void BackImage();
 void PlayerControl(); //プレイヤーの処理
+void ArrowControl();  //プレイヤーの矢印の処理
 void TakaraControl(); //宝箱の処理
 
 /***********************************************
@@ -165,7 +197,7 @@ void DrawGameTitle(void) {
         if (++g_MenuNumber > 3) g_MenuNumber = 0;
     }
     if (g_KeyFlg & PAD_INPUT_UP) {
-        if (--g_MenuNumber < 0) g_MenuNumber = 2;
+        if (--g_MenuNumber < 0) g_MenuNumber = 3;
     }
 
     //Ｚキーでメニュー選択
@@ -173,22 +205,29 @@ void DrawGameTitle(void) {
 
     //タイトル画像表示
     DrawGraph(0, 0, g_TitleImage, FALSE);
+    SetDrawBlendMode(DX_BLENDMODE_ALPHA, 128);
+    DrawBox(160, 255, 480, 450, GetColor(255,255,255), TRUE);
+    SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
 
-    //メニューカーソル（三角形）の表示
     g_MenuY = g_MenuNumber * 52;
-    DrawTriangle(240, 255 + g_MenuY, 260, 270 + g_MenuY, 240, 285 + g_MenuY, GetColor(255, 0, 0), TRUE);
-
+    //メニューカーソル（三角形）の表示
+    if (g_MenuNumber == 0 || g_MenuNumber == 1) {
+        DrawTriangle(180, 255 + g_MenuY, 200, 270 + g_MenuY, 180, 285 + g_MenuY, GetColor(0, 0, 225), TRUE);
+       // DrawGraph(160, 255 + g_MenuNumber * 50, g_cursor, TRUE);
+    }
+    if (g_MenuNumber == 2 || g_MenuNumber == 3) {
+        DrawTriangle(240, 255 + g_MenuY, 260, 270 + g_MenuY, 240, 285 + g_MenuY, GetColor(0, 0, 225), TRUE);
+       /* DrawGraph(225, 255 + g_MenuNumber * 50, g_cursor, TRUE);*/
+    }
+    DrawBox(160, 255, 480, 450, GetColor(0, 0, 0), FALSE);
     SetFontSize(40);
     //ゲームタイトルを載せる予定
-    DrawString(100, 0, "ゲームタイトル決定後反映", 0xffffff, 0);
-
-    //ステージ選択
-    SetFontSize(30);
-    DrawString(265, 255, "ゲームスタート", 0xffffff, 0);
-    DrawString(265, 307, "ランキング", 0xffffff, 0);
-    DrawString(265, 359, "ヘルプ", 0xffffff, 0);
-    DrawString(265, 411, "エンド", 0xffffff, 0);
-
+    DrawStringToHandle(100, 130, "ゲームタイトル予定",GetColor(255, 255, 255), Font1);
+   
+    DrawStringToHandle(210, 255, "ゲームスタート",GetColor(255, 0, 0), Font);
+    DrawStringToHandle(210, 305, "ランキング", GetColor(255, 0, 0), Font);
+    DrawStringToHandle(275, 355, "ヘルプ", GetColor(255, 0, 0), Font);
+    DrawStringToHandle(275, 405, "エンド", GetColor(255, 0, 0), Font);
 }
 
 /***********************************************
@@ -211,6 +250,14 @@ void GameInit(void)
     g_arrow.x = g_takara[g_arrow.no].x;
     g_arrow.no = 0;
 
+    //プレイヤー初期処理
+    g_player = { 139, 200, 13, PLAYER_IMAGE_TIME };
+
+    //背景画像(廊下）の初期処理
+    g_stage = { STAGE_NO, g_RoadImage, 0, 0 };
+
+    g_GameMode = 0;
+
     //現在の経過時間を得る
     g_StartTime = GetNowCount();
 
@@ -223,11 +270,20 @@ void GameInit(void)
  ***********************************************/
 void GameMain(void)
 {
-    BackScrool();
-    PlayerControl();
-    TakaraControl();
-    UIView();
-    TimeCount();
+    switch (g_GameMode) {
+    case 0:
+       /* BackScrool(0);
+        PlayerControl();
+        break;*/
+    case 1:
+        BackImage();
+        TakaraControl();
+        ArrowControl();
+        break;
+    }
+    
+    /*UIView();
+    TimeCount();*/
 
     //スペースキーでメニューに戻る　ゲームメインからタイトルに戻る追加
     if (g_KeyFlg & PAD_INPUT_M)g_GameState = 6;
@@ -240,7 +296,7 @@ void GameMain(void)
  ***********************************************/
 void DrawGameOver(void)
 {
-    BackScrool();
+    //BackScrool();
 
     //スペースキーでメニューに戻る
     if (g_KeyFlg & PAD_INPUT_M)   g_GameState = 0;
@@ -265,7 +321,23 @@ void DrawGameOver(void)
  * 引  数:なし
  * 戻り値:なし
  ***********************************************/
-void BackScrool()
+void BackScrool(int a)
+{
+    DrawGraph(g_stage.x, g_stage.y, g_stage.img, FALSE);
+    if (g_stage.no > 0)DrawGraph(g_stage.x, g_stage.y - 480, g_stage.img, FALSE);
+    else if (g_stage.no <= 0) DrawGraph(g_stage.x, g_stage.y - 480, g_RoadImage2, FALSE);
+
+    g_stage.y += (PLAYER_SPEED * a);
+
+    if (g_stage.y >= 480)
+    {
+        g_stage.y = 0;
+        g_stage.no--;
+        if (g_stage.no < 0)g_stage.img = g_RoadImage2;
+    }
+}
+
+void BackImage()
 {
     DrawGraph(0, 0, g_StageImage, FALSE);
 }
@@ -277,8 +349,76 @@ void BackScrool()
  ***********************************************/
 void PlayerControl()
 {
+    if (g_player.imgtime <= 0)g_player.imgtime = PLAYER_IMAGE_TIME;
+    g_player.imgtime--;
+
+    if (g_NowKey & PAD_INPUT_UP)
+    {
+        if (g_NowKey != g_OldKey)g_player.img = 12;
+        if (g_player.imgtime <= 0)
+        {
+            g_player.img++;
+            if (g_player.img > 15)g_player.img = 12;
+        }
+        if (g_player.y > 200 || g_stage.no < 0)g_player.y -= PLAYER_SPEED;
+        if (g_player.y <= 200 && g_stage.no >= 0)
+        {
+            g_player.y = 200;
+            BackScrool(1);
+        }
+    }
+    else if (g_NowKey & PAD_INPUT_DOWN)
+    {
+        if (g_NowKey != g_OldKey)g_player.img = 0;
+        if (g_player.imgtime <= 0)
+        {
+            g_player.img++;
+            if (g_player.img > 3)g_player.img = 0;
+        }
+
+        g_player.y += PLAYER_SPEED;
+    }
+    else if (g_NowKey & PAD_INPUT_LEFT)
+    {
+        if (g_NowKey != g_OldKey) g_player.img = 8;
+        if (g_player.imgtime <= 0)
+        {
+            g_player.img++;
+            if (g_player.img > 11)g_player.img = 8;
+        }
+        g_player.x -= PLAYER_SPEED;
+    }
+    else if (g_NowKey & PAD_INPUT_RIGHT)
+    {
+        if (g_NowKey != g_OldKey) g_player.img = 4;
+        if (g_player.imgtime <= 0)
+        {
+            g_player.img++;
+            if (g_player.img > 7)g_player.img = 4;
+        }
+        g_player.x += PLAYER_SPEED;
+    }
+
+    if (g_player.x > 280)g_player.x = 280;
+    if (g_player.x < 0)g_player.x = 0;
+    if (g_player.y > 400)g_player.y = 400;
+    if (g_player.y < 59 && g_player.x >= 130 && g_player.x <= 150)g_GameMode = 1;
+    if (g_player.y < 60)g_player.y = 60;
+
+    DrawFormatString(0, 0, 0x111FFF, "キャラ画像 = %d", g_player.img);
+    DrawFormatString(0, 20, 0x111FFF, "X = %d", g_player.x);
+    DrawFormatString(0, 40, 0x111FFF, "Y = %d", g_player.y);
+    DrawGraph(g_player.x, g_player.y, g_Player[g_player.img], TRUE);
+}
 
 
+/***********************************************
+ * 矢印の処理
+ * 引  数:なし
+ * 戻り値:なし
+ ***********************************************/
+void ArrowControl()
+{
     if (g_KeyFlg & PAD_INPUT_LEFT)
     {
         g_arrow.no--;
@@ -445,9 +585,10 @@ int LoadImages()
 
     //ステージ背景
     if ((g_StageImage = LoadGraph("images/haikei.png")) == -1)return -1;
-
-    //ヘルプ画面背景
-    if ((g_HelpImage = LoadGraph("images/Help.png")) == -1)return -1;
+    
+    //廊下の画像
+    if ((g_RoadImage = LoadGraph("images/road3.png")) == -1)return -1;
+    if ((g_RoadImage2 = LoadGraph("images/road4.png")) == -1)return -1;
 
     //エンド画面背景
     if ((g_EndImage = LoadGraph("images/EndImage.png")) == -1)return -1;
@@ -456,6 +597,9 @@ int LoadImages()
 
     //プレイヤー矢印画像
     if ((g_Arrow = LoadGraph("images/Arrow.png")) == -1)return -1;
+
+    //プレイヤー画像
+    if (LoadDivGraph("images/player.png", 16, 4, 4, 70, 90, g_Player) == -1) return -1;
 
     return 0;
 }

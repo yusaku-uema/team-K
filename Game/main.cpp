@@ -28,7 +28,8 @@ const int STAGE_NO = 1; //背景の廊下の長さ
  ***********************************************/
 int g_OldKey;  // 前回の入力キー 
 int g_NowKey;  // 今回の入力キー 
-int g_KeyFlg;  // 入力キー情報 
+int g_KeyFlg;  // 入力キー情報
+int Font,Font1; //フォント
 
 int g_GameState = 0;  // ゲームモード 
 
@@ -37,8 +38,6 @@ int g_GameMode = 0; //ゲームモード（神里が作った）
 int g_TitleImage; // 画像用変数 
 int g_Menu; //メニュー画面
 int	g_MenuNumber = 0;		// メニューカーソル位置
-int g_MenuY;				// メニューカーソルのＹ座標
-
 int g_Score = 0; //スコア
 
 int g_WaitTime = 0; //待ち時間
@@ -47,8 +46,7 @@ int Time;   // 現在時間
 
 int g_TakaraBako[4]; //宝箱の画像
 int g_Arrow;  //プレイヤーの矢印の画像
-int g_Player[16];  //プレイヤーの画像
-int g_Applec; //タイトルカーソル変数　消さないで
+int g_cursor; //タイトルカーソル変数　
 
 int g_StageImage;   //ゲームメイン背景
 
@@ -134,6 +132,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
     //描画先画面を裏にする 
     SetDrawScreen(DX_SCREEN_BACK);
 
+    Font = CreateFontToHandle("メイリオ", 30, 9, DX_FONTTYPE_ANTIALIASING_EDGE_8X8);//"メイリオ"  の30pt,太さ3のフォントを作成 
+    Font1= CreateFontToHandle("メイリオ", 50, 14, DX_FONTTYPE_ANTIALIASING_EDGE);
     if (LoadImages() == -1) return -1; //画像読込み関数を呼び出し
 
       //ゲームループ 
@@ -187,13 +187,13 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
  * ゲームタイトル表示
  ***********************************************/
 void DrawGameTitle(void) {
-  
+
     //メニューカーソル移動処理
     if (g_KeyFlg & PAD_INPUT_DOWN) {
         if (++g_MenuNumber > 3) g_MenuNumber = 0;
     }
     if (g_KeyFlg & PAD_INPUT_UP) {
-        if (--g_MenuNumber < 0) g_MenuNumber = 2;
+        if (--g_MenuNumber < 0) g_MenuNumber = 3;
     }
 
     //Ｚキーでメニュー選択
@@ -201,22 +201,27 @@ void DrawGameTitle(void) {
 
     //タイトル画像表示
     DrawGraph(0, 0, g_TitleImage, FALSE);
+    SetDrawBlendMode(DX_BLENDMODE_ALPHA, 128);
+    DrawBox(160, 255, 480, 450, GetColor(255,255,255), TRUE);
+    SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
 
     //メニューカーソル（三角形）の表示
-    g_MenuY = g_MenuNumber * 52;
-    DrawTriangle(240, 255 + g_MenuY, 260, 270 + g_MenuY, 240, 285 + g_MenuY, GetColor(255, 0, 0), TRUE);
+    if (g_MenuNumber == 0 || g_MenuNumber == 1) {
+        DrawGraph(160, 255 + g_MenuNumber * 50, g_cursor, TRUE);
+    }
+    if (g_MenuNumber == 2 || g_MenuNumber == 3) {
+        DrawGraph(225, 255 + g_MenuNumber * 50, g_cursor, TRUE);
+    }
 
     SetFontSize(40);
     //ゲームタイトルを載せる予定
-    DrawString(100, 0, "ゲームタイトル決定後反映", 0xffffff, 0);
-
-    //ステージ選択
-    SetFontSize(30);
-    DrawString(265, 255, "ゲームスタート", 0xffffff, 0);
-    DrawString(265, 307, "ランキング", 0xffffff, 0);
-    DrawString(265, 359, "ヘルプ", 0xffffff, 0);
-    DrawString(265, 411, "エンド", 0xffffff, 0);
-
+    DrawStringToHandle(100, 130, "ゲームタイトル予定", GetColor(255, 255, 255), Font1);
+    
+    DrawStringToHandle(210, 255, "ゲームスタート", GetColor(255, 0, 0), Font);
+    DrawStringToHandle(210, 305, "ランキング", GetColor(255, 0, 0), Font);
+    DrawStringToHandle(275, 355, "ヘルプ", GetColor(255, 0, 0), Font);
+    DrawStringToHandle(275, 405, "エンド", GetColor(255, 0, 0), Font);
+   
 }
 
 /***********************************************
@@ -526,7 +531,7 @@ int LoadImages()
     if ((g_TitleImage = LoadGraph("images/Title.png")) == -1) return -1;
 
     //メニュー
-    if ((g_Applec = LoadGraph("images/Applec.png")) == -1) return -1;
+    if ((g_cursor = LoadGraph("images/cursor.png")) == -1) return -1;
 
     //ステージ背景
     if ((g_StageImage = LoadGraph("images/haikei.png")) == -1)return -1;

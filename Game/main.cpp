@@ -4,6 +4,8 @@
 ********************************************************************/
 #include"DxLib.h"
 #include<math.h>
+#include"keyboard.h"
+
 /***********************************************
  * 定数を宣言
  ***********************************************/
@@ -119,6 +121,7 @@ void PlayerControl(); //プレイヤーの処理
 void ArrowControl();  //プレイヤーの矢印の処理
 void TakaraControl(); //宝箱の処理
 
+void InputRanking();  //ランキング入力
 /***********************************************
  * プログラムの開始
  **********************************************/
@@ -177,7 +180,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
             DrawGameOver();
             break;
         case 7:
-            //InputRanking();
+            InputRanking();
             break;
         }
 
@@ -262,6 +265,9 @@ void GameInit(void)
 
     //現在の経過時間を得る
     g_StartTime = GetNowCount();
+
+    //キーボード初期処理
+    keyboard.KeyBoardInit();
 
     //ゲームメイン処理へ
     g_GameState = 5;
@@ -574,6 +580,13 @@ void DrawHelp(void)
   
 }
 
+void InputRanking()
+{
+    keyboard.DrawKeyBoard();
+    keyboard.KeyBoardControl(g_NowKey);
+    keyboard.Push_B_Key(g_NowKey, &g_GameState, g_Score);
+}
+
 /***********************************************
  * 画像読み込み
  ***********************************************/
@@ -602,6 +615,9 @@ int LoadImages()
 
     //プレイヤー画像
     if (LoadDivGraph("images/player.png", 16, 4, 4, 70, 90, g_Player) == -1) return -1;
+
+    //キーボード諸々画像
+    if (keyboard.LoadImgae() == -1)return -1;
 
     return 0;
 }

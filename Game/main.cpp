@@ -21,7 +21,7 @@ const int PLAYER_SPEED = 3;
 const int PLAYER_IMAGE_TIME = 8;
 
 //背景のやつ
-const int STAGE_NO = 1; //背景の廊下の長さ
+const int STAGE_NO = 2; //背景の廊下の長さ
 
 /***********************************************
  * 変数の宣言
@@ -39,6 +39,7 @@ int g_GameMode = 0; //ゲームモード（神里が作った）
 int g_TitleImage; // 画像用変数 
 int g_Menu; //メニュー画面
 int	g_MenuNumber = 0;		// メニューカーソル位置
+int g_MenuY;
 int g_Score = 0; //スコア
 
 int g_WaitTime = 0; //待ち時間
@@ -206,23 +207,25 @@ void DrawGameTitle(void) {
     DrawBox(160, 255, 480, 450, GetColor(255,255,255), TRUE);
     SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
 
+    g_MenuY = g_MenuNumber * 52;
     //メニューカーソル（三角形）の表示
     if (g_MenuNumber == 0 || g_MenuNumber == 1) {
-        DrawGraph(160, 255 + g_MenuNumber * 50, g_cursor, TRUE);
+        DrawTriangle(180, 255 + g_MenuY, 200, 270 + g_MenuY, 180, 285 + g_MenuY, GetColor(0, 0, 225), TRUE);
+       // DrawGraph(160, 255 + g_MenuNumber * 50, g_cursor, TRUE);
     }
     if (g_MenuNumber == 2 || g_MenuNumber == 3) {
-        DrawGraph(225, 255 + g_MenuNumber * 50, g_cursor, TRUE);
+        DrawTriangle(240, 255 + g_MenuY, 260, 270 + g_MenuY, 240, 285 + g_MenuY, GetColor(0, 0, 225), TRUE);
+       /* DrawGraph(225, 255 + g_MenuNumber * 50, g_cursor, TRUE);*/
     }
-
+    DrawBox(160, 255, 480, 450, GetColor(0, 0, 0), FALSE);
     SetFontSize(40);
     //ゲームタイトルを載せる予定
-    DrawStringToHandle(100, 130, "ゲームタイトル予定", GetColor(255, 255, 255), Font1);
-    
-    DrawStringToHandle(210, 255, "ゲームスタート", GetColor(255, 0, 0), Font);
+    DrawStringToHandle(100, 130, "ゲームタイトル予定",GetColor(255, 255, 255), Font1);
+   
+    DrawStringToHandle(210, 255, "ゲームスタート",GetColor(255, 0, 0), Font);
     DrawStringToHandle(210, 305, "ランキング", GetColor(255, 0, 0), Font);
     DrawStringToHandle(275, 355, "ヘルプ", GetColor(255, 0, 0), Font);
     DrawStringToHandle(275, 405, "エンド", GetColor(255, 0, 0), Font);
-   
 }
 
 /***********************************************
@@ -267,9 +270,9 @@ void GameMain(void)
 {
     switch (g_GameMode) {
     case 0:
-        BackScrool(0);
+       /* BackScrool(0);
         PlayerControl();
-        break;
+        break;*/
     case 1:
         BackImage();
         TakaraControl();
@@ -277,8 +280,8 @@ void GameMain(void)
         break;
     }
     
-    UIView();
-    TimeCount();
+    /*UIView();
+    TimeCount();*/
 
     //スペースキーでメニューに戻る　ゲームメインからタイトルに戻る追加
     if (g_KeyFlg & PAD_INPUT_M)g_GameState = 6;
@@ -397,7 +400,8 @@ void PlayerControl()
     if (g_player.x > 280)g_player.x = 280;
     if (g_player.x < 0)g_player.x = 0;
     if (g_player.y > 400)g_player.y = 400;
-    if (g_player.y < 60)g_GameMode = 1;
+    if (g_player.y < 59 && g_player.x >= 130 && g_player.x <= 150)g_GameMode = 1;
+    if (g_player.y < 60)g_player.y = 60;
 
     DrawFormatString(0, 0, 0x111FFF, "キャラ画像 = %d", g_player.img);
     DrawFormatString(0, 20, 0x111FFF, "X = %d", g_player.x);

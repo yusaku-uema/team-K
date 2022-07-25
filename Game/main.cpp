@@ -599,7 +599,9 @@ int LoadImages()
 
     //プレイヤー矢印画像
     if ((g_Arrow = LoadGraph("images/Arrow.png")) == -1)return -1;
-
+    
+    //ヘルプ画面
+    if ((g_HelpImage = LoadGraph("images/Help.png")) == -1)return -1;
     //プレイヤー画像
     if (LoadDivGraph("images/player.png", 16, 4, 4, 70, 90, g_Player) == -1) return -1;
 

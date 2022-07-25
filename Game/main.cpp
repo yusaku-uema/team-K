@@ -40,7 +40,11 @@ int g_Arrow;  //プレイヤーの矢印の画像
 int g_Applec; //タイトルカーソル変数　消さないで
 
 int g_StageImage;   //ゲームメイン背景
+int g_HelpImage; //ヘルプ背景
+int g_EndImage;//エンド背景
 
+int g_PosY; //佐久本さんが使います
+int Font3, Font4, Font5;//ヘルプ画面とエンド画面のフォント変更
 //プレイヤー矢印の構造体
 struct ARROW
 {
@@ -98,6 +102,10 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
     //描画先画面を裏にする 
     SetDrawScreen(DX_SCREEN_BACK);
 
+    //フォントの見た目替えるよう
+    Font3 = CreateFontToHandle("メイリオ", 50, 9, DX_FONTTYPE_ANTIALIASING_EDGE);//"メイリオ"  の30pt,太さ3のフォントを作成
+    Font4 = CreateFontToHandle("メイリオ", 30, 9, DX_FONTTYPE_ANTIALIASING_EDGE);//"メイリオ"  の30pt,太さ3のフォントを作成
+    Font5 = CreateFontToHandle("メイリオ", 20, 9, DX_FONTTYPE_ANTIALIASING_EDGE);//"メイリオ"  の30pt,太さ3のフォントを作成
     if (LoadImages() == -1) return -1; //画像読込み関数を呼び出し
 
       //ゲームループ 
@@ -356,14 +364,34 @@ void UIView(void)
  ***********************************************/
 void DrawEnd(void)
 {
-    ////エンド画像表示予定
-    //DrawGraph(0, 0, g_EndImage, FALSE);
 
-    SetFontSize(40);
-    DrawString(100, 255,"Thank you for Playing", 0xffffff, 0);
+    //エンド画像表示
+    DrawGraph(0, 0, g_EndImage, FALSE);
 
-    //タイムの加算処理＆終了（3秒後）
-    if (++g_WaitTime > 180)g_GameState = 99;
+    //エンディング表示
+    if (++g_WaitTime < 10000) g_PosY = 400 - g_WaitTime / 2;
+
+    //大きい文字見出し
+    DrawStringToHandle(200, 100 + g_PosY, "タイトル", GetColor(255, 255, 255), Font3);
+
+    DrawStringToHandle(250, 200 + g_PosY, "制作者", GetColor(255, 255, 255), Font4);
+
+    DrawStringToHandle(150, 260 + g_PosY, "       上間　〇〇〇さん", GetColor(255, 255, 255), Font5);
+    DrawStringToHandle(150, 290 + g_PosY, "       神里　〇〇〇さん", GetColor(255, 255, 255), Font5);
+    DrawStringToHandle(150, 320 + g_PosY, "       佐久本　〇〇〇さん", GetColor(255, 255, 255), Font5);
+    DrawStringToHandle(150, 350 + g_PosY, "       川端　〇〇〇さん", GetColor(255, 255, 255), Font5);
+    DrawStringToHandle(150, 380 + g_PosY, "       安里　〇〇〇さん", GetColor(255, 255, 255), Font5);
+    DrawStringToHandle(150, 410 + g_PosY, "       名嘉村　〇〇〇さん", GetColor(255, 255, 255), Font5);
+
+    //２パート
+    DrawStringToHandle(250, 550 + g_PosY, "素材利用", GetColor(255, 255, 255), Font4);
+    DrawStringToHandle(225, 600 + g_PosY, "BGM　 〇〇〇", GetColor(255, 255, 255), Font5);
+    //DrawStringToHandle(150, 650 + g_PosY, "   　　　 　     ", GetColor(255, 255, 255), Font01);
+    DrawStringToHandle(225, 700 + g_PosY, "SE    〇〇〇", GetColor(255, 255, 255), Font5);
+    //DrawStringToHandle(150, 750 + g_PosY, "    　　　　     ", GetColor(255, 255, 255), Font01);
+
+    //タイムの加算処理＆終了
+    if (++g_WaitTime > 2500)g_GameState = 99;
 }
 
 /***********************************************
@@ -374,11 +402,34 @@ void DrawHelp(void)
     //スペースキーでメニューに戻る
     if (g_KeyFlg & PAD_INPUT_M) g_GameState = 0;
 
-    //タイトル画像表示
-    //DrawGraph(0, 0, g_TitleImage, FALSE);
-    SetFontSize(20);
-    DrawString(100, 120, "ヘルプ画面仮", 0xffffff, 0);
-    DrawString(100, 255, "スペースキーを押してタイトルへ戻る ", 0xffffff, 0);
+	////タイトル画面表示
+	DrawGraph(0, 0, g_HelpImage, FALSE);
+
+	SetDrawBlendMode(DX_BLENDMODE_ALPHA, 128);        //ブレンドモードをα(128/255)に設定
+	DrawBox(50, 25, 590, 500, GetColor(255, 255, 255), TRUE);
+	SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
+
+	DrawStringToHandle(200, 50, "ヘルプ画面", GetColor(255, 255, 255), Font3);
+
+	//大きい文字見出し
+	DrawStringToHandle(150, 150, "プレイヤー操作について", GetColor(255, 255, 255), Font4);
+	DrawStringToHandle(300, 250, "宝箱", GetColor(255, 255, 255), Font4);
+
+	//小さい見出し
+	DrawStringToHandle(250, 200, "十字キーで移動", GetColor(255, 255, 255), Font5);
+	DrawStringToHandle(100, 300, "カーソル移動　十字キーで取りたい宝箱を選ぶ", GetColor(255, 255, 255), Font5);
+	DrawStringToHandle(225, 350, "宝箱の決定　Bボタン", GetColor(255, 255, 255), Font5);
+
+	//文字の表示（点滅）
+	if (++g_WaitTime < 30) {
+
+		DrawStringToHandle(150, 425, "---Bボタンでゲームメインに移動---", GetColor(255, 255, 255), Font5);
+	}
+	else if (g_WaitTime > 60) {
+		g_WaitTime = 0;
+	}
+
+  
 }
 
 /***********************************************
@@ -395,6 +446,11 @@ int LoadImages()
     //ステージ背景
     if ((g_StageImage = LoadGraph("images/haikei.png")) == -1)return -1;
 
+    //ヘルプ画面背景
+    if ((g_HelpImage = LoadGraph("images/Help.png")) == -1)return -1;
+
+    //エンド画面背景
+    if ((g_EndImage = LoadGraph("images/EndImage.png")) == -1)return -1;
     //宝箱の画像
     if (LoadDivGraph("images/TakaraBako.png", 4, 2, 2, 60, 60, g_TakaraBako) == -1) return -1;
 

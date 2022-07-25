@@ -38,7 +38,7 @@ int g_TitleImage; // 画像用変数
 int g_Menu; //メニュー画面
 int	g_MenuNumber = 0;		// メニューカーソル位置
 int g_MenuY;				// メニューカーソルのＹ座標
-
+ 
 int g_Score = 0; //スコア
 
 int g_WaitTime = 0; //待ち時間
@@ -46,15 +46,17 @@ int g_StartTime;   // スタート時間
 int Time;   // 現在時間
 
 int g_TakaraBako[4]; //宝箱の画像
+int g_Player[16];
 int g_Arrow;  //プレイヤーの矢印の画像
 int g_Applec; //タイトルカーソル変数　消さないで
 
 int g_StageImage;   //ゲームメイン背景
 int g_HelpImage; //ヘルプ背景
 int g_EndImage;//エンド背景
-
+int g_RoadImage;
+int g_RoadImage2;
 int g_PosY; //佐久本さんが使います
-int Font3, Font4, Font5;//ヘルプ画面とエンド画面のフォント変更
+int Font,Font1,Font3, Font4, Font5;//ヘルプ画面とエンド画面のフォント変更
 //プレイヤー矢印の構造体
 struct ARROW
 {
@@ -135,6 +137,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
     SetDrawScreen(DX_SCREEN_BACK);
 
     //フォントの見た目替えるよう
+    Font =  CreateFontToHandle("メイリオ", 30, 9, DX_FONTTYPE_ANTIALIASING_EDGE);
+    Font1 = CreateFontToHandle("メイリオ", 50, 9, DX_FONTTYPE_ANTIALIASING_EDGE);
     Font3 = CreateFontToHandle("メイリオ", 50, 9, DX_FONTTYPE_ANTIALIASING_EDGE);//"メイリオ"  の30pt,太さ3のフォントを作成
     Font4 = CreateFontToHandle("メイリオ", 30, 9, DX_FONTTYPE_ANTIALIASING_EDGE);//"メイリオ"  の30pt,太さ3のフォントを作成
     Font5 = CreateFontToHandle("メイリオ", 20, 9, DX_FONTTYPE_ANTIALIASING_EDGE);//"メイリオ"  の30pt,太さ3のフォントを作成
@@ -213,11 +217,9 @@ void DrawGameTitle(void) {
     //メニューカーソル（三角形）の表示
     if (g_MenuNumber == 0 || g_MenuNumber == 1) {
         DrawTriangle(180, 255 + g_MenuY, 200, 270 + g_MenuY, 180, 285 + g_MenuY, GetColor(0, 0, 225), TRUE);
-       // DrawGraph(160, 255 + g_MenuNumber * 50, g_cursor, TRUE);
     }
     if (g_MenuNumber == 2 || g_MenuNumber == 3) {
         DrawTriangle(240, 255 + g_MenuY, 260, 270 + g_MenuY, 240, 285 + g_MenuY, GetColor(0, 0, 225), TRUE);
-       /* DrawGraph(225, 255 + g_MenuNumber * 50, g_cursor, TRUE);*/
     }
     DrawBox(160, 255, 480, 450, GetColor(0, 0, 0), FALSE);
     SetFontSize(40);

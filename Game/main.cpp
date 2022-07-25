@@ -13,7 +13,7 @@ const int SCREEN_HEIGHT = 480;
 //制限時間
 const int TIMELIMIT = 30000;
 //宝箱の個数
-const int ENEMY_MAX = 3;
+const int ENEMY_MAX = 7;
 const int TAKARA_TIME = 100;
 
 //プレイヤーのやつ
@@ -246,8 +246,9 @@ void GameInit(void)
     for (int i = 0; i < ENEMY_MAX; i++)
     {
         g_takara[i] = g_enemy00;
-        g_takara[i].point = GetRand(5) * 1000;
+        g_takara[i].point = GetRand(9); //ランダムで値を変える→０が鍵
     }
+    g_takara[GetRand(ENEMY_MAX - 1)].point = 0; //強制的に宝箱一つに０点を代入する
 
     //プレイヤー矢印の初期処理
     g_arrow.y = g_takara[g_arrow.no].y - 100;
@@ -467,16 +468,7 @@ void TakaraControl()
         {
             if (g_takara[i].point <= 0) g_takara[i].img = 1;
             else if (g_takara[i].point > 0)g_takara[i].img = 1;
-            g_takara[i].time--;
             DrawFormatString(g_takara[i].x, g_takara[i].y - 60, 0x00ffff, "%d点", g_takara[i].point);
-
-            if (g_takara[i].time <= 0)
-            {
-                g_takara[i].flg = TRUE;
-                g_takara[i].point = GetRand(5) * 1000;
-                g_takara[i].time = TAKARA_TIME;
-                g_takara[i].img = 0;
-            }
         }
     }
 }

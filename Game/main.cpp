@@ -4,9 +4,6 @@
 ********************************************************************/
 #include"DxLib.h"
 #include<math.h>
-#include"keyboard.h"
-#include"ranking.h"
-
 /***********************************************
  * 定数を宣言
  ***********************************************/
@@ -16,7 +13,7 @@ const int SCREEN_HEIGHT = 480;
 //制限時間
 const int TIMELIMIT = 30000;
 //宝箱の個数
-const int ENEMY_MAX = 7;
+const int ENEMY_MAX = 6;
 const int TAKARA_TIME = 100;
 
 //プレイヤーのやつ
@@ -24,14 +21,16 @@ const int PLAYER_SPEED = 3;
 const int PLAYER_IMAGE_TIME = 8;
 
 //背景のやつ
-const int STAGE_NO = 2; //背景の廊下の長さ
+const int STAGE_NO = 1; //背景の廊下の長さ
 
 /***********************************************
  * 変数の宣言
  ***********************************************/
 int g_OldKey;  // 前回の入力キー 
 int g_NowKey;  // 今回の入力キー 
-int g_KeyFlg;  // 入力キー情報 
+int g_KeyFlg;  // 入力キー情報
+int Font,Font1; //フォント
+int g_Player[16];
 
 int g_GameState = 0;  // ゲームモード 
 
@@ -40,28 +39,22 @@ int g_GameMode = 0; //ゲームモード（神里が作った）
 int g_TitleImage; // 画像用変数 
 int g_Menu; //メニュー画面
 int	g_MenuNumber = 0;		// メニューカーソル位置
-int g_MenuY;				// メニューカーソルのＹ座標
- 
 int g_Score = 0; //スコア
-
-int g_TakaraPosition;
 
 int g_WaitTime = 0; //待ち時間
 int g_StartTime;   // スタート時間
 int Time;   // 現在時間
 
-int g_TakaraBako[2]; //宝箱の画像
-int g_Player[16];
+int g_TakaraBako[4]; //宝箱の画像
 int g_Arrow;  //プレイヤーの矢印の画像
-int g_Applec; //タイトルカーソル変数　消さないで
+int g_cursor; //タイトルカーソル変数　
 
 int g_StageImage;   //ゲームメイン背景
-int g_HelpImage; //ヘルプ背景
-int g_EndImage;//エンド背景
+
 int g_RoadImage;
 int g_RoadImage2;
-int g_PosY; //佐久本さんが使います
-int Font,Font1,Font3, Font4, Font5;//ヘルプ画面とエンド画面のフォント変更
+int g_kakusibeya;
+
 //プレイヤー矢印の構造体
 struct ARROW
 {
@@ -124,8 +117,6 @@ void PlayerControl(); //プレイヤーの処理
 void ArrowControl();  //プレイヤーの矢印の処理
 void TakaraControl(); //宝箱の処理
 
-void DrawRanking();   //ランキング描画
-void InputRanking();  //ランキング入力
 /***********************************************
  * プログラムの開始
  **********************************************/
@@ -143,16 +134,11 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
     //描画先画面を裏にする 
     SetDrawScreen(DX_SCREEN_BACK);
 
-    //フォントの見た目替えるよう
-    Font =  CreateFontToHandle("メイリオ", 30, 9, DX_FONTTYPE_ANTIALIASING_EDGE);
-    Font1 = CreateFontToHandle("メイリオ", 50, 9, DX_FONTTYPE_ANTIALIASING_EDGE);
-    Font3 = CreateFontToHandle("メイリオ", 50, 9, DX_FONTTYPE_ANTIALIASING_EDGE);//"メイリオ"  の30pt,太さ3のフォントを作成
-    Font4 = CreateFontToHandle("メイリオ", 30, 9, DX_FONTTYPE_ANTIALIASING_EDGE);//"メイリオ"  の30pt,太さ3のフォントを作成
-    Font5 = CreateFontToHandle("メイリオ", 20, 9, DX_FONTTYPE_ANTIALIASING_EDGE);//"メイリオ"  の30pt,太さ3のフォントを作成
+    Font = CreateFontToHandle("メイリオ", 30, 9, DX_FONTTYPE_ANTIALIASING_EDGE_8X8);//"メイリオ"  の30pt,太さ3のフォントを作成 
+    Font1= CreateFontToHandle("メイリオ", 50, 14, DX_FONTTYPE_ANTIALIASING_EDGE);
     if (LoadImages() == -1) return -1; //画像読込み関数を呼び出し
-    if (ranking.ReadRanking() == -1) return -1; //ランキング読み込み
 
-      //ゲームループ 
+    //ゲームループ 
     while (ProcessMessage() == 0 && g_GameState != 99) {
         //キー入力取得 
         g_OldKey = g_NowKey;
@@ -170,7 +156,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
             GameInit();
             break;
         case 2:
-            DrawRanking();
+            //DrawRanking();
             break;
         case 3:
             DrawHelp();
@@ -185,7 +171,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
             DrawGameOver();
             break;
         case 7:
-            InputRanking();
+            //InputRanking();
             break;
         }
 
@@ -203,7 +189,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
  * ゲームタイトル表示
  ***********************************************/
 void DrawGameTitle(void) {
-  
+
     //メニューカーソル移動処理
     if (g_KeyFlg & PAD_INPUT_DOWN) {
         if (++g_MenuNumber > 3) g_MenuNumber = 0;
@@ -221,23 +207,23 @@ void DrawGameTitle(void) {
     DrawBox(160, 255, 480, 450, GetColor(255,255,255), TRUE);
     SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
 
-    g_MenuY = g_MenuNumber * 52;
     //メニューカーソル（三角形）の表示
     if (g_MenuNumber == 0 || g_MenuNumber == 1) {
-        DrawTriangle(180, 255 + g_MenuY, 200, 270 + g_MenuY, 180, 285 + g_MenuY, GetColor(0, 0, 225), TRUE);
+        DrawGraph(160, 255 + g_MenuNumber * 50, g_cursor, TRUE);
     }
     if (g_MenuNumber == 2 || g_MenuNumber == 3) {
-        DrawTriangle(240, 255 + g_MenuY, 260, 270 + g_MenuY, 240, 285 + g_MenuY, GetColor(0, 0, 225), TRUE);
+        DrawGraph(225, 255 + g_MenuNumber * 50, g_cursor, TRUE);
     }
-    DrawBox(160, 255, 480, 450, GetColor(0, 0, 0), FALSE);
+
     SetFontSize(40);
     //ゲームタイトルを載せる予定
-    DrawStringToHandle(100, 130, "ゲームタイトル予定",GetColor(255, 255, 255), Font1);
-   
-    DrawStringToHandle(210, 255, "ゲームスタート",GetColor(255, 0, 0), Font);
+    DrawStringToHandle(100, 130, "ゲームタイトル予定", GetColor(255, 255, 255), Font1);
+    
+    DrawStringToHandle(210, 255, "ゲームスタート", GetColor(255, 0, 0), Font);
     DrawStringToHandle(210, 305, "ランキング", GetColor(255, 0, 0), Font);
     DrawStringToHandle(275, 355, "ヘルプ", GetColor(255, 0, 0), Font);
     DrawStringToHandle(275, 405, "エンド", GetColor(255, 0, 0), Font);
+   
 }
 
 /***********************************************
@@ -252,9 +238,8 @@ void GameInit(void)
     for (int i = 0; i < ENEMY_MAX; i++)
     {
         g_takara[i] = g_enemy00;
-        g_takara[i].point = GetRand(9); //ランダムで値を変える→０が鍵
+        g_takara[i].point = GetRand(5) * 1000;
     }
-    g_takara[GetRand(ENEMY_MAX - 1)].point = 0; //強制的に宝箱一つに０点を代入する
 
     //プレイヤー矢印の初期処理
     g_arrow.y = g_takara[g_arrow.no].y - 100;
@@ -272,9 +257,6 @@ void GameInit(void)
     //現在の経過時間を得る
     g_StartTime = GetNowCount();
 
-    //キーボード初期処理
-    keyboard.KeyBoardInit();
-
     //ゲームメイン処理へ
     g_GameState = 5;
 }
@@ -286,9 +268,9 @@ void GameMain(void)
 {
     switch (g_GameMode) {
     case 0:
-       /* BackScrool(0);
+        BackScrool(0);
         PlayerControl();
-        break;*/
+        break;
     case 1:
         BackImage();
         TakaraControl();
@@ -296,8 +278,8 @@ void GameMain(void)
         break;
     }
     
-    /*UIView();
-    TimeCount();*/
+    UIView();
+    TimeCount();
 
     //スペースキーでメニューに戻る　ゲームメインからタイトルに戻る追加
     if (g_KeyFlg & PAD_INPUT_M)g_GameState = 6;
@@ -331,8 +313,8 @@ void DrawGameOver(void)
 
 
 /***********************************************
- * 背景画像スクロール処理
- * 引  数:なし
+ * 背景画像スクロール処理(廊下）
+ * 引  数:あり
  * 戻り値:なし
  ***********************************************/
 void BackScrool(int a)
@@ -416,8 +398,7 @@ void PlayerControl()
     if (g_player.x > 280)g_player.x = 280;
     if (g_player.x < 0)g_player.x = 0;
     if (g_player.y > 400)g_player.y = 400;
-    if (g_player.y < 59 && g_player.x >= 130 && g_player.x <= 150)g_GameMode = 1;
-    if (g_player.y < 60)g_player.y = 60;
+    if (g_player.y < 60)g_GameMode = 1;
 
     DrawFormatString(0, 0, 0x111FFF, "キャラ画像 = %d", g_player.img);
     DrawFormatString(0, 20, 0x111FFF, "X = %d", g_player.x);
@@ -436,12 +417,12 @@ void ArrowControl()
     if (g_KeyFlg & PAD_INPUT_LEFT)
     {
         g_arrow.no--;
-        if (g_arrow.no < 0) g_arrow.no = ENEMY_MAX - 1;
+        if (g_arrow.no < 0) g_arrow.no = 5;
     }
     else if (g_KeyFlg & PAD_INPUT_RIGHT)
     {
         g_arrow.no++;
-        if (g_arrow.no > ENEMY_MAX - 1) g_arrow.no = 0;
+        if (g_arrow.no > 5) g_arrow.no = 0;
     }
 
     else if (g_KeyFlg & PAD_INPUT_A)
@@ -465,19 +446,26 @@ void ArrowControl()
  ***********************************************/
 void TakaraControl()
 {
-    g_TakaraPosition = (640 - ((ENEMY_MAX * 60) + ((ENEMY_MAX - 1) * 20))) / 2;
-
     for (int i = 0; i < ENEMY_MAX; i++)
     {
-        g_takara[i].x = i * 80 + g_TakaraPosition;
+        g_takara[i].x = i * 70 + 30;
         DrawGraph(g_takara[i].x, g_takara[i].y, g_TakaraBako[g_takara[i].img], TRUE); //敵の表示
 
 
         if (g_takara[i].flg == FALSE)
         {
             if (g_takara[i].point <= 0) g_takara[i].img = 1;
-            else if (g_takara[i].point > 0)g_takara[i].img = 1;
+            else if (g_takara[i].point > 0)g_takara[i].img = 2;
+            g_takara[i].time--;
             DrawFormatString(g_takara[i].x, g_takara[i].y - 60, 0x00ffff, "%d点", g_takara[i].point);
+
+            if (g_takara[i].time <= 0)
+            {
+                g_takara[i].flg = TRUE;
+                g_takara[i].point = GetRand(5) * 1000;
+                g_takara[i].time = TAKARA_TIME;
+                g_takara[i].img = 0;
+            }
         }
     }
 }
@@ -511,34 +499,47 @@ void UIView(void)
  ***********************************************/
 void DrawEnd(void)
 {
+    //エンド画像表示予定
+    DrawGraph(0, 0, g_kakusibeya, FALSE);
 
-    //エンド画像表示
-    DrawGraph(0, 0, g_EndImage, FALSE);
+    // ********** フォントのロード **********
+    LPCSTR font_path = "azukiP.ttf"; // 読み込むフォントファイルのパス
+    if (AddFontResourceEx(font_path, FR_PRIVATE, NULL) > 0) {
+    }
+    else {
+        // フォント読込エラー処理
+        MessageBox(NULL, "フォント読込失敗", "", MB_OK);
+    }
 
-    //エンディング表示
-    if (++g_WaitTime < 10000) g_PosY = 400 - g_WaitTime / 2;
+    SetFontSize(40);
+    ChangeFont("あずきフォントP", DX_CHARSET_DEFAULT);
+    /*DrawString(100, 255,"Thank you for Playing", 0xffffff, 0);*/
+    DrawString(255, 30, "チームK", 0xffffff, 0);
+    DrawString(100, 150, "安里和也", 0xffffff, 0);
+    DrawString(100, 100, "名嘉村亜澄真", 0xffffff, 0);
+    DrawString(400, 100, "川畑勇快", 0xffffff, 0);
+    DrawString(400, 150, "神里晃汰", 0xffffff, 0);
+    DrawString(100, 200, "上間優咲", 0xffffff, 0);
+    DrawString(400, 200, "佐久本盛杏", 0xffffff, 0);
+    DrawString(220, 255, "フリー素材", 0xffffff, 0);
+    DrawString(250, 300, "?", 0xffffff, 0);
+    DrawString(310, 300, "?", 0xffffff, 0);
+    DrawString(370, 300, "?", 0xffffff, 0);
+    DrawString(370, 350, "?", 0xffffff, 0);
+    DrawString(250, 350, "?", 0xffffff, 0);
+    DrawString(310, 350, "?", 0xffffff, 0);
 
-    //大きい文字見出し
-    DrawStringToHandle(200, 100 + g_PosY, "タイトル", GetColor(255, 255, 255), Font3);
 
-    DrawStringToHandle(250, 200 + g_PosY, "制作者", GetColor(255, 255, 255), Font4);
+    // ********** フォントのアンロード **********
+    if (RemoveFontResourceEx(font_path, FR_PRIVATE, NULL)) {
+    }
+    else {
+        MessageBox(NULL, "remove failure", "", MB_OK);
+    }
+    
 
-    DrawStringToHandle(150, 260 + g_PosY, "       上間　〇〇〇さん", GetColor(255, 255, 255), Font5);
-    DrawStringToHandle(150, 290 + g_PosY, "       神里　〇〇〇さん", GetColor(255, 255, 255), Font5);
-    DrawStringToHandle(150, 320 + g_PosY, "       佐久本　〇〇〇さん", GetColor(255, 255, 255), Font5);
-    DrawStringToHandle(150, 350 + g_PosY, "       川端　〇〇〇さん", GetColor(255, 255, 255), Font5);
-    DrawStringToHandle(150, 380 + g_PosY, "       安里　〇〇〇さん", GetColor(255, 255, 255), Font5);
-    DrawStringToHandle(150, 410 + g_PosY, "       名嘉村　〇〇〇さん", GetColor(255, 255, 255), Font5);
-
-    //２パート
-    DrawStringToHandle(225, 550 + g_PosY, "素材利用", GetColor(255, 255, 255), Font4);
-    DrawStringToHandle(205, 600 + g_PosY, "BGM　 〇〇〇", GetColor(255, 255, 255), Font5);
-    //DrawStringToHandle(150, 650 + g_PosY, "   　　　 　     ", GetColor(255, 255, 255), Font01);
-    DrawStringToHandle(205, 700 + g_PosY, "SE    〇〇〇", GetColor(255, 255, 255), Font5);
-    //DrawStringToHandle(150, 750 + g_PosY, "    　　　　     ", GetColor(255, 255, 255), Font01);
-
-    //タイムの加算処理＆終了
-    if (++g_WaitTime > 2500)g_GameState = 99;
+    //タイムの加算処理＆終了（3秒後）
+    if (++g_WaitTime > 300)g_GameState = 99;
 }
 
 /***********************************************
@@ -549,66 +550,11 @@ void DrawHelp(void)
     //スペースキーでメニューに戻る
     if (g_KeyFlg & PAD_INPUT_M) g_GameState = 0;
 
-	////タイトル画面表示
-	DrawGraph(0, 0, g_HelpImage, FALSE);
-
-	SetDrawBlendMode(DX_BLENDMODE_ALPHA, 128);        //ブレンドモードをα(128/255)に設定
-	DrawBox(50, 25, 590, 500, GetColor(255, 255, 255), TRUE);
-	SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
-
-	DrawStringToHandle(200, 50, "ヘルプ画面", GetColor(255, 255, 255), Font3);
-
-	//大きい文字見出し
-	DrawStringToHandle(150, 150, "プレイヤー操作について", GetColor(255, 255, 255), Font4);
-	DrawStringToHandle(300, 250, "宝箱", GetColor(255, 255, 255), Font4);
-
-	//小さい見出し
-	DrawStringToHandle(250, 200, "十字キーで移動", GetColor(255, 255, 255), Font5);
-	DrawStringToHandle(100, 300, "カーソル移動　十字キーで取りたい宝箱を選ぶ", GetColor(255, 255, 255), Font5);
-	DrawStringToHandle(225, 350, "宝箱の決定　Bボタン", GetColor(255, 255, 255), Font5);
-
-	//文字の表示（点滅）
-	if (++g_WaitTime < 30) {
-
-		DrawStringToHandle(150, 425, "---Bボタンでゲームメインに移動---", GetColor(255, 255, 255), Font5);
-	}
-	else if (g_WaitTime > 60) {
-		g_WaitTime = 0;
-	}
-
-  
-}
-
-/***********************************************
- * ランキング入力
- ***********************************************/
-void InputRanking()
-{
-    keyboard.DrawKeyBoard();
-    keyboard.KeyBoardControl(g_NowKey);
-    keyboard.Push_B_Key(g_NowKey, &g_GameState, g_Score);
-}
-
-/***********************************************
- * ランキング描画
- ***********************************************/
-void DrawRanking()
-{
-    // Bボタン or Xキー でタイトルに戻る
-    if (g_KeyFlg & PAD_INPUT_B) g_GameState = 0;
-
-    //ランキング画像表示
-    //DrawGraph(0, 0, g_RankingImage, FALSE);
-
-    ranking.DrawRanking();
-
-    // 文字の表示(点滅)
-    if (++g_WaitTime < 30)
-    {
-        SetFontSize(24);
-        DrawString(150, 450, "--  Press B button or X Key  --", 0xFF0000);
-    }
-    else if (g_WaitTime > 60) g_WaitTime = 0;
+    //タイトル画像表示
+    //DrawGraph(0, 0, g_TitleImage, FALSE);
+    SetFontSize(20);
+    DrawString(100, 120, "ヘルプ画面仮", 0xffffff, 0);
+    DrawString(100, 255, "スペースキーを押してタイトルへ戻る ", 0xffffff, 0);
 }
 
 /***********************************************
@@ -620,7 +566,7 @@ int LoadImages()
     if ((g_TitleImage = LoadGraph("images/Title.png")) == -1) return -1;
 
     //メニュー
-    if ((g_Applec = LoadGraph("images/Applec.png")) == -1) return -1;
+    if ((g_cursor = LoadGraph("images/cursor.png")) == -1) return -1;
 
     //ステージ背景
     if ((g_StageImage = LoadGraph("images/haikei.png")) == -1)return -1;
@@ -629,21 +575,17 @@ int LoadImages()
     if ((g_RoadImage = LoadGraph("images/road3.png")) == -1)return -1;
     if ((g_RoadImage2 = LoadGraph("images/road4.png")) == -1)return -1;
 
-    //エンド画面背景
-    if ((g_EndImage = LoadGraph("images/EndImage.png")) == -1)return -1;
     //宝箱の画像
-    if (LoadDivGraph("images/takarabako.png", 2, 2, 1, 60, 60, g_TakaraBako) == -1) return -1;
+    if (LoadDivGraph("images/TakaraBako.png", 3, 3, 1, 60, 60, g_TakaraBako) == -1) return -1;
 
     //プレイヤー矢印画像
     if ((g_Arrow = LoadGraph("images/Arrow.png")) == -1)return -1;
-    
-    //ヘルプ画面
-    if ((g_HelpImage = LoadGraph("images/Help.png")) == -1)return -1;
+
     //プレイヤー画像
     if (LoadDivGraph("images/player.png", 16, 4, 4, 70, 90, g_Player) == -1) return -1;
 
-    //キーボード諸々画像
-    if (keyboard.LoadImgae() == -1)return -1;
+    //エンド画像
+    if ((g_kakusibeya = LoadGraph("images/kakusibeya.png")) == -1)return -1;
 
     return 0;
 }

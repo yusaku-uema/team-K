@@ -367,40 +367,29 @@ void GameMain(void)
  ***********************************************/
 void DrawStage()
 {
-    if (g_NowStage <= 1) {
+    int ay, by;
+
+    if (g_NowStage <= 1)
+    {
         DrawGraph(0, 0, g_DrawStageImages, FALSE);
-        SetFontSize(50);
-        DrawFormatString(280, 170, GetColor(255, 255, 255), "%dŠK", g_NowStage);//170
-        DrawFormatString(290, 270, GetColor(255, 255, 255), "~", g_NowStage);//270
-        DrawFormatString(360, 270, GetColor(255, 255, 255), "%d", g_player.hp);//270,
-        DrawGraph(230, 270, g_HeartImage, TRUE);
+        ay = 170, by = 270;
     }
-    else if (g_NowStage >= 2) {
+    else if (g_NowStage >= 2) 
+    {
         DrawGraph(0, 100, g_DrawStageImages1, FALSE);
-        SetFontSize(50);
-        DrawFormatString(280, 40, GetColor(255, 255, 255), "%dŠK", g_NowStage);//170
-        DrawFormatString(290, 430, GetColor(255, 255, 255), "~", g_NowStage);//270
-        DrawFormatString(360, 430, GetColor(255, 255, 255), "%d", g_player.hp);//270,
-        DrawGraph(230, 430, g_HeartImage, TRUE);
+        ay = 40, by = 430;
     }
+    SetFontSize(50);
+    DrawFormatString(280, ay, GetColor(255, 255, 255), "%dŠK", g_NowStage);
+    DrawFormatString(290, by, GetColor(255, 255, 255), "~", g_NowStage);
+    DrawFormatString(360, by, GetColor(255, 255, 255), "%d", g_player.hp);
+    DrawGraph(230, by, g_HeartImage, TRUE);
 
-    //ƒ^ƒCƒ€‚Ì‰ÁŽZˆ—•I—¹
-    if (++g_WaitTime > 100 || g_KeyFlg & PAD_INPUT_A) {
-       /* SetFontSize(50);
-        DrawFormatString(280, 170, 0xffffff, "%dŠK", g_NowStage);
-        DrawFormatString(290, 270, 0xffffff, "~", g_NowStage);
-        DrawFormatString(360, 270, 0xffffff, "%d", g_player.hp);*/
-
-
-        DrawGraph(230, 270, g_HeartImage, TRUE);
-
-        //ƒ^ƒCƒ€‚Ì‰ÁŽZˆ—•I—¹i3•bŒãj
-        if (++g_WaitTime > 180) {
-            g_GameMode = 1;
-            g_WaitTime = 0;
-
-        }
-    }
+    if (++g_WaitTime > 100 || g_KeyFlg & PAD_INPUT_A)
+    {
+        g_GameMode = 1;
+        g_WaitTime = 0;
+    }  
 }
 
 /***********************************************

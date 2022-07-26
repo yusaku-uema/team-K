@@ -35,7 +35,7 @@ int g_OldKey;  // 前回の入力キー
 int g_NowKey;  // 今回の入力キー 
 int g_KeyFlg;  // 入力キー情報 
 
-int g_WalkOldKey  = 0;
+int g_WalkOldKey = 0;
 
 int g_GameState = 0;  // ゲームモード 
 
@@ -87,9 +87,9 @@ int s_RoadBGM;//廊下BGM用変数
 //プレイヤー矢印の構造体
 struct ARROW
 {
-    int x, y;      //座標x,y
-    int no;
-    int oldkey;
+	int x, y;      //座標x,y
+	int no;
+	int oldkey;
 };
 //プレイヤー
 struct ARROW g_arrow;
@@ -97,10 +97,10 @@ struct ARROW g_arrow;
 //プレイヤーの構造体
 struct PLAYER
 {
-    int x, y;      //座標x,y
-    int img;
-    int imgtime;
-    int hp;
+	int x, y;      //座標x,y
+	int img;
+	int imgtime;
+	int hp;
 };
 //プレイヤー
 struct PLAYER g_player;
@@ -108,25 +108,25 @@ struct PLAYER g_player;
 //廊下の背景画像の構造体（神里が使う）
 struct STAGE
 {
-    int no;
-    int img;
-    int x;
-    int y;
+	int no;
+	int img;
+	int x;
+	int y;
 };
 struct STAGE g_stage;
 
 
 //宝箱の構造体
 struct TAKARA {
-    int flg; //使用フラグ
-    int type; //タイプ
-    int img; //画像
-    int x, y; //座標x,y,幅w,高さh
-    int point; //宝の得点
+	int flg; //使用フラグ
+	int type; //タイプ
+	int img; //画像
+	int x, y; //座標x,y,幅w,高さh
+	int point; //宝の得点
 };
 //敵機
 struct TAKARA g_takara[TREASUREBOX_MAX];
-struct TAKARA g_treasurebox00 = { TRUE,0,0,30,300,0};
+struct TAKARA g_treasurebox00 = { TRUE,0,0,30,300,0 };
 
 /***********************************************
  * 関数のプロトタイプ宣言
@@ -157,80 +157,80 @@ int LoadSounds(); //音声読み込み
  * プログラムの開始
  **********************************************/
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
-    LPSTR lpCmdLine, int nCmdShow)
+	LPSTR lpCmdLine, int nCmdShow)
 {
-    //タイトルを設定
-    SetMainWindowText("アケロダンジョン君（仮）");
-    //ウィンドウモードで起動する 
-    ChangeWindowMode(TRUE);
+	//タイトルを設定
+	SetMainWindowText("アケロダンジョン君（仮）");
+	//ウィンドウモードで起動する 
+	ChangeWindowMode(TRUE);
 
-    // DX ライブラリの初期化処理:エラーが起きたら直ちに終了 
-    if (DxLib_Init() == -1) return -1;
+	// DX ライブラリの初期化処理:エラーが起きたら直ちに終了 
+	if (DxLib_Init() == -1) return -1;
 
-    //描画先画面を裏にする 
-    SetDrawScreen(DX_SCREEN_BACK);
+	//描画先画面を裏にする 
+	SetDrawScreen(DX_SCREEN_BACK);
 
-    //フォントの見た目替えるよう
-    Font =  CreateFontToHandle("メイリオ", 30, 9, DX_FONTTYPE_ANTIALIASING_EDGE);
-    Font1 = CreateFontToHandle("メイリオ", 50, 9, DX_FONTTYPE_ANTIALIASING_EDGE);
-    Font3 = CreateFontToHandle("メイリオ", 50, 9, DX_FONTTYPE_ANTIALIASING_EDGE);//"メイリオ"  の30pt,太さ3のフォントを作成
-    Font4 = CreateFontToHandle("メイリオ", 30, 9, DX_FONTTYPE_ANTIALIASING_EDGE);//"メイリオ"  の30pt,太さ3のフォントを作成
-    Font5 = CreateFontToHandle("メイリオ", 20, 9, DX_FONTTYPE_ANTIALIASING_EDGE);//"メイリオ"  の30pt,太さ3のフォントを作成
-    if (LoadImages() == -1) return -1; //画像読込み関数を呼び出し
-    if (LoadSounds() == -1) return -1; //音声読込み関数を呼び出し
-    if (ranking.ReadRanking() == -1) return -1;
-      //ゲームループ 
-    while (ProcessMessage() == 0 && g_GameState != 99) {
-        //キー入力取得 
-        g_OldKey = g_NowKey;
-        g_NowKey = GetJoypadInputState(DX_INPUT_KEY_PAD1); //ゲームパッドを持ってきていない人用に後でゲームパッドのみに変更
-        g_KeyFlg = g_NowKey & ~g_OldKey;
+	//フォントの見た目替えるよう
+	Font = CreateFontToHandle("メイリオ", 30, 9, DX_FONTTYPE_ANTIALIASING_EDGE);
+	Font1 = CreateFontToHandle("メイリオ", 50, 9, DX_FONTTYPE_ANTIALIASING_EDGE);
+	Font3 = CreateFontToHandle("メイリオ", 50, 9, DX_FONTTYPE_ANTIALIASING_EDGE);//"メイリオ"  の30pt,太さ3のフォントを作成
+	Font4 = CreateFontToHandle("メイリオ", 30, 9, DX_FONTTYPE_ANTIALIASING_EDGE);//"メイリオ"  の30pt,太さ3のフォントを作成
+	Font5 = CreateFontToHandle("メイリオ", 20, 9, DX_FONTTYPE_ANTIALIASING_EDGE);//"メイリオ"  の30pt,太さ3のフォントを作成
+	if (LoadImages() == -1) return -1; //画像読込み関数を呼び出し
+	if (LoadSounds() == -1) return -1; //音声読込み関数を呼び出し
+	if (ranking.ReadRanking() == -1) return -1;
+	//ゲームループ 
+	while (ProcessMessage() == 0 && g_GameState != 99) {
+		//キー入力取得 
+		g_OldKey = g_NowKey;
+		g_NowKey = GetJoypadInputState(DX_INPUT_KEY_PAD1); //ゲームパッドを持ってきていない人用に後でゲームパッドのみに変更
+		g_KeyFlg = g_NowKey & ~g_OldKey;
 
-        // 画面の初期化 
-        ClearDrawScreen();
+		// 画面の初期化 
+		ClearDrawScreen();
 
-        switch (g_GameState) {
-        case 0:
-            DrawGameTitle(); //ゲームタイトル描画処理
-            break;
-        case 1:
-            GameInit();
-            break;
-        case 2:
-            DrawRanking();
-            break;
-        case 3:
-            DrawHelp();
-            break;
-        case 4:
-            DrawEnd();
-            break;
-        case 5:
-            GameMain();
-            break;
-        case 6:
-            DrawGameOver();
-            break;
-        case 7:
-            InputRanking();
-            break;
-        }
+		switch (g_GameState) {
+		case 0:
+			DrawGameTitle(); //ゲームタイトル描画処理
+			break;
+		case 1:
+			GameInit();
+			break;
+		case 2:
+			DrawRanking();
+			break;
+		case 3:
+			DrawHelp();
+			break;
+		case 4:
+			DrawEnd();
+			break;
+		case 5:
+			GameMain();
+			break;
+		case 6:
+			DrawGameOver();
+			break;
+		case 7:
+			InputRanking();
+			break;
+		}
 
-        if (g_GameState != 0) {
-            StopSoundMem(s_TitleBGM);
-        }
-        if (g_GameState != 5) {
-            StopSoundMem(s_RoadBGM);
-        }
+		if (g_GameState != 0) {
+			StopSoundMem(s_TitleBGM);
+		}
+		if (g_GameState != 5) {
+			StopSoundMem(s_RoadBGM);
+		}
 
-        //裏画面の内容を表画面に反映します 
-        ScreenFlip();
-    }
-    //DX ライブラリ使用の終了処理 
-    DxLib_End();
+		//裏画面の内容を表画面に反映します 
+		ScreenFlip();
+	}
+	//DX ライブラリ使用の終了処理 
+	DxLib_End();
 
-    //ソフトの終了 
-    return 0;
+	//ソフトの終了 
+	return 0;
 }
 
 /***********************************************
@@ -238,48 +238,48 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
  ***********************************************/
 void DrawGameTitle(void) {
 
-    if (CheckSoundMem(s_TitleBGM) != 1) {
-        ChangeVolumeSoundMem(70, s_TitleBGM);
-        PlaySoundMem(s_TitleBGM, DX_PLAYTYPE_LOOP, TRUE);
-    }
+	if (CheckSoundMem(s_TitleBGM) != 1) {
+		ChangeVolumeSoundMem(70, s_TitleBGM);
+		PlaySoundMem(s_TitleBGM, DX_PLAYTYPE_LOOP, TRUE);
+	}
 
-    //メニューカーソル移動処理
-    if (g_KeyFlg & PAD_INPUT_DOWN) {
-        if (++g_MenuNumber > 3) g_MenuNumber = 0;
-    }
-    if (g_KeyFlg & PAD_INPUT_UP) {
-        if (--g_MenuNumber < 0) g_MenuNumber = 3;
-    }
+	//メニューカーソル移動処理
+	if (g_KeyFlg & PAD_INPUT_DOWN) {
+		if (++g_MenuNumber > 3) g_MenuNumber = 0;
+	}
+	if (g_KeyFlg & PAD_INPUT_UP) {
+		if (--g_MenuNumber < 0) g_MenuNumber = 3;
+	}
 
-    //Ｚキーでメニュー選択
-    if (g_KeyFlg & PAD_INPUT_A) g_GameState = g_MenuNumber + 1;
+	//Ｚキーでメニュー選択
+	if (g_KeyFlg & PAD_INPUT_A) g_GameState = g_MenuNumber + 1;
 
-    //タイトル画像表示
-    DrawGraph(0, 0, g_TitleImage, FALSE);
-    SetDrawBlendMode(DX_BLENDMODE_ALPHA, 128);
-    DrawBox(160, 245, 480, 450, GetColor(255,255,255), TRUE); //透明なボックス追加
-    SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
+	//タイトル画像表示
+	DrawGraph(0, 0, g_TitleImage, FALSE);
+	SetDrawBlendMode(DX_BLENDMODE_ALPHA, 128);
+	DrawBox(160, 245, 480, 450, GetColor(255, 255, 255), TRUE); //透明なボックス追加
+	SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
 
-    g_MenuY = g_MenuNumber * 52;
-    //メニューカーソル（三角形）の表示
-    if (g_MenuNumber == 0) { //ゲームスタートの時のカーソル
-        DrawTriangle(180, 255 + g_MenuY, 200, 270 + g_MenuY, 180, 285 + g_MenuY, GetColor(0, 0, 225), TRUE);
-    }
-    if (g_MenuNumber == 1) {
-        DrawTriangle(210, 255 + g_MenuY, 230, 270 + g_MenuY, 210, 285 + g_MenuY, GetColor(0, 0, 225), TRUE);
-    }
-    if (g_MenuNumber == 2 || g_MenuNumber == 3) {
-        DrawTriangle(240, 255 + g_MenuY, 260, 270 + g_MenuY, 240, 285 + g_MenuY, GetColor(0, 0, 225), TRUE);
-    }
-    DrawBox(160, 245, 480, 450, GetColor(0, 0, 0), FALSE); //透明なボックスに黒い線を追加
-    SetFontSize(40);
-    //ゲームタイトルを載せる予定
-    DrawStringToHandle(100, 130, "ゲームタイトル予定",GetColor(255, 255, 255), Font1);
-   
-    DrawStringToHandle(210, 255, "ゲームスタート",GetColor(255, 0, 0), Font);
-    DrawStringToHandle(240, 305, "ランキング", GetColor(255, 0, 0), Font);
-    DrawStringToHandle(275, 355, "ヘルプ", GetColor(255, 0, 0), Font);
-    DrawStringToHandle(275, 405, "エンド", GetColor(255, 0, 0), Font);
+	g_MenuY = g_MenuNumber * 52;
+	//メニューカーソル（三角形）の表示
+	if (g_MenuNumber == 0) { //ゲームスタートの時のカーソル
+		DrawTriangle(180, 255 + g_MenuY, 200, 270 + g_MenuY, 180, 285 + g_MenuY, GetColor(0, 0, 225), TRUE);
+	}
+	if (g_MenuNumber == 1) {
+		DrawTriangle(210, 255 + g_MenuY, 230, 270 + g_MenuY, 210, 285 + g_MenuY, GetColor(0, 0, 225), TRUE);
+	}
+	if (g_MenuNumber == 2 || g_MenuNumber == 3) {
+		DrawTriangle(240, 255 + g_MenuY, 260, 270 + g_MenuY, 240, 285 + g_MenuY, GetColor(0, 0, 225), TRUE);
+	}
+	DrawBox(160, 245, 480, 450, GetColor(0, 0, 0), FALSE); //透明なボックスに黒い線を追加
+	SetFontSize(40);
+	//ゲームタイトルを載せる予定
+	DrawStringToHandle(100, 130, "ゲームタイトル予定", GetColor(255, 255, 255), Font1);
+
+	DrawStringToHandle(210, 255, "ゲームスタート", GetColor(255, 0, 0), Font);
+	DrawStringToHandle(240, 305, "ランキング", GetColor(255, 0, 0), Font);
+	DrawStringToHandle(275, 355, "ヘルプ", GetColor(255, 0, 0), Font);
+	DrawStringToHandle(275, 405, "エンド", GetColor(255, 0, 0), Font);
 }
 
 /***********************************************
@@ -287,48 +287,48 @@ void DrawGameTitle(void) {
  ***********************************************/
 void GameInit(void)
 {
-    //スコアの初期処理6
-    g_Score = 0;
+	//スコアの初期処理6
+	g_Score = 0;
 
-    //現在のステージ
-    g_NowStage = 1;
+	//現在のステージ
+	g_NowStage = 1;
 
-    //宝箱を開けてるかの処理
-    g_OpenBox = -1;
-    g_BoxQuantity = 2;
+	//宝箱を開けてるかの処理
+	g_OpenBox = -1;
+	g_BoxQuantity = 2;
 
-    //エネミーの初期処理
-    for (int i = 0; i < g_BoxQuantity; i++)
-    {
-        g_takara[i] = g_treasurebox00;
-        g_takara[i].point = GetRand(3); //ランダムで値を変える→０が鍵
-    }
-    g_takara[GetRand(g_BoxQuantity - 1)].point = 0; //強制的に宝箱一つに０点を代入する
+	//エネミーの初期処理
+	for (int i = 0; i < g_BoxQuantity; i++)
+	{
+		g_takara[i] = g_treasurebox00;
+		g_takara[i].point = GetRand(3); //ランダムで値を変える→０が鍵
+	}
+	g_takara[GetRand(g_BoxQuantity - 1)].point = 0; //強制的に宝箱一つに０点を代入する
 
-    //プレイヤー矢印の初期処理
-    g_arrow.no = 0;
-    g_arrow.y = g_takara[g_arrow.no].y - 100;
-    g_arrow.x = g_takara[g_arrow.no].x;
-
-
-    //プレイヤー初期処理
-
-    g_player = { 290, 400, 13, PLAYER_IMAGE_TIME, PLAYER_HP};
+	//プレイヤー矢印の初期処理
+	g_arrow.no = 0;
+	g_arrow.y = g_takara[g_arrow.no].y - 100;
+	g_arrow.x = g_takara[g_arrow.no].x;
 
 
-    //背景画像(廊下）の初期処理
-    g_stage = { STAGE_NO, g_RoadImage, 0, 0 };
+	//プレイヤー初期処理
 
-    g_GameMode = 0;
+	g_player = { 290, 400, 13, PLAYER_IMAGE_TIME, PLAYER_HP };
 
-    //現在の経過時間を得る
-    g_StartTime = GetNowCount();
 
-    //キーボード（ランキング入力）初期処理
-    keyboard.KeyBoardInit();
+	//背景画像(廊下）の初期処理
+	g_stage = { STAGE_NO, g_RoadImage, 0, 0 };
 
-    //ゲームメイン処理へ
-    g_GameState = 5;
+	g_GameMode = 0;
+
+	//現在の経過時間を得る
+	g_StartTime = GetNowCount();
+
+	//キーボード（ランキング入力）初期処理
+	keyboard.KeyBoardInit();
+
+	//ゲームメイン処理へ
+	g_GameState = 5;
 }
 
 /***********************************************
@@ -336,30 +336,30 @@ void GameInit(void)
  ***********************************************/
 void GameMain(void)
 {
-    switch (g_GameMode) {
-    case 0:
-        DrawStage();
-        break;
-    case 1:
-        BackScrool(0);
-        PlayerControl();
-        if (CheckSoundMem(s_RoadBGM) != 1) {
-            ChangeVolumeSoundMem(70, s_RoadBGM);
-            PlaySoundMem(s_RoadBGM, DX_PLAYTYPE_LOOP, TRUE);
-        }
-        break;
-    case 2:
-        BackImage();
-        TakaraControl();
-        ArrowControl();
-        if (g_OpenBox > -1)OpenTreasureBox();
-        break;
-    }
+	switch (g_GameMode) {
+	case 0:
+		DrawStage();
+		break;
+	case 1:
+		BackScrool(0);
+		PlayerControl();
+		if (CheckSoundMem(s_RoadBGM) != 1) {
+			ChangeVolumeSoundMem(70, s_RoadBGM);
+			PlaySoundMem(s_RoadBGM, DX_PLAYTYPE_LOOP, TRUE);
+		}
+		break;
+	case 2:
+		BackImage();
+		TakaraControl();
+		ArrowControl();
+		if (g_OpenBox > -1)OpenTreasureBox();
+		break;
+	}
 
-    //スペースキーでメニューに戻る　ゲームメインからタイトルに戻る追加
-    if (g_KeyFlg & PAD_INPUT_M)g_GameState = 6;
-    SetFontSize(16);
-    //DrawString(150, 450, "---スペースキーを押してゲームオーバーへ---", 0xffffff, 0);
+	//スペースキーでメニューに戻る　ゲームメインからタイトルに戻る追加
+	if (g_KeyFlg & PAD_INPUT_M)g_GameState = 6;
+	SetFontSize(16);
+	//DrawString(150, 450, "---スペースキーを押してゲームオーバーへ---", 0xffffff, 0);
 }
 
 /***********************************************
@@ -367,30 +367,30 @@ void GameMain(void)
  ***********************************************/
 void DrawStage()
 {
-    int ay, by;
+	int ay, by;
 
-    if (g_NowStage <= 1)
-    {
-        DrawGraph(0, 0, g_DrawStageImages, FALSE);
-        ay = 170, by = 270;
-    }
-    else if (g_NowStage >= 2) 
-    {
-        DrawGraph(0, 100, g_DrawStageImages1, FALSE);
-        ay = 40, by = 430;
-    }
-    SetFontSize(50);
-    DrawFormatString(280, ay, GetColor(255, 255, 255), "%d階", g_NowStage);
-    DrawFormatString(290, by, GetColor(255, 255, 255), "×", g_NowStage);
-    DrawFormatString(360, by, GetColor(255, 255, 255), "%d", g_player.hp);
-    DrawGraph(230, by, g_HeartImage, TRUE);
+	if (g_NowStage <= 1)
+	{
+		DrawGraph(0, 0, g_DrawStageImages, FALSE);
+		ay = 170, by = 270;
+	}
+	else if (g_NowStage >= 2)
+	{
+		DrawGraph(0, 100, g_DrawStageImages1, FALSE);
+		ay = 40, by = 430;
+	}
+	SetFontSize(50);
+	DrawFormatString(280, ay, GetColor(255, 255, 255), "%d階", g_NowStage);
+	DrawFormatString(290, by, GetColor(255, 255, 255), "×", g_NowStage);
+	DrawFormatString(360, by, GetColor(255, 255, 255), "%d", g_player.hp);
+	DrawGraph(230, by, g_HeartImage, TRUE);
 
-   
-    if (++g_WaitTime > 100 || g_KeyFlg & PAD_INPUT_A)
-    {
-        g_GameMode = 1;
-        g_WaitTime = 0;
-    }  
+
+	if (++g_WaitTime > 100 || g_KeyFlg & PAD_INPUT_A)
+	{
+		g_GameMode = 1;
+		g_WaitTime = 0;
+	}
 }
 
 /***********************************************
@@ -398,26 +398,26 @@ void DrawStage()
  ***********************************************/
 void DrawGameOver(void)
 {
-    DrawGraph(0, 0, g_GameOverImage, 0);
+	DrawGraph(0, 0, g_GameOverImage, 0);
 
-    //スペースキーでメニューに戻る
-    if (g_KeyFlg & PAD_INPUT_M)   g_GameState = 0;
+	//スペースキーでメニューに戻る
+	if (g_KeyFlg & PAD_INPUT_M)   g_GameState = 0;
 
-   
-   
 
-    SetDrawBlendMode(DX_BLENDMODE_ALPHA, 128);        //ブレンドモードをα(128/255)に設定
-    DrawBox(50, 25, 590, 500, GetColor(0, 0, 0), TRUE);
-    SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
 
-    DrawStringToHandle(130, 100, "GAME   OVER", GetColor(255,0, 0), Font3);
-   \
-    SetFontSize(35);
 
-    DrawFormatString(180, 250, 0xFFFFFF, "最終階層 = %02d階", g_NowStage);
+	SetDrawBlendMode(DX_BLENDMODE_ALPHA, 128);        //ブレンドモードをα(128/255)に設定
+	DrawBox(50, 25, 590, 500, GetColor(0, 0, 0), TRUE);
+	SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
 
-    SetFontSize(20);
-    DrawString(150, 450, "---スペースキーを押してタイトルへ戻る ---", 0xffffff, 0);
+	DrawStringToHandle(130, 100, "GAME   OVER", GetColor(255, 0, 0), Font3);
+	\
+		SetFontSize(35);
+
+	DrawFormatString(180, 250, 0xFFFFFF, "最終階層 = %02d階", g_NowStage);
+
+	SetFontSize(20);
+	DrawString(150, 450, "---スペースキーを押してタイトルへ戻る ---", 0xffffff, 0);
 }
 
 
@@ -429,23 +429,23 @@ void DrawGameOver(void)
  ***********************************************/
 void BackScrool(int a)
 {
-    DrawGraph(g_stage.x, g_stage.y, g_stage.img, FALSE);
-    if (g_stage.no > 0)DrawGraph(g_stage.x, g_stage.y - 480, g_stage.img, FALSE);
-    else if (g_stage.no <= 0) DrawGraph(g_stage.x, g_stage.y - 480, g_RoadImage2, FALSE);
+	DrawGraph(g_stage.x, g_stage.y, g_stage.img, FALSE);
+	if (g_stage.no > 0)DrawGraph(g_stage.x, g_stage.y - 480, g_stage.img, FALSE);
+	else if (g_stage.no <= 0) DrawGraph(g_stage.x, g_stage.y - 480, g_RoadImage2, FALSE);
 
-    g_stage.y += (PLAYER_SPEED * a);
+	g_stage.y += (PLAYER_SPEED * a);
 
-    if (g_stage.y >= 480)
-    {
-        g_stage.y = 0;
-        g_stage.no--;
-        if (g_stage.no < 0)g_stage.img = g_RoadImage2;
-    }
+	if (g_stage.y >= 480)
+	{
+		g_stage.y = 0;
+		g_stage.no--;
+		if (g_stage.no < 0)g_stage.img = g_RoadImage2;
+	}
 }
 
 void BackImage()
 {
-    DrawGraph(0, 100, g_StageImage, FALSE);
+	DrawGraph(0, 100, g_StageImage, FALSE);
 }
 
 /***********************************************
@@ -455,79 +455,79 @@ void BackImage()
  ***********************************************/
 void PlayerControl()
 {
-    
 
-    if (g_NowKey & PAD_INPUT_UP)
-    {
-        if (g_WalkOldKey != 8)g_player.img = 12;
-        g_WalkOldKey = 8;
-        if (g_player.imgtime <= 0)
-        {
-            g_player.img++;
-            if (g_player.img > 15)g_player.img = 12;
-        }
-        if (g_player.y > 200 || g_stage.no < 0)g_player.y -= PLAYER_SPEED;
-        if (g_player.y <= 200 && g_stage.no >= 0)
-        {
-            g_player.y = 200;
-            BackScrool(1);
-        }
-    }
-    else if (g_NowKey & PAD_INPUT_DOWN)
-    {
-        if (g_WalkOldKey != 1)g_player.img = 0;
-        g_WalkOldKey = 1;
-        if (g_player.imgtime <= 0)
-        {
-            g_player.img++;
-            if (g_player.img > 3)g_player.img = 0;
-        }
 
-        g_player.y += PLAYER_SPEED;
-    }
-    else if (g_NowKey & PAD_INPUT_LEFT)
-    {
-        if (g_WalkOldKey != 2) g_player.img = 8;
-        g_WalkOldKey = 2;
-        if (g_player.imgtime <= 0)
-        {
-            g_player.img++;
-            if (g_player.img > 11)g_player.img = 8;
-        }
-        g_player.x -= PLAYER_SPEED;
-    }
-    else if (g_NowKey & PAD_INPUT_RIGHT)
-    {
-        if (g_WalkOldKey != 4) g_player.img = 4;
-        g_WalkOldKey = 4;
-        if (g_player.imgtime <= 0)
-        {
-            g_player.img++;
-            if (g_player.img > 7)g_player.img = 4;
-        }
-        g_player.x += PLAYER_SPEED;
-    }
+	if (g_NowKey & PAD_INPUT_UP)
+	{
+		if (g_WalkOldKey != 8)g_player.img = 12;
+		g_WalkOldKey = 8;
+		if (g_player.imgtime <= 0)
+		{
+			g_player.img++;
+			if (g_player.img > 15)g_player.img = 12;
+		}
+		if (g_player.y > 200 || g_stage.no < 0)g_player.y -= PLAYER_SPEED;
+		if (g_player.y <= 200 && g_stage.no >= 0)
+		{
+			g_player.y = 200;
+			BackScrool(1);
+		}
+	}
+	else if (g_NowKey & PAD_INPUT_DOWN)
+	{
+		if (g_WalkOldKey != 1)g_player.img = 0;
+		g_WalkOldKey = 1;
+		if (g_player.imgtime <= 0)
+		{
+			g_player.img++;
+			if (g_player.img > 3)g_player.img = 0;
+		}
 
-    if (g_player.imgtime <= 0)g_player.imgtime = PLAYER_IMAGE_TIME;
-    g_player.imgtime--;
+		g_player.y += PLAYER_SPEED;
+	}
+	else if (g_NowKey & PAD_INPUT_LEFT)
+	{
+		if (g_WalkOldKey != 2) g_player.img = 8;
+		g_WalkOldKey = 2;
+		if (g_player.imgtime <= 0)
+		{
+			g_player.img++;
+			if (g_player.img > 11)g_player.img = 8;
+		}
+		g_player.x -= PLAYER_SPEED;
+	}
+	else if (g_NowKey & PAD_INPUT_RIGHT)
+	{
+		if (g_WalkOldKey != 4) g_player.img = 4;
+		g_WalkOldKey = 4;
+		if (g_player.imgtime <= 0)
+		{
+			g_player.img++;
+			if (g_player.img > 7)g_player.img = 4;
+		}
+		g_player.x += PLAYER_SPEED;
+	}
 
-    DrawFormatString(0, 60, 0x111FFF, "%d", g_WalkOldKey);
+	if (g_player.imgtime <= 0)g_player.imgtime = PLAYER_IMAGE_TIME;
+	g_player.imgtime--;
 
-    if (g_player.x > 435)g_player.x = 435;
-    if (g_player.x < 145)g_player.x = 145;
-    if (g_player.y > 400)g_player.y = 400;
-    if (g_player.y < 59 && g_player.x >= 270 && g_player.x <= 320)g_GameMode = 2;
-    if (g_player.y < 60)g_player.y = 60;
+	DrawFormatString(0, 60, 0x111FFF, "%d", g_WalkOldKey);
 
-    for (int i = 0; i < g_player.hp; i++)
-    {
-        DrawGraph(55 * i, 10, g_HeartImage, TRUE);
-    }
+	if (g_player.x > 435)g_player.x = 435;
+	if (g_player.x < 145)g_player.x = 145;
+	if (g_player.y > 400)g_player.y = 400;
+	if (g_player.y < 59 && g_player.x >= 270 && g_player.x <= 320)g_GameMode = 2;
+	if (g_player.y < 60)g_player.y = 60;
 
-    DrawFormatString(0, 0, 0x111FFF, "キャラ画像 = %d", g_player.img);
-    DrawFormatString(0, 20, 0x111FFF, "X = %d", g_player.x);
-    DrawFormatString(0, 40, 0x111FFF, "Y = %d", g_player.y);
-    DrawGraph(g_player.x, g_player.y, g_Player[g_player.img], TRUE);
+	for (int i = 0; i < g_player.hp; i++)
+	{
+		DrawGraph(55 * i, 10, g_HeartImage, TRUE);
+	}
+
+	DrawFormatString(0, 0, 0x111FFF, "キャラ画像 = %d", g_player.img);
+	DrawFormatString(0, 20, 0x111FFF, "X = %d", g_player.x);
+	DrawFormatString(0, 40, 0x111FFF, "Y = %d", g_player.y);
+	DrawGraph(g_player.x, g_player.y, g_Player[g_player.img], TRUE);
 }
 
 
@@ -538,50 +538,50 @@ void PlayerControl()
  ***********************************************/
 void ArrowControl()
 {
-    if (g_OpenBox == -1)
-    {
-        if (g_KeyFlg & PAD_INPUT_LEFT)
-        {
-            g_arrow.no--;
-            if (g_arrow.no < 0) g_arrow.no = g_BoxQuantity - 1;
-        }
-        else if (g_KeyFlg & PAD_INPUT_RIGHT)
-        {
-            g_arrow.no++;
-            if (g_arrow.no > g_BoxQuantity - 1) g_arrow.no = 0;
-        }
+	if (g_OpenBox == -1)
+	{
+		if (g_KeyFlg & PAD_INPUT_LEFT)
+		{
+			g_arrow.no--;
+			if (g_arrow.no < 0) g_arrow.no = g_BoxQuantity - 1;
+		}
+		else if (g_KeyFlg & PAD_INPUT_RIGHT)
+		{
+			g_arrow.no++;
+			if (g_arrow.no > g_BoxQuantity - 1) g_arrow.no = 0;
+		}
 
-        else if (g_KeyFlg & PAD_INPUT_A)
-        {
-            if (g_takara[g_arrow.no].flg == TRUE)
-            {
-                g_Score += g_takara[g_arrow.no].point;
-            }
-            g_OpenBox = g_arrow.no;
-            g_KeyFlg = 0;
-        }
-    }
+		else if (g_KeyFlg & PAD_INPUT_A)
+		{
+			if (g_takara[g_arrow.no].flg == TRUE)
+			{
+				g_Score += g_takara[g_arrow.no].point;
+			}
+			g_OpenBox = g_arrow.no;
+			g_KeyFlg = 0;
+		}
+	}
 
-    if (g_OpenBox <= -1)
-    {
-        DrawGraph(10, 380, g_PlayerIkon, TRUE);  //プレイヤーアイコン
-        SetFontSize(10);
-        DrawString(70, 380, "プレイヤー", 0xFFFFFF, TRUE);
+	if (g_OpenBox <= -1)
+	{
+		DrawGraph(10, 380, g_PlayerIkon, TRUE);  //プレイヤーアイコン
+		SetFontSize(10);
+		DrawString(70, 380, "プレイヤー", 0xFFFFFF, TRUE);
 
-        SetFontSize(40);
-        DrawString(150, 400, "どれにしようかな？", 0xffffff, TRUE);
+		SetFontSize(40);
+		DrawString(150, 400, "どれにしようかな？", 0xffffff, TRUE);
 
-       
-    }
-  
-    g_arrow.x = g_takara[g_arrow.no].x;
 
-    for (int i = 0; i < g_player.hp; i++)
-    {
-        DrawGraph(55 * i, 10, g_HeartImage, TRUE);
-    }
+	}
 
-    DrawGraph(g_arrow.x, g_arrow.y, g_Arrow, TRUE);
+	g_arrow.x = g_takara[g_arrow.no].x;
+
+	for (int i = 0; i < g_player.hp; i++)
+	{
+		DrawGraph(55 * i, 10, g_HeartImage, TRUE);
+	}
+
+	DrawGraph(g_arrow.x, g_arrow.y, g_Arrow, TRUE);
 }
 
 /***********************************************
@@ -591,14 +591,14 @@ void ArrowControl()
  ***********************************************/
 void TakaraControl()
 {
-    g_TakaraPosition = (640 - ((g_BoxQuantity * 60) + ((g_BoxQuantity - 1) * 20))) / 2;
+	g_TakaraPosition = (640 - ((g_BoxQuantity * 60) + ((g_BoxQuantity - 1) * 20))) / 2;
 
-    for (int i = 0; i < g_BoxQuantity; i++)
-    {
-        g_takara[i].x = i * 80 + g_TakaraPosition;
-        DrawGraph(g_takara[i].x, g_takara[i].y, g_TakaraBako[g_takara[i].img], TRUE); //宝箱の表示
-        DrawFormatString(g_takara[i].x,  g_takara[i].y - 20, 0xFFFFFF, "%d", g_takara[i].point);
-    }
+	for (int i = 0; i < g_BoxQuantity; i++)
+	{
+		g_takara[i].x = i * 80 + g_TakaraPosition;
+		DrawGraph(g_takara[i].x, g_takara[i].y, g_TakaraBako[g_takara[i].img], TRUE); //宝箱の表示
+		DrawFormatString(g_takara[i].x, g_takara[i].y - 20, 0xFFFFFF, "%d", g_takara[i].point);
+	}
 }
 
 /***********************************************
@@ -608,164 +608,155 @@ void TakaraControl()
  ***********************************************/
 void OpenTreasureBox()
 {
-    SetFontSize(40);
+	SetFontSize(40);
 
-    if (g_takara[g_OpenBox].point <= 0) //宝箱の中身がカギ（0）だった時
-    {
-        g_takara[g_OpenBox].img = 1;  //からの宝箱の画像に切り替える
-        SetDrawBlendMode(DX_BLENDMODE_ALPHA, 150);        //ブレンドモードをα(128/255)に設定
-        DrawBox(180, 100, 460, 380, GetColor(255, 255, 255), TRUE);
-        SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
-        DrawGraph(180, 100, g_KeyImage, TRUE); //鍵の画像を表示させる
+	if (g_takara[g_OpenBox].point <= 0) //宝箱の中身がカギ（0）だった時
+	{
+		g_takara[g_OpenBox].img = 1;  //からの宝箱の画像に切り替える
+		SetDrawBlendMode(DX_BLENDMODE_ALPHA, 150);        //ブレンドモードをα(128/255)に設定
+		DrawBox(180, 100, 460, 380, GetColor(255, 255, 255), TRUE);
+		SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
+		DrawGraph(180, 100, g_KeyImage, TRUE); //鍵の画像を表示させる
+		DrawString(150, 400, "やったー！カギだ！", 0xffffff, TRUE);
+		DrawGraph(10, 380, g_PlayerIkon, TRUE);  //プレイヤーアイコン
+		SetFontSize(10);
+		DrawString(70, 380, "プレイヤー", 0xFFFFFF, TRUE);
+	}
 
-        DrawString(150, 400, "やったー！カギだ！", 0xffffff, TRUE);
+	else if (g_takara[g_OpenBox].point > 0) //宝箱の中身がミミック（0以外）だった時
+	{
+		if (g_takara[g_OpenBox].point >= 2) {
+			if (g_takara[g_OpenBox].flg == TRUE)
+			{
+				g_takara[g_OpenBox].img = 2;  //ミミックの画像に切り替える
+				SetDrawBlendMode(DX_BLENDMODE_ALPHA, 150);        //ブレンドモードをα(128/255)に設定
+				DrawBox(180, 100, 460, 380, GetColor(255, 255, 255), TRUE);
+				SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
+				DrawGraph(180, 100, g_MimicImage, TRUE);  //ミミックの画像を表示
+				SetFontSize(40);
+				DrawString(160, 400, "ミッ、ミミックだ！", 0xffffff, TRUE);
+				DrawGraph(10, 380, g_PlayerIkon, TRUE);  //プレイヤーアイコン
+				SetFontSize(10);
+				DrawString(70, 380, "プレイヤー", 0xFFFFFF, TRUE);
+			}
+			else if (g_takara[g_OpenBox].flg == FALSE)
+			{
+				SetFontSize(40);
+				DrawString(180, 400, "さわると危険だ！", 0xffffff, TRUE);
+				DrawGraph(10, 380, g_PlayerIkon, TRUE);  //プレイヤーアイコン
+				SetFontSize(10);
+				DrawString(70, 380, "プレイヤー", 0xFFFFFF, TRUE);
+			}
+		}
+		if (g_takara[g_OpenBox].point == 1) {
+			if (g_takara[g_OpenBox].flg == TRUE)
+			{
+				g_takara[g_OpenBox].img = 1;  //空の画像に切り替える
+				SetDrawBlendMode(DX_BLENDMODE_ALPHA, 150);        //ブレンドモードをα(128/255)に設定
+				DrawBox(180, 100, 460, 380, GetColor(255, 255, 255), TRUE);
+				SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
+				DrawGraph(180, 100, g_HeartImage1, TRUE);  //ミミックの画像を表示
+				DrawGraph(10, 380, g_PlayerIkon, TRUE);  //プレイヤーアイコン
+				SetFontSize(10);
+				DrawString(70, 380, "プレイヤー", 0xFFFFFF, TRUE);
+			}
+			if (g_player.hp == PLAYER_HP) { //HPがMAXの時に表示する
+				SetFontSize(40);
+				DrawString(230, 400, "HPがMAXだ!", 0xffffff, TRUE);
+			}
+			else if (g_player.hp < PLAYER_HP) { //HPが減っていた時に表示する。
+				SetFontSize(40);
+				DrawString(160, 400, "HPが１回復した!", 0xffffff, TRUE);
+			}
+		}
+		else if (g_takara[g_OpenBox].flg == FALSE)
+		{
+			SetFontSize(40);
+			DrawString(180, 400, "中身がからっぽだ！", 0xffffff, TRUE);
+			DrawGraph(10, 380, g_PlayerIkon, TRUE);  //プレイヤーアイコン
+			SetFontSize(10);
+			DrawString(70, 380, "プレイヤー", 0xFFFFFF, TRUE);
+		}
+	}
 
-        DrawGraph(10, 380, g_PlayerIkon, TRUE);  //プレイヤーアイコン
-        SetFontSize(10);
-        DrawString(70, 380, "プレイヤー", 0xFFFFFF, TRUE);
-    }
+	if (g_KeyFlg & PAD_INPUT_A) //ミミックかカギの画像が表示されているとき何かのキーを押すと
+	{
+		if (g_takara[g_OpenBox].point > 1)  //ミミックだった場合
+		{
+			if (g_takara[g_OpenBox].flg == TRUE) g_player.hp--; //プレイヤーのHPをマイナス1する
+			g_takara[g_OpenBox].flg = FALSE;
 
+			if (g_player.hp <= 0)g_GameState = 6;  //HPが0になった時ゲームオーバーにする
 
-    else if (g_takara[g_OpenBox].point > 0) //宝箱の中身がミミック（0以外）だった時
-    {
-      if(g_takara[g_OpenBox].point>=2){
-        if (g_takara[g_OpenBox].flg == TRUE)
-        {
-            g_takara[g_OpenBox].img = 2;  //ミミックの画像に切り替える
-            SetDrawBlendMode(DX_BLENDMODE_ALPHA, 150);        //ブレンドモードをα(128/255)に設定
-            DrawBox(180, 100, 460, 380, GetColor(255, 255, 255), TRUE);
-            SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
-            DrawGraph(180, 100, g_MimicImage, TRUE);  //ミミックの画像を表示
-            
-            DrawString(160, 400, "ミッ、ミミックだ！", 0xffffff, TRUE);
+			g_OpenBox = -1; //g_OpenBoxを-1にすると宝箱を選択できるようになる
+		}
+		else if (g_takara[g_OpenBox].point == 1) {
+			if (g_takara[g_OpenBox].flg == TRUE) {
+				if (g_player.hp < PLAYER_HP) { //最大HPなら回復しない
+					g_player.hp++; //プレイヤーのHPをプラス１する
+				}
+				g_takara[g_OpenBox].flg = FALSE;
+			}
+			if (g_player.hp <= 0)g_GameState = 6;  //HPが0になった時ゲームオーバーにする
 
-            DrawGraph(10, 380, g_PlayerIkon, TRUE);  //プレイヤーアイコン
-            SetFontSize(10);
-            DrawString(70, 380, "プレイヤー", 0xFFFFFF, TRUE);
-        }
-        else if(g_takara[g_OpenBox].flg == FALSE)
-        {
-           
-            DrawString(180, 400, "さわると危険だ！", 0xffffff, TRUE);
+			g_OpenBox = -1; //g_OpenBoxを-1にすると宝箱を選択できるようになる
 
-            DrawGraph(10, 380, g_PlayerIkon, TRUE);  //プレイヤーアイコン
-            SetFontSize(10);
-            DrawString(70, 380, "プレイヤー", 0xFFFFFF, TRUE);
-        }
-      }
-      if (g_takara[g_OpenBox].point == 1) {
-          if (g_takara[g_OpenBox].flg == TRUE)
-          {
-              g_takara[g_OpenBox].img = 1;  //ミミックの画像に切り替える
-              SetDrawBlendMode(DX_BLENDMODE_ALPHA, 150);        //ブレンドモードをα(128/255)に設定
-              DrawBox(180, 100, 460, 380, GetColor(255, 255, 255), TRUE);
-              SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
-              DrawGraph(180, 100, g_HeartImage1, TRUE);  //ミミックの画像を表示
+		}
+		else //鍵を取った時はいろいろ初期化する
+		{
+			g_NowStage++; //ステージに1足す
+			g_OpenBox = -1;
 
-              DrawString(160, 400, "HPが１回復した!", 0xffffff, TRUE);
+			g_BoxQuantity = GetRand(TREASUREBOX_MAX - 2) + 2;
+			//宝箱の中身を変える
+			for (int i = 0; i < g_BoxQuantity; i++)
+			{
+				g_takara[i] = g_treasurebox00;
+				g_takara[i].point = GetRand(3); //ランダムで値を変える→０が鍵
+			}
+			g_takara[GetRand(g_BoxQuantity - 1)].point = 0; //強制的に宝箱一つに０点を代入する
 
-              DrawGraph(10, 380, g_PlayerIkon, TRUE);  //プレイヤーアイコン
-              SetFontSize(10);
-              DrawString(70, 380, "プレイヤー", 0xFFFFFF, TRUE);
-          }
-              if (g_player.hp == PLAYER_HP) { //HPがMAXの時に表示する
-                  DrawString(230, 400, "HPがMAXだ!", 0xffffff, TRUE);
-              }
-              else if (g_player.hp < PLAYER_HP){ //HPが減っていた時に表示する。
-                  DrawString(160, 400, "HPが１回復した!", 0xffffff, TRUE);
-              }
-          }
-          else if (g_takara[g_OpenBox].flg == FALSE)
-          {
-             
-              DrawString(180, 400, "中身がからっぽだ！", 0xffffff, TRUE);
+			//選択カーソルの位置を初期位置に戻す
+			g_arrow.no = 0;
+			g_arrow.y = g_takara[g_arrow.no].y - 100;
+			g_arrow.x = g_takara[g_arrow.no].x;
 
-              DrawGraph(10, 380, g_PlayerIkon, TRUE);  //プレイヤーアイコン
-              SetFontSize(10);
-              DrawString(70, 380, "プレイヤー", 0xFFFFFF, TRUE);
-          }
-      }
+			//プレイヤー初期処理
+			g_player.x = 290;
+			g_player.y = 400;
+			g_player.img = 13;
 
-    }
+			//背景画像(廊下）の初期処理
+			g_stage = { STAGE_NO, g_RoadImage, 0, 0 };
 
-    if (g_KeyFlg & PAD_INPUT_A) //ミミックかカギの画像が表示されているとき何かのキーを押すと
-    {
-        if (g_takara[g_OpenBox].point >1)  //ミミックだった場合
-        {
-            if(g_takara[g_OpenBox].flg == TRUE) g_player.hp--; //プレイヤーのHPをマイナス1する
-            g_takara[g_OpenBox].flg = FALSE;
-
-            if (g_player.hp <= 0)g_GameState = 6;  //HPが0になった時ゲームオーバーにする
-
-            g_OpenBox = -1; //g_OpenBoxを-1にすると宝箱を選択できるようになる
-        }
-        else if (g_takara[g_OpenBox].point == 1) {
-            if (g_takara[g_OpenBox].flg == TRUE) {
-                if (g_player.hp < PLAYER_HP) { //最大HPなら回復しない
-                    g_player.hp++; //プレイヤーのHPをプラス１する
-                }
-                g_takara[g_OpenBox].flg = FALSE;
-            }
-            if (g_player.hp <= 0)g_GameState = 6;  //HPが0になった時ゲームオーバーにする
-
-            g_OpenBox = -1; //g_OpenBoxを-1にすると宝箱を選択できるようになる
-
-        }
-        else //鍵を取った時はいろいろ初期化する
-        {
-            g_NowStage++; //ステージに1足す
-            g_OpenBox = -1;
-
-            g_BoxQuantity = GetRand(TREASUREBOX_MAX - 2) + 2;
-            //宝箱の中身を変える
-            for (int i = 0; i < g_BoxQuantity; i++)
-            {
-                g_takara[i] = g_treasurebox00;
-                g_takara[i].point = GetRand(3); //ランダムで値を変える→０が鍵
-            }
-            g_takara[GetRand(g_BoxQuantity - 1)].point = 0; //強制的に宝箱一つに０点を代入する
-
-            //選択カーソルの位置を初期位置に戻す
-            g_arrow.no = 0;
-            g_arrow.y = g_takara[g_arrow.no].y - 100;
-            g_arrow.x = g_takara[g_arrow.no].x;
-
-            //プレイヤー初期処理
-            g_player.x = 290;
-            g_player.y = 400;
-            g_player.img = 13;
-
-            //背景画像(廊下）の初期処理
-            g_stage = { STAGE_NO, g_RoadImage, 0, 0 };
-
-            g_GameMode = 0;
-        }
-    }
+			g_GameMode = 0;
+		}
+	}
 }
 
 void TimeCount(void)
 {
-    //制限時間を過ぎたらゲームオーバー
-    Time = TIMELIMIT - (GetNowCount() - g_StartTime);
-    if (Time <= 0)
-    {
-        g_GameState = 6;
-    }
-    SetFontSize(50);
-    DrawFormatString(570, 100, 0xffffff, "%2d", Time / 1000);
+	//制限時間を過ぎたらゲームオーバー
+	Time = TIMELIMIT - (GetNowCount() - g_StartTime);
+	if (Time <= 0)
+	{
+		g_GameState = 6;
+	}
+	SetFontSize(50);
+	DrawFormatString(570, 100, 0xffffff, "%2d", Time / 1000);
 }
 
 void UIView(void)
 {
-    
-    ////UI「TIME」表示
-    //SetFontSize(50);
-    //DrawString(520, 40, "TIME", 0xffffff, 0);
 
-    ////UI「SCORE」表示
-    //SetFontSize(45);
-    //DrawString(510, 320, "SCORE", 0xffffff, 0);
-    //DrawFormatString(510, 360, 0x00ffff, "%d", g_Score);
+	////UI「TIME」表示
+	//SetFontSize(50);
+	//DrawString(520, 40, "TIME", 0xffffff, 0);
+
+	////UI「SCORE」表示
+	//SetFontSize(45);
+	//DrawString(510, 320, "SCORE", 0xffffff, 0);
+	//DrawFormatString(510, 360, 0x00ffff, "%d", g_Score);
 }
 
 /***********************************************
@@ -774,36 +765,36 @@ void UIView(void)
 void DrawEnd(void)
 {
 
-    //エンド画像表示
-    DrawGraph(0, 0, g_EndImage, FALSE);
+	//エンド画像表示
+	DrawGraph(0, 0, g_EndImage, FALSE);
 
-    //エンディング表示
-    if (++g_WaitTime < 10000) g_PosY = 400 - g_WaitTime / 2;
+	//エンディング表示
+	if (++g_WaitTime < 10000) g_PosY = 400 - g_WaitTime / 2;
 
-    //大きい文字見出し
-    DrawStringToHandle(200, 100 + g_PosY, "タイトル", GetColor(255, 255, 255), Font3);
+	//大きい文字見出し
+	DrawStringToHandle(200, 100 + g_PosY, "タイトル", GetColor(255, 255, 255), Font3);
 
-    DrawStringToHandle(250, 200 + g_PosY, "制作者", GetColor(255, 255, 255), Font4);
+	DrawStringToHandle(250, 200 + g_PosY, "制作者", GetColor(255, 255, 255), Font4);
 
-    DrawStringToHandle(150, 260 + g_PosY, "       上間　〇〇〇さん", GetColor(255, 255, 255), Font5);
-    DrawStringToHandle(150, 290 + g_PosY, "       神里　〇〇〇さん", GetColor(255, 255, 255), Font5);
-    DrawStringToHandle(150, 320 + g_PosY, "       佐久本　〇〇〇さん", GetColor(255, 255, 255), Font5);
-    DrawStringToHandle(150, 350 + g_PosY, "       川端　〇〇〇さん", GetColor(255, 255, 255), Font5);
-    DrawStringToHandle(150, 380 + g_PosY, "       安里　〇〇〇さん", GetColor(255, 255, 255), Font5);
-    DrawStringToHandle(150, 410 + g_PosY, "       名嘉村　〇〇〇さん", GetColor(255, 255, 255), Font5);
+	DrawStringToHandle(150, 260 + g_PosY, "       上間　〇〇〇さん", GetColor(255, 255, 255), Font5);
+	DrawStringToHandle(150, 290 + g_PosY, "       神里　〇〇〇さん", GetColor(255, 255, 255), Font5);
+	DrawStringToHandle(150, 320 + g_PosY, "       佐久本　〇〇〇さん", GetColor(255, 255, 255), Font5);
+	DrawStringToHandle(150, 350 + g_PosY, "       川端　〇〇〇さん", GetColor(255, 255, 255), Font5);
+	DrawStringToHandle(150, 380 + g_PosY, "       安里　〇〇〇さん", GetColor(255, 255, 255), Font5);
+	DrawStringToHandle(150, 410 + g_PosY, "       名嘉村　〇〇〇さん", GetColor(255, 255, 255), Font5);
 
-    //２パート
-    DrawStringToHandle(225, 550 + g_PosY, "素材利用", GetColor(255, 255, 255), Font4);
-    DrawStringToHandle(205, 600 + g_PosY, "BGM　 〇〇〇", GetColor(255, 255, 255), Font5);
-    DrawStringToHandle(205, 700 + g_PosY, "SE    〇〇〇", GetColor(255, 255, 255), Font5);
-   
+	//２パート
+	DrawStringToHandle(225, 550 + g_PosY, "素材利用", GetColor(255, 255, 255), Font4);
+	DrawStringToHandle(205, 600 + g_PosY, "BGM　 〇〇〇", GetColor(255, 255, 255), Font5);
+	DrawStringToHandle(205, 700 + g_PosY, "SE    〇〇〇", GetColor(255, 255, 255), Font5);
 
-    //タイムの加算処理＆終了
-    if (++g_WaitTime > 2500)g_GameState = 99;
-    DrawFormatString(0, 0, 0x00ffff, "%d",g_WaitTime);
-    if (g_WaitTime > 2300) {
-        DrawStringToHandle(0, 240, "Thank you for Playing", GetColor(255, 255, 255), Font1);
-    }
+
+	//タイムの加算処理＆終了
+	if (++g_WaitTime > 2500)g_GameState = 99;
+	DrawFormatString(0, 0, 0x00ffff, "%d", g_WaitTime);
+	if (g_WaitTime > 2300) {
+		DrawStringToHandle(0, 240, "Thank you for Playing", GetColor(255, 255, 255), Font1);
+	}
 }
 
 /***********************************************
@@ -811,41 +802,41 @@ void DrawEnd(void)
  ***********************************************/
 void DrawHelp(void)
 {
-  
 
-    ////タイトル画面表示
-    DrawGraph(0, 0, g_HelpImage, FALSE);
 
-    SetDrawBlendMode(DX_BLENDMODE_ALPHA, 128);        //ブレンドモードをα(128/255)に設定
-    DrawBox(50, 25, 590, 500, GetColor(255, 255, 255), TRUE);
-    SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
+	////タイトル画面表示
+	DrawGraph(0, 0, g_HelpImage, FALSE);
 
-    DrawStringToHandle(200, 50, "ヘルプ画面", GetColor(255, 255, 255), Font3);
+	SetDrawBlendMode(DX_BLENDMODE_ALPHA, 128);        //ブレンドモードをα(128/255)に設定
+	DrawBox(50, 25, 590, 500, GetColor(255, 255, 255), TRUE);
+	SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
 
-    //大きい文字見出し
-    DrawStringToHandle(150, 150, "プレイヤー操作について", GetColor(255, 0, 0), Font4);
-    DrawStringToHandle(240, 250, "宝箱を選択", GetColor(255, 0, 0), Font4);
+	DrawStringToHandle(200, 50, "ヘルプ画面", GetColor(255, 255, 255), Font3);
 
-    //小さい見出し
-    DrawStringToHandle(190, 200, "十字キーやスティックで移動", GetColor(255, 255, 255), Font5);
-    DrawStringToHandle(100, 300, "開けたい宝箱を選択する方法は十字キーや、", GetColor(255, 255, 255), Font5);
-    DrawStringToHandle(100, 320, "スティックで取りたい宝箱を選ぶ。", GetColor(255, 255, 255), Font5); 
-    DrawStringToHandle(100, 350, "開けたい宝箱の決定　Aボタン", GetColor(255, 255, 255), Font5);
+	//大きい文字見出し
+	DrawStringToHandle(150, 150, "プレイヤー操作について", GetColor(255, 0, 0), Font4);
+	DrawStringToHandle(240, 250, "宝箱を選択", GetColor(255, 0, 0), Font4);
 
-    //文字の表示（点滅）
-    if (++g_WaitTime < 30) {
+	//小さい見出し
+	DrawStringToHandle(190, 200, "十字キーやスティックで移動", GetColor(255, 255, 255), Font5);
+	DrawStringToHandle(100, 300, "開けたい宝箱を選択する方法は十字キーや、", GetColor(255, 255, 255), Font5);
+	DrawStringToHandle(100, 320, "スティックで取りたい宝箱を選ぶ。", GetColor(255, 255, 255), Font5);
+	DrawStringToHandle(100, 350, "開けたい宝箱の決定　Aボタン", GetColor(255, 255, 255), Font5);
 
-        DrawStringToHandle(150, 425, "---Aボタンでタイトルに移動---", GetColor(255, 255, 255), Font5);
-        DrawStringToHandle(150, 455, "---Bボタンでタイトルに移動---", GetColor(255, 255, 255), Font5);
-    }
-    else if (g_WaitTime > 60) {
-        g_WaitTime = 0;
-    }
+	//文字の表示（点滅）
+	if (++g_WaitTime < 30) {
 
-    //Aでメニューに戻る
-    if (g_KeyFlg & PAD_INPUT_A) g_GameState = 0;
-    //Bボタンでゲームスタート
-    if (g_KeyFlg & PAD_INPUT_B) g_GameState = 1;
+		DrawStringToHandle(150, 425, "---Aボタンでタイトルに移動---", GetColor(255, 255, 255), Font5);
+		DrawStringToHandle(150, 455, "---Bボタンでタイトルに移動---", GetColor(255, 255, 255), Font5);
+	}
+	else if (g_WaitTime > 60) {
+		g_WaitTime = 0;
+	}
+
+	//Aでメニューに戻る
+	if (g_KeyFlg & PAD_INPUT_A) g_GameState = 0;
+	//Bボタンでゲームスタート
+	if (g_KeyFlg & PAD_INPUT_B) g_GameState = 1;
 }
 
 /***********************************************
@@ -853,30 +844,30 @@ void DrawHelp(void)
  ***********************************************/
 void InputRanking()
 {
-    keyboard.DrawKeyBoard();
-    keyboard.KeyBoardControl(g_NowKey);
-    keyboard.Push_B_Key(g_NowKey, &g_GameState, g_Score);
+	keyboard.DrawKeyBoard();
+	keyboard.KeyBoardControl(g_NowKey);
+	keyboard.Push_B_Key(g_NowKey, &g_GameState, g_Score);
 }
 /***********************************************
  * ランキング描画処理
  ***********************************************/
 void DrawRanking()
 {
-    // Bボタン or Xキー でタイトルに戻る
-    if (g_KeyFlg & PAD_INPUT_B) g_GameState = 0;
+	// Bボタン or Xキー でタイトルに戻る
+	if (g_KeyFlg & PAD_INPUT_B) g_GameState = 0;
 
-    //ランキング画像表示
-    DrawGraph(0, 0, g_RankingImage, FALSE);
+	//ランキング画像表示
+	DrawGraph(0, 0, g_RankingImage, FALSE);
 
-    ranking.DrawRanking();
+	ranking.DrawRanking();
 
-    // 文字の表示(点滅)
-    if (++g_WaitTime < 30)
-    {
-        SetFontSize(24);
-        DrawString(150, 450, "--  Bボタンを押して戻る  --", 0xffffed);
-    }
-    else if (g_WaitTime > 60) g_WaitTime = 0;
+	// 文字の表示(点滅)
+	if (++g_WaitTime < 30)
+	{
+		SetFontSize(24);
+		DrawString(150, 450, "--  Bボタンを押して戻る  --", 0xffffed);
+	}
+	else if (g_WaitTime > 60) g_WaitTime = 0;
 }
 
 /***********************************************
@@ -884,53 +875,53 @@ void DrawRanking()
  ***********************************************/
 int LoadImages()
 {
-    //タイトル タイトル画像替えました。
-    if ((g_TitleImage = LoadGraph("images/Title.png")) == -1) return -1;
+	//タイトル タイトル画像替えました。
+	if ((g_TitleImage = LoadGraph("images/Title.png")) == -1) return -1;
 
-    //メニュー
+	//メニュー
    // if ((g_Applec = LoadGraph("images/Applec.png")) == -1) return -1;
 
-    //ステージ背景
-    if ((g_StageImage = LoadGraph("images/haikei1.png")) == -1)return -1;
-    if ((g_DrawStageImages = LoadGraph("images/doukutu.png")) == -1)return -1;
-    if ((g_DrawStageImages1 = LoadGraph("images/doukutu1 .png")) == -1)return -1;
-    
-    //廊下の画像
-    if ((g_RoadImage = LoadGraph("images/road3.png")) == -1)return -1;
-    if ((g_RoadImage2 = LoadGraph("images/road4.png")) == -1)return -1;
+	//ステージ背景
+	if ((g_StageImage = LoadGraph("images/haikei1.png")) == -1)return -1;
+	if ((g_DrawStageImages = LoadGraph("images/doukutu.png")) == -1)return -1;
+	if ((g_DrawStageImages1 = LoadGraph("images/doukutu1 .png")) == -1)return -1;
 
-    //エンド画面背景
-    if ((g_EndImage = LoadGraph("images/EndImage.png")) == -1)return -1;
-    //ランキング背景
-    if ((g_RankingImage = LoadGraph("images/rank_back.png")) == -1) return -1;
-    //宝箱の画像
-    if (LoadDivGraph("images/takarabako.png", 3, 3, 1, 60, 60, g_TakaraBako) == -1) return -1;
+	//廊下の画像
+	if ((g_RoadImage = LoadGraph("images/road3.png")) == -1)return -1;
+	if ((g_RoadImage2 = LoadGraph("images/road4.png")) == -1)return -1;
 
-    //鍵の画像
-    if ((g_KeyImage = LoadGraph("images/Key.png")) == -1)return -1;
-    //ミミックの画像
-    if ((g_MimicImage = LoadGraph("images/Mimic.png")) == -1)return -1;
-    //ハートの画像
-    if ((g_HeartImage = LoadGraph("images/heart.png")) == -1)return -1;
-    if ((g_HeartImage1 = LoadGraph("images/HP.png")) == -1)return -1;
+	//エンド画面背景
+	if ((g_EndImage = LoadGraph("images/EndImage.png")) == -1)return -1;
+	//ランキング背景
+	if ((g_RankingImage = LoadGraph("images/rank_back.png")) == -1) return -1;
+	//宝箱の画像
+	if (LoadDivGraph("images/takarabako.png", 3, 3, 1, 60, 60, g_TakaraBako) == -1) return -1;
 
-    //キーボード諸々
-    if (keyboard.LoadImgae() == -1) return -1;
+	//鍵の画像
+	if ((g_KeyImage = LoadGraph("images/Key.png")) == -1)return -1;
+	//ミミックの画像
+	if ((g_MimicImage = LoadGraph("images/Mimic.png")) == -1)return -1;
+	//ハートの画像
+	if ((g_HeartImage = LoadGraph("images/heart.png")) == -1)return -1;
+	if ((g_HeartImage1 = LoadGraph("images/HP.png")) == -1)return -1;
 
-    //プレイヤー矢印画像
-    if ((g_Arrow = LoadGraph("images/Arrow.png")) == -1)return -1;
+	//キーボード諸々
+	if (keyboard.LoadImgae() == -1) return -1;
 
-    //ヘルプ画面
-    if ((g_HelpImage = LoadGraph("images/Help.png")) == -1)return -1;
-    //プレイヤー画像
-    if (LoadDivGraph("images/player.png", 16, 4, 4, 70, 90, g_Player) == -1) return -1;
+	//プレイヤー矢印画像
+	if ((g_Arrow = LoadGraph("images/Arrow.png")) == -1)return -1;
 
-    //プレイヤーアイコン
-    if ((g_PlayerIkon = LoadGraph("images/PlayerIkon.png")) == -1)return -1;
+	//ヘルプ画面
+	if ((g_HelpImage = LoadGraph("images/Help.png")) == -1)return -1;
+	//プレイヤー画像
+	if (LoadDivGraph("images/player.png", 16, 4, 4, 70, 90, g_Player) == -1) return -1;
 
-    //ゲームオーバー画像
-    if ((g_GameOverImage = LoadGraph("images/GameOverImage.png")) == -1)return -1;
-    return 0;
+	//プレイヤーアイコン
+	if ((g_PlayerIkon = LoadGraph("images/PlayerIkon.png")) == -1)return -1;
+
+	//ゲームオーバー画像
+	if ((g_GameOverImage = LoadGraph("images/GameOverImage.png")) == -1)return -1;
+	return 0;
 }
 
 /***********************************************
@@ -938,43 +929,43 @@ int LoadImages()
  ***********************************************/
 int LoadSounds()
 {
-    //タイトル タイトル画像替えました。
-    //if ((s_TitleBGM = LoadSoundMem("BGM/see.mp3")) == -1) return -1;
+	//タイトル タイトル画像替えました。
+	//if ((s_TitleBGM = LoadSoundMem("BGM/see.mp3")) == -1) return -1;
 
-    //キーボード
-    //if (keyboard.LoadSounds() == -1) return -1;
+	//キーボード
+	//if (keyboard.LoadSounds() == -1) return -1;
 
-    ////メニュー
-    //if ((g_Applec = LoadGraph("images/Applec.png")) == -1) return -1;
+	////メニュー
+	//if ((g_Applec = LoadGraph("images/Applec.png")) == -1) return -1;
 
-    ////ステージ背景
-    //if ((g_StageImage = LoadGraph("images/haikei.png")) == -1)return -1;
+	////ステージ背景
+	//if ((g_StageImage = LoadGraph("images/haikei.png")) == -1)return -1;
 
-    //廊下の画像
-    if ((s_RoadBGM = LoadSoundMem("BGM/Flutter.mp3")) == -1) return -1;
+	//廊下の画像
+	if ((s_RoadBGM = LoadSoundMem("BGM/Flutter.mp3")) == -1) return -1;
 
-    ////エンド画面背景
-    //if ((g_EndImage = LoadGraph("images/EndImage.png")) == -1)return -1;
-    ////宝箱の画像
-    //if (LoadDivGraph("images/takarabako.png", 3, 3, 1, 60, 60, g_TakaraBako) == -1) return -1;
+	////エンド画面背景
+	//if ((g_EndImage = LoadGraph("images/EndImage.png")) == -1)return -1;
+	////宝箱の画像
+	//if (LoadDivGraph("images/takarabako.png", 3, 3, 1, 60, 60, g_TakaraBako) == -1) return -1;
 
-    ////鍵の画像
-    //if ((g_KeyImage = LoadGraph("images/Key.png")) == -1)return -1;
-    ////ミミックの画像
-    //if ((g_MimicImage = LoadGraph("images/Mimic.png")) == -1)return -1;
-    ////ハートの画像
-    //if ((g_HeartImage = LoadGraph("images/heart.png")) == -1)return -1;
+	////鍵の画像
+	//if ((g_KeyImage = LoadGraph("images/Key.png")) == -1)return -1;
+	////ミミックの画像
+	//if ((g_MimicImage = LoadGraph("images/Mimic.png")) == -1)return -1;
+	////ハートの画像
+	//if ((g_HeartImage = LoadGraph("images/heart.png")) == -1)return -1;
 
-    ////キーボード諸々
-    //if (keyboard.LoadImgae() == -1) return -1;
+	////キーボード諸々
+	//if (keyboard.LoadImgae() == -1) return -1;
 
-    ////プレイヤー矢印画像
-    //if ((g_Arrow = LoadGraph("images/Arrow.png")) == -1)return -1;
+	////プレイヤー矢印画像
+	//if ((g_Arrow = LoadGraph("images/Arrow.png")) == -1)return -1;
 
-    ////ヘルプ画面
-    //if ((g_HelpImage = LoadGraph("images/Help.png")) == -1)return -1;
-    ////プレイヤー画像
-    //if (LoadDivGraph("images/player.png", 16, 4, 4, 70, 90, g_Player) == -1) return -1;
+	////ヘルプ画面
+	//if ((g_HelpImage = LoadGraph("images/Help.png")) == -1)return -1;
+	////プレイヤー画像
+	//if (LoadDivGraph("images/player.png", 16, 4, 4, 70, 90, g_Player) == -1) return -1;
 
-    return 0;
+	return 0;
 }

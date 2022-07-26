@@ -75,6 +75,8 @@ int g_HeartImage1; //ハート
 int g_DrawStageImages; //ステージ最初のみ
 int g_DrawStageImages1; //二回目以降はこの画像
 int g_DrawStageno; //回数
+int g_PlayerIkon;//プレイヤーアイコン背景
+int g_GameOverImage;//ゲームオバー背景
 
 int g_PosY; //佐久本さんが使います
 int Font, Font1, Font3, Font4, Font5;//ヘルプ画面とエンド画面のフォント変更
@@ -387,6 +389,7 @@ void DrawStage()
     DrawFormatString(360, by, GetColor(255, 255, 255), "%d", g_player.hp);
     DrawGraph(230, by, g_HeartImage, TRUE);
 
+   
     if (++g_WaitTime > 100 || g_KeyFlg & PAD_INPUT_A)
     {
         g_GameMode = 1;
@@ -399,16 +402,20 @@ void DrawStage()
  ***********************************************/
 void DrawGameOver(void)
 {
-    //BackScrool();
+    DrawGraph(0, 0, g_GameOverImage, 0);
 
     //スペースキーでメニューに戻る
     if (g_KeyFlg & PAD_INPUT_M)   g_GameState = 0;
 
-    DrawBox(150, 150, 490, 330, 0x009900, TRUE);
-    DrawBox(150, 150, 490, 330, 0x000000, FALSE);
+   
+   
 
-    SetFontSize(20);
-    DrawString(220, 170, "ゲームオーバー", 0xcc0000);
+    SetDrawBlendMode(DX_BLENDMODE_ALPHA, 128);        //ブレンドモードをα(128/255)に設定
+    DrawBox(50, 25, 590, 500, GetColor(0, 0, 0), TRUE);
+    SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
+
+    DrawStringToHandle(130, 100, "GAME   OVER", GetColor(255,0, 0), Font3);
+   \
     SetFontSize(35);
 
     DrawFormatString(180, 250, 0xFFFFFF, "最終階層 = %02d階", g_NowStage);
@@ -561,10 +568,16 @@ void ArrowControl()
 
     if (g_OpenBox <= -1)
     {
+        DrawGraph(10, 380, g_PlayerIkon, TRUE);  //プレイヤーアイコン
+        SetFontSize(10);
+        DrawString(70, 380, "プレイヤー", 0xFFFFFF, TRUE);
+
         SetFontSize(40);
         DrawString(150, 400, "どれにしようかな？", 0xffffff, TRUE);
-    }
 
+       
+    }
+  
     g_arrow.x = g_takara[g_arrow.no].x;
 
     for (int i = 0; i < g_player.hp; i++)
@@ -610,6 +623,10 @@ void OpenTreasureBox()
         DrawGraph(180, 100, g_KeyImage, TRUE); //鍵の画像を表示させる
 
         DrawString(150, 400, "やったー！カギだ！", 0xffffff, TRUE);
+
+        DrawGraph(10, 380, g_PlayerIkon, TRUE);  //プレイヤーアイコン
+        SetFontSize(10);
+        DrawString(70, 380, "プレイヤー", 0xFFFFFF, TRUE);
     }
 
 
@@ -625,10 +642,19 @@ void OpenTreasureBox()
             DrawGraph(180, 100, g_MimicImage, TRUE);  //ミミックの画像を表示
             
             DrawString(160, 400, "ミッ、ミミックだ！", 0xffffff, TRUE);
+
+            DrawGraph(10, 380, g_PlayerIkon, TRUE);  //プレイヤーアイコン
+            SetFontSize(10);
+            DrawString(70, 380, "プレイヤー", 0xFFFFFF, TRUE);
         }
         else if(g_takara[g_OpenBox].flg == FALSE)
         {
+           
             DrawString(180, 400, "さわると危険だ！", 0xffffff, TRUE);
+
+            DrawGraph(10, 380, g_PlayerIkon, TRUE);  //プレイヤーアイコン
+            SetFontSize(10);
+            DrawString(70, 380, "プレイヤー", 0xFFFFFF, TRUE);
         }
       }
       if (g_takara[g_OpenBox].point == 1) {
@@ -641,10 +667,19 @@ void OpenTreasureBox()
               DrawGraph(180, 100, g_HeartImage1, TRUE);  //ミミックの画像を表示
 
               DrawString(160, 400, "HPが１回復した!", 0xffffff, TRUE);
+
+              DrawGraph(10, 380, g_PlayerIkon, TRUE);  //プレイヤーアイコン
+              SetFontSize(10);
+              DrawString(70, 380, "プレイヤー", 0xFFFFFF, TRUE);
           }
           else if (g_takara[g_OpenBox].flg == FALSE)
           {
+             
               DrawString(180, 400, "中身がからっぽだ！", 0xffffff, TRUE);
+
+              DrawGraph(10, 380, g_PlayerIkon, TRUE);  //プレイヤーアイコン
+              SetFontSize(10);
+              DrawString(70, 380, "プレイヤー", 0xFFFFFF, TRUE);
           }
       }
 
@@ -877,6 +912,11 @@ int LoadImages()
     //プレイヤー画像
     if (LoadDivGraph("images/player.png", 16, 4, 4, 70, 90, g_Player) == -1) return -1;
 
+    //プレイヤーアイコン
+    if ((g_PlayerIkon = LoadGraph("images/PlayerIkon.png")) == -1)return -1;
+
+    //ゲームオーバー画像
+    if ((g_GameOverImage = LoadGraph("images/GameOverImage.png")) == -1)return -1;
     return 0;
 }
 

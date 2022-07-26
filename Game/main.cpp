@@ -65,6 +65,10 @@ int g_RoadImage2;
 int g_KeyImage; //鍵の画像（神里が追加
 int g_MimicImage; //ミミックの画像（神里が追加
 int g_HeartImage;
+int g_DrawStageImages; //ステージ最初のみ
+int g_DrawStageImages1; //二回目以降はこの画像
+int g_DrawStageno; //回数
+
 int g_PosY; //佐久本さんが使います
 int Font,Font1,Font3, Font4, Font5;//ヘルプ画面とエンド画面のフォント変更
 //プレイヤー矢印の構造体
@@ -170,6 +174,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
         switch (g_GameState) {
         case 0:
             DrawGameTitle(); //ゲームタイトル描画処理
+            g_DrawStageno = 0;
             break;
         case 1:
             GameInit();
@@ -320,7 +325,7 @@ void GameMain(void)
     //スペースキーでメニューに戻る　ゲームメインからタイトルに戻る追加
     if (g_KeyFlg & PAD_INPUT_M)g_GameState = 6;
     SetFontSize(16);
-    DrawString(150, 450, "---スペースキーを押してゲームオーバーへ---", 0xffffff, 0);
+    //DrawString(150, 450, "---スペースキーを押してゲームオーバーへ---", 0xffffff, 0);
 }
 
 /***********************************************
@@ -328,13 +333,28 @@ void GameMain(void)
  ***********************************************/
 void DrawStage()
 {
-    SetFontSize(50);
-    DrawFormatString(200, 170, 0xffffff, "%d階", g_NowStage);
-    DrawFormatString(290, 270, 0xffffff, "×", g_NowStage);
-    DrawFormatString(360, 270, 0xffffff, "%d", g_player.hp);
+    if (g_NowStage <= 1) {
+        DrawGraph(0, 0, g_DrawStageImages, FALSE);
+        SetFontSize(50);
+        DrawFormatString(280, 170, GetColor(255, 255, 255), "%d階", g_NowStage);//170
+        DrawFormatString(290, 270, GetColor(255, 255, 255), "×", g_NowStage);//270
+        DrawFormatString(360, 270, GetColor(255, 255, 255), "%d", g_player.hp);//270,
+        DrawGraph(230, 270, g_HeartImage, TRUE);
+    }
+    else if (g_NowStage >= 2) {
+        DrawGraph(0, 100, g_DrawStageImages1, FALSE);
+        SetFontSize(50);
+        DrawFormatString(280, 40, GetColor(255, 255, 255), "%d階", g_NowStage);//170
+        DrawFormatString(290, 430, GetColor(255, 255, 255), "×", g_NowStage);//270
+        DrawFormatString(360, 430, GetColor(255, 255, 255), "%d", g_player.hp);//270,
+        DrawGraph(230, 430, g_HeartImage, TRUE);
+    }
 
-    DrawGraph(230, 270, g_HeartImage, TRUE);
-    if (g_KeyFlg & PAD_INPUT_A)   g_GameMode = 1;
+    //タイムの加算処理＆終了
+    if (++g_WaitTime > 100|| g_KeyFlg & PAD_INPUT_A) {
+        g_GameMode = 1;
+        g_WaitTime = 0;
+    }
 }
 
 /***********************************************
@@ -693,6 +713,8 @@ int LoadImages()
 
     //ステージ背景
     if ((g_StageImage = LoadGraph("images/haikei.png")) == -1)return -1;
+    if ((g_DrawStageImages = LoadGraph("images/doukutu.png")) == -1)return -1;
+    if ((g_DrawStageImages1 = LoadGraph("images/doukutu1 .png")) == -1)return -1;
     
     //廊下の画像
     if ((g_RoadImage = LoadGraph("images/road3.png")) == -1)return -1;

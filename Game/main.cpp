@@ -17,7 +17,7 @@ const int SCREEN_HEIGHT = 480;
 //制限時間
 const int TIMELIMIT = 30000;
 //宝箱の個数
-const int ENEMY_MAX = 7;
+const int TREASUREBOX_MAX = 7;
 const int TAKARA_TIME = 100;
 
 //プレイヤーのやつ
@@ -121,11 +121,10 @@ struct TAKARA {
     int img; //画像
     int x, y; //座標x,y,幅w,高さh
     int point; //宝の得点
-    int time;
 };
 //敵機
-struct TAKARA g_takara[ENEMY_MAX];
-struct TAKARA g_enemy00 = { TRUE,0,0,30,300,0, TAKARA_TIME };
+struct TAKARA g_takara[TREASUREBOX_MAX];
+struct TAKARA g_treasurebox00 = { TRUE,0,0,30,300,0};
 
 /***********************************************
  * 関数のプロトタイプ宣言
@@ -300,7 +299,7 @@ void GameInit(void)
     //エネミーの初期処理
     for (int i = 0; i < g_BoxQuantity; i++)
     {
-        g_takara[i] = g_enemy00;
+        g_takara[i] = g_treasurebox00;
         g_takara[i].point = GetRand(3); //ランダムで値を変える→０が鍵
     }
     g_takara[GetRand(g_BoxQuantity - 1)].point = 0; //強制的に宝箱一つに０点を代入する
@@ -356,8 +355,6 @@ void GameMain(void)
         break;
     }
 
-    /*UIView();
-    TimeCount();*/
     //スペースキーでメニューに戻る　ゲームメインからタイトルに戻る追加
     if (g_KeyFlg & PAD_INPUT_M)g_GameState = 6;
     SetFontSize(16);
@@ -650,7 +647,7 @@ void OpenTreasureBox()
 
     }
 
-    if (g_KeyFlg) //ミミックかカギの画像が表示されているとき何かのキーを押すと
+    if (g_KeyFlg & PAD_INPUT_A) //ミミックかカギの画像が表示されているとき何かのキーを押すと
     {
         if (g_takara[g_OpenBox].point >1)  //ミミックだった場合
         {
@@ -675,11 +672,11 @@ void OpenTreasureBox()
             g_NowStage++; //ステージに1足す
             g_OpenBox = -1;
 
-            g_BoxQuantity = GetRand(ENEMY_MAX - 2) + 2;
+            g_BoxQuantity = GetRand(TREASUREBOX_MAX - 2) + 2;
             //宝箱の中身を変える
             for (int i = 0; i < g_BoxQuantity; i++)
             {
-                g_takara[i] = g_enemy00;
+                g_takara[i] = g_treasurebox00;
                 g_takara[i].point = GetRand(3); //ランダムで値を変える→０が鍵
             }
             g_takara[GetRand(g_BoxQuantity - 1)].point = 0; //強制的に宝箱一つに０点を代入する

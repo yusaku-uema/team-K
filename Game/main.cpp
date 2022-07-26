@@ -35,6 +35,8 @@ int g_OldKey;  // 前回の入力キー
 int g_NowKey;  // 今回の入力キー 
 int g_KeyFlg;  // 入力キー情報 
 
+int g_WalkOldKey  = 0;
+
 int g_GameState = 0;  // ゲームモード 
 
 int g_GameMode = 0; //ゲームモード（神里が作った）
@@ -63,6 +65,7 @@ int g_Applec; //タイトルカーソル変数　消さないで
 int g_StageImage;   //ゲームメイン背景
 int g_HelpImage; //ヘルプ背景
 int g_EndImage;//エンド背景
+int g_RankingImage; //ランキング背景
 int g_RoadImage;
 int g_RoadImage2;
 int g_KeyImage; //鍵の画像（神里が追加
@@ -77,6 +80,7 @@ int g_PosY; //佐久本さんが使います
 int Font, Font1, Font3, Font4, Font5;//ヘルプ画面とエンド画面のフォント変更
 
 int s_TitleBGM;//タイトルBGM用変数
+int s_RoadBGM;//廊下BGM用変数
 
 //プレイヤー矢印の構造体
 struct ARROW
@@ -208,12 +212,15 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
             DrawGameOver();
             break;
         case 7:
-            //InputRanking();
+            InputRanking();
             break;
         }
 
         if (g_GameState != 0) {
             StopSoundMem(s_TitleBGM);
+        }
+        if (g_GameState != 5) {
+            StopSoundMem(s_RoadBGM);
         }
 
         //裏画面の内容を表画面に反映します 
@@ -306,13 +313,11 @@ void GameInit(void)
 
     //プレイヤー初期処理
 
-    //g_player = { 139, 400, 13, PLAYER_IMAGE_TIME, PLAYER_HP };
-
-    g_player = { 285, 400, 13, PLAYER_IMAGE_TIME, PLAYER_HP};
+    g_player = { 290, 400, 13, PLAYER_IMAGE_TIME, PLAYER_HP};
 
 
     //背景画像(廊下）の初期処理
-    g_stage = { STAGE_NO, g_RoadImage, 145, 0 };
+    g_stage = { STAGE_NO, g_RoadImage, 0, 0 };
 
     g_GameMode = 0;
 
@@ -338,6 +343,10 @@ void GameMain(void)
     case 1:
         BackScrool(0);
         PlayerControl();
+        if (CheckSoundMem(s_RoadBGM) != 1) {
+            ChangeVolumeSoundMem(70, s_RoadBGM);
+            PlaySoundMem(s_RoadBGM, DX_PLAYTYPE_LOOP, TRUE);
+        }
         break;
     case 2:
         BackImage();
@@ -349,7 +358,6 @@ void GameMain(void)
 
     /*UIView();
     TimeCount();*/
-
     //スペースキーでメニューに戻る　ゲームメインからタイトルに戻る追加
     if (g_KeyFlg & PAD_INPUT_M)g_GameState = 6;
     SetFontSize(16);
@@ -379,9 +387,21 @@ void DrawStage()
     }
 
     //タイムの加算処理＆終了
-    if (++g_WaitTime > 100|| g_KeyFlg & PAD_INPUT_A) {
-        g_GameMode = 1;
-        g_WaitTime = 0;
+    if (++g_WaitTime > 100 || g_KeyFlg & PAD_INPUT_A) {
+       /* SetFontSize(50);
+        DrawFormatString(280, 170, 0xffffff, "%d階", g_NowStage);
+        DrawFormatString(290, 270, 0xffffff, "×", g_NowStage);
+        DrawFormatString(360, 270, 0xffffff, "%d", g_player.hp);*/
+
+
+        DrawGraph(230, 270, g_HeartImage, TRUE);
+
+        //タイムの加算処理＆終了（3秒後）
+        if (++g_WaitTime > 180) {
+            g_GameMode = 1;
+            g_WaitTime = 0;
+
+        }
     }
 }
 
@@ -443,12 +463,12 @@ void BackImage()
  ***********************************************/
 void PlayerControl()
 {
-    if (g_player.imgtime <= 0)g_player.imgtime = PLAYER_IMAGE_TIME;
-    g_player.imgtime--;
+    
 
     if (g_NowKey & PAD_INPUT_UP)
     {
-        if (g_NowKey != g_OldKey)g_player.img = 12;
+        if (g_WalkOldKey != 8)g_player.img = 12;
+        g_WalkOldKey = 8;
         if (g_player.imgtime <= 0)
         {
             g_player.img++;
@@ -463,7 +483,8 @@ void PlayerControl()
     }
     else if (g_NowKey & PAD_INPUT_DOWN)
     {
-        if (g_NowKey != g_OldKey)g_player.img = 0;
+        if (g_WalkOldKey != 1)g_player.img = 0;
+        g_WalkOldKey = 1;
         if (g_player.imgtime <= 0)
         {
             g_player.img++;
@@ -474,7 +495,8 @@ void PlayerControl()
     }
     else if (g_NowKey & PAD_INPUT_LEFT)
     {
-        if (g_NowKey != g_OldKey) g_player.img = 8;
+        if (g_WalkOldKey != 2) g_player.img = 8;
+        g_WalkOldKey = 2;
         if (g_player.imgtime <= 0)
         {
             g_player.img++;
@@ -484,7 +506,8 @@ void PlayerControl()
     }
     else if (g_NowKey & PAD_INPUT_RIGHT)
     {
-        if (g_NowKey != g_OldKey) g_player.img = 4;
+        if (g_WalkOldKey != 4) g_player.img = 4;
+        g_WalkOldKey = 4;
         if (g_player.imgtime <= 0)
         {
             g_player.img++;
@@ -493,8 +516,13 @@ void PlayerControl()
         g_player.x += PLAYER_SPEED;
     }
 
-    if (g_player.x > g_stage.x + 350 - 60)g_player.x = g_stage.x + 350 - 60;
-    if (g_player.x < g_stage.x)g_player.x = g_stage.x;
+    if (g_player.imgtime <= 0)g_player.imgtime = PLAYER_IMAGE_TIME;
+    g_player.imgtime--;
+
+    DrawFormatString(0, 60, 0x111FFF, "%d", g_WalkOldKey);
+
+    if (g_player.x > 435)g_player.x = 435;
+    if (g_player.x < 145)g_player.x = 145;
     if (g_player.y > 400)g_player.y = 400;
     if (g_player.y < 59 && g_player.x >= 270 && g_player.x <= 320)g_GameMode = 2;
     if (g_player.y < 60)g_player.y = 60;
@@ -540,6 +568,12 @@ void ArrowControl()
             g_OpenBox = g_arrow.no;
             g_KeyFlg = 0;
         }
+    }
+
+    if (g_OpenBox <= -1)
+    {
+        SetFontSize(40);
+        DrawString(150, 400, "どれにしようかな？", 0xffffff, TRUE);
     }
 
     g_arrow.x = g_takara[g_arrow.no].x;
@@ -667,12 +701,12 @@ void OpenTreasureBox()
             g_arrow.x = g_takara[g_arrow.no].x;
 
             //プレイヤー初期処理
-            g_player.x = 285;
+            g_player.x = 290;
             g_player.y = 400;
             g_player.img = 13;
 
             //背景画像(廊下）の初期処理
-            g_stage = { STAGE_NO, g_RoadImage, 145, 0 };
+            g_stage = { STAGE_NO, g_RoadImage, 0, 0 };
 
             g_GameMode = 0;
         }
@@ -693,14 +727,15 @@ void TimeCount(void)
 
 void UIView(void)
 {
-    //UI「TIME」表示
-    SetFontSize(50);
-    DrawString(520, 40, "TIME", 0xffffff, 0);
+    
+    ////UI「TIME」表示
+    //SetFontSize(50);
+    //DrawString(520, 40, "TIME", 0xffffff, 0);
 
-    //UI「SCORE」表示
-    SetFontSize(45);
-    DrawString(510, 320, "SCORE", 0xffffff, 0);
-    DrawFormatString(510, 360, 0x00ffff, "%d", g_Score);
+    ////UI「SCORE」表示
+    //SetFontSize(45);
+    //DrawString(510, 320, "SCORE", 0xffffff, 0);
+    //DrawFormatString(510, 360, 0x00ffff, "%d", g_Score);
 }
 
 /***********************************************
@@ -794,7 +829,7 @@ void DrawRanking()
     if (g_KeyFlg & PAD_INPUT_B) g_GameState = 0;
 
     //ランキング画像表示
-    //DrawGraph(0, 0, g_RankingImage, FALSE);
+    DrawGraph(0, 0, g_RankingImage, FALSE);
 
     ranking.DrawRanking();
 
@@ -802,7 +837,7 @@ void DrawRanking()
     if (++g_WaitTime < 30)
     {
         SetFontSize(24);
-        DrawString(150, 450, "--  Press B button or X Key  --", 0xFF0000);
+        DrawString(150, 450, "--  Bボタンを押して戻る  --", 0xffffed);
     }
     else if (g_WaitTime > 60) g_WaitTime = 0;
 }
@@ -819,7 +854,7 @@ int LoadImages()
    // if ((g_Applec = LoadGraph("images/Applec.png")) == -1) return -1;
 
     //ステージ背景
-    if ((g_StageImage = LoadGraph("images/haikei.png")) == -1)return -1;
+    if ((g_StageImage = LoadGraph("images/haikei1.png")) == -1)return -1;
     if ((g_DrawStageImages = LoadGraph("images/doukutu.png")) == -1)return -1;
     if ((g_DrawStageImages1 = LoadGraph("images/doukutu1 .png")) == -1)return -1;
     
@@ -829,6 +864,8 @@ int LoadImages()
 
     //エンド画面背景
     if ((g_EndImage = LoadGraph("images/EndImage.png")) == -1)return -1;
+    //ランキング背景
+    if ((g_RankingImage = LoadGraph("images/rank_back.png")) == -1) return -1;
     //宝箱の画像
     if (LoadDivGraph("images/takarabako.png", 3, 3, 1, 60, 60, g_TakaraBako) == -1) return -1;
 
@@ -862,15 +899,17 @@ int LoadSounds()
     //タイトル タイトル画像替えました。
     //if ((s_TitleBGM = LoadSoundMem("BGM/see.mp3")) == -1) return -1;
 
+    //キーボード
+    if (keyboard.LoadSounds() == -1) return -1;
+
     ////メニュー
     //if ((g_Applec = LoadGraph("images/Applec.png")) == -1) return -1;
 
     ////ステージ背景
     //if ((g_StageImage = LoadGraph("images/haikei.png")) == -1)return -1;
 
-    ////廊下の画像
-    //if ((g_RoadImage = LoadGraph("images/road3.png")) == -1)return -1;
-    //if ((g_RoadImage2 = LoadGraph("images/road4.png")) == -1)return -1;
+    //廊下の画像
+    if ((s_RoadBGM = LoadSoundMem("BGM/Flutter.mp3")) == -1) return -1;
 
     ////エンド画面背景
     //if ((g_EndImage = LoadGraph("images/EndImage.png")) == -1)return -1;

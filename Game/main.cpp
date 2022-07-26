@@ -25,7 +25,7 @@ const int PLAYER_SPEED = 3;
 const int PLAYER_IMAGE_TIME = 8;
 
 //背景のやつ
-const int STAGE_NO = 1; //背景の廊下の長さ
+const int STAGE_NO = 0; //背景の廊下の長さ
 const int PLAYER_HP = 8;
 
 /***********************************************
@@ -324,7 +324,6 @@ void GameMain(void)
 
     /*UIView();
     TimeCount();*/
-
     //スペースキーでメニューに戻る　ゲームメインからタイトルに戻る追加
     if (g_KeyFlg & PAD_INPUT_M)g_GameState = 6;
     SetFontSize(16);
@@ -341,7 +340,9 @@ void DrawStage()
     DrawFormatString(290, 270, 0xffffff, "×", g_NowStage);
     DrawFormatString(360, 270, 0xffffff, "%d", g_player.hp);
 
+
     DrawGraph(230, 270, g_HeartImage, TRUE);
+   
     //タイムの加算処理＆終了（3秒後）
     if (++g_WaitTime > 180) {
         g_GameMode = 1;
@@ -609,14 +610,15 @@ void TimeCount(void)
 
 void UIView(void)
 {
-    //UI「TIME」表示
-    SetFontSize(50);
-    DrawString(520, 40, "TIME", 0xffffff, 0);
+    
+    ////UI「TIME」表示
+    //SetFontSize(50);
+    //DrawString(520, 40, "TIME", 0xffffff, 0);
 
-    //UI「SCORE」表示
-    SetFontSize(45);
-    DrawString(510, 320, "SCORE", 0xffffff, 0);
-    DrawFormatString(510, 360, 0x00ffff, "%d", g_Score);
+    ////UI「SCORE」表示
+    //SetFontSize(45);
+    //DrawString(510, 320, "SCORE", 0xffffff, 0);
+    //DrawFormatString(510, 360, 0x00ffff, "%d", g_Score);
 }
 
 /***********************************************
@@ -753,7 +755,7 @@ int LoadImages()
     //ハートの画像
     if ((g_HeartImage = LoadGraph("images/heart.png")) == -1)return -1;
 
-    //キーボード諸々
+      //キーボード諸々
     if (keyboard.LoadImgae() == -1) return -1;
 
     //プレイヤー矢印画像

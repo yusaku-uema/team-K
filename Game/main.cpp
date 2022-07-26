@@ -3,6 +3,7 @@
 ** 　宝箱をアケルゲーム
 ********************************************************************/
 #include"DxLib.h"
+#define _USE_MATH_DEFINES
 #include<math.h>
 /***********************************************
  * 定数を宣言
@@ -222,24 +223,27 @@ void DrawGameTitle(void) {
     //タイトル画像表示
     DrawGraph(0, 0, g_TitleImage, FALSE);
     SetDrawBlendMode(DX_BLENDMODE_ALPHA, 128);
-    DrawBox(160, 255, 480, 450, GetColor(255,255,255), TRUE);
+    DrawBox(160, 245, 480, 450, GetColor(255,255,255), TRUE); //透明なボックス追加
     SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
 
     g_MenuY = g_MenuNumber * 52;
     //メニューカーソル（三角形）の表示
-    if (g_MenuNumber == 0 || g_MenuNumber == 1) {
+    if (g_MenuNumber == 0) { //ゲームスタートの時のカーソル
         DrawTriangle(180, 255 + g_MenuY, 200, 270 + g_MenuY, 180, 285 + g_MenuY, GetColor(0, 0, 225), TRUE);
+    }
+    if (g_MenuNumber == 1) {
+        DrawTriangle(210, 255 + g_MenuY, 230, 270 + g_MenuY, 210, 285 + g_MenuY, GetColor(0, 0, 225), TRUE);
     }
     if (g_MenuNumber == 2 || g_MenuNumber == 3) {
         DrawTriangle(240, 255 + g_MenuY, 260, 270 + g_MenuY, 240, 285 + g_MenuY, GetColor(0, 0, 225), TRUE);
     }
-    DrawBox(160, 255, 480, 450, GetColor(0, 0, 0), FALSE);
+    DrawBox(160, 245, 480, 450, GetColor(0, 0, 0), FALSE); //透明なボックスに黒い線を追加
     SetFontSize(40);
     //ゲームタイトルを載せる予定
     DrawStringToHandle(100, 130, "ゲームタイトル予定",GetColor(255, 255, 255), Font1);
    
     DrawStringToHandle(210, 255, "ゲームスタート",GetColor(255, 0, 0), Font);
-    DrawStringToHandle(210, 305, "ランキング", GetColor(255, 0, 0), Font);
+    DrawStringToHandle(240, 305, "ランキング", GetColor(255, 0, 0), Font);
     DrawStringToHandle(275, 355, "ヘルプ", GetColor(255, 0, 0), Font);
     DrawStringToHandle(275, 405, "エンド", GetColor(255, 0, 0), Font);
 }
@@ -326,6 +330,10 @@ void DrawStage()
 {
     SetFontSize(50);
     DrawFormatString(200, 170, 0xffffff, "%d階", g_NowStage);
+    DrawFormatString(290, 270, 0xffffff, "×", g_NowStage);
+    DrawFormatString(360, 270, 0xffffff, "%d", g_player.hp);
+
+    DrawGraph(230, 270, g_HeartImage, TRUE);
     if (g_KeyFlg & PAD_INPUT_A)   g_GameMode = 1;
 }
 

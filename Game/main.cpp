@@ -757,12 +757,15 @@ void DrawEnd(void)
     //‚Qƒp[ƒg
     DrawStringToHandle(225, 550 + g_PosY, "‘fÞ—˜—p", GetColor(255, 255, 255), Font4);
     DrawStringToHandle(205, 600 + g_PosY, "BGM@ ZZZ", GetColor(255, 255, 255), Font5);
-    //DrawStringToHandle(150, 650 + g_PosY, "   @@@ @     ", GetColor(255, 255, 255), Font01);
     DrawStringToHandle(205, 700 + g_PosY, "SE    ZZZ", GetColor(255, 255, 255), Font5);
-    //DrawStringToHandle(150, 750 + g_PosY, "    @@@@     ", GetColor(255, 255, 255), Font01);
+   
 
     //ƒ^ƒCƒ€‚Ì‰ÁŽZˆ—•I—¹
     if (++g_WaitTime > 2500)g_GameState = 99;
+    DrawFormatString(0, 0, 0x00ffff, "%d",g_WaitTime);
+    if (g_WaitTime > 2300) {
+        DrawStringToHandle(0, 240, "Thank you for Playing", GetColor(255, 255, 255), Font1);
+    }
 }
 
 /***********************************************

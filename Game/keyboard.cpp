@@ -1,6 +1,6 @@
 #include"DxLib.h"
 #include"keyboard.h"
-//#include"ranking.h"
+#include"ranking.h"
 
 KeyBoard keyboard;
 
@@ -179,7 +179,7 @@ void KeyBoard::KeyBoardControl(int NowKey)
 	//testPush_B_Key2(NowKey);
 }
 
-//Bボタンが押された時の処理 テスト2
+//Bボタンが押された時の処理　引数はrankingで使います
 void KeyBoard::Push_B_Key(int NowKey, int* GameState, int Score)
 {
 	//"押した瞬間"を判定
@@ -236,9 +236,8 @@ void KeyBoard::Push_B_Key(int NowKey, int* GameState, int Score)
 				{
 					InputName[namePos + 1] = '\0';
 
-					//ランキングname変数=InputName;
-					//ranking.SetRankingName(InputName);
-					//ranking.EndRanking(GameState, Score);
+					//ランキング変数へ name・Score を代入 --> 画面遷移
+					ranking.SetRanking(InputName, GameState, Score);
 				}
 			}
 		}
@@ -255,8 +254,6 @@ void KeyBoard::Push_B_Key(int NowKey, int* GameState, int Score)
 //入力情報表示
 void KeyBoard::DrawInputInfo()
 {
-	//if (InputName[0] == 0) InputName[0] = '|';
-
 	if (InputName[0] == 0)
 	{
 		//SetDrawBlendMode

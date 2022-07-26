@@ -5,6 +5,7 @@
 #include"DxLib.h"
 #include<math.h>
 #include"keyboard.h"
+#include"ranking.h"
 
 /***********************************************
  * 定数を宣言
@@ -123,6 +124,7 @@ void PlayerControl(); //プレイヤーの処理
 void ArrowControl();  //プレイヤーの矢印の処理
 void TakaraControl(); //宝箱の処理
 
+void DrawRanking();   //ランキング描画
 void InputRanking();  //ランキング入力
 /***********************************************
  * プログラムの開始
@@ -148,6 +150,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
     Font4 = CreateFontToHandle("メイリオ", 30, 9, DX_FONTTYPE_ANTIALIASING_EDGE);//"メイリオ"  の30pt,太さ3のフォントを作成
     Font5 = CreateFontToHandle("メイリオ", 20, 9, DX_FONTTYPE_ANTIALIASING_EDGE);//"メイリオ"  の30pt,太さ3のフォントを作成
     if (LoadImages() == -1) return -1; //画像読込み関数を呼び出し
+    if (ranking.ReadRanking() == -1) return -1; //ランキング読み込み
 
       //ゲームループ 
     while (ProcessMessage() == 0 && g_GameState != 99) {
@@ -167,7 +170,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
             GameInit();
             break;
         case 2:
-            //DrawRanking();
+            DrawRanking();
             break;
         case 3:
             DrawHelp();
@@ -576,11 +579,36 @@ void DrawHelp(void)
   
 }
 
+/***********************************************
+ * ランキング入力
+ ***********************************************/
 void InputRanking()
 {
     keyboard.DrawKeyBoard();
     keyboard.KeyBoardControl(g_NowKey);
     keyboard.Push_B_Key(g_NowKey, &g_GameState, g_Score);
+}
+
+/***********************************************
+ * ランキング描画
+ ***********************************************/
+void DrawRanking()
+{
+    // Bボタン or Xキー でタイトルに戻る
+    if (g_KeyFlg & PAD_INPUT_B) g_GameState = 0;
+
+    //ランキング画像表示
+    //DrawGraph(0, 0, g_RankingImage, FALSE);
+
+    ranking.DrawRanking();
+
+    // 文字の表示(点滅)
+    if (++g_WaitTime < 30)
+    {
+        SetFontSize(24);
+        DrawString(150, 450, "--  Press B button or X Key  --", 0xFF0000);
+    }
+    else if (g_WaitTime > 60) g_WaitTime = 0;
 }
 
 /***********************************************

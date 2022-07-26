@@ -17,7 +17,7 @@ const int SCREEN_HEIGHT = 480;
 //制限時間
 const int TIMELIMIT = 30000;
 //宝箱の個数
-const int ENEMY_MAX = 7;
+const int TREASUREBOX_MAX = 7;
 const int TAKARA_TIME = 100;
 
 //プレイヤーのやつ
@@ -121,11 +121,10 @@ struct TAKARA {
     int img; //画像
     int x, y; //座標x,y,幅w,高さh
     int point; //宝の得点
-    int time;
 };
 //敵機
-struct TAKARA g_takara[ENEMY_MAX];
-struct TAKARA g_enemy00 = { TRUE,0,0,30,300,0, TAKARA_TIME };
+struct TAKARA g_takara[TREASUREBOX_MAX];
+struct TAKARA g_treasurebox00 = { TRUE,0,0,30,300,0};
 
 /***********************************************
  * 関数のプロトタイプ宣言
@@ -300,7 +299,7 @@ void GameInit(void)
     //エネミーの初期処理
     for (int i = 0; i < g_BoxQuantity; i++)
     {
-        g_takara[i] = g_enemy00;
+        g_takara[i] = g_treasurebox00;
         g_takara[i].point = GetRand(3); //ランダムで値を変える→０が鍵
     }
     g_takara[GetRand(g_BoxQuantity - 1)].point = 0; //強制的に宝箱一つに０点を代入する
@@ -356,8 +355,6 @@ void GameMain(void)
         break;
     }
 
-    /*UIView();
-    TimeCount();*/
     //スペースキーでメニューに戻る　ゲームメインからタイトルに戻る追加
     if (g_KeyFlg & PAD_INPUT_M)g_GameState = 6;
     SetFontSize(16);
@@ -369,28 +366,29 @@ void GameMain(void)
  ***********************************************/
 void DrawStage()
 {
-    if (g_NowStage <= 1) {
-        DrawGraph(0, 0, g_DrawStageImages, FALSE);
-        SetFontSize(50);
-        DrawFormatString(280, 170, GetColor(255, 255, 255), "%d階", g_NowStage);//170
-        DrawFormatString(290, 270, GetColor(255, 255, 255), "×", g_NowStage);//270
-        DrawFormatString(360, 270, GetColor(255, 255, 255), "%d", g_player.hp);//270,
-        DrawGraph(230, 270, g_HeartImage, TRUE);
-    }
-    else if (g_NowStage >= 2) {
-        DrawGraph(0, 100, g_DrawStageImages1, FALSE);
-        SetFontSize(50);
-        DrawFormatString(280, 40, GetColor(255, 255, 255), "%d階", g_NowStage);//170
-        DrawFormatString(290, 430, GetColor(255, 255, 255), "×", g_NowStage);//270
-        DrawFormatString(360, 430, GetColor(255, 255, 255), "%d", g_player.hp);//270,
-        DrawGraph(230, 430, g_HeartImage, TRUE);
-    }
+    int ay, by;
 
-    //タイムの加算処理＆終了
-    if (++g_WaitTime > 100 || g_KeyFlg & PAD_INPUT_A) {
-            g_GameMode = 1;
-            g_WaitTime = 0;
+    if (g_NowStage <= 1)
+    {
+        DrawGraph(0, 0, g_DrawStageImages, FALSE);
+        ay = 170, by = 270;
     }
+    else if (g_NowStage >= 2) 
+    {
+        DrawGraph(0, 100, g_DrawStageImages1, FALSE);
+        ay = 40, by = 430;
+    }
+    SetFontSize(50);
+    DrawFormatString(280, ay, GetColor(255, 255, 255), "%d階", g_NowStage);
+    DrawFormatString(290, by, GetColor(255, 255, 255), "×", g_NowStage);
+    DrawFormatString(360, by, GetColor(255, 255, 255), "%d", g_player.hp);
+    DrawGraph(230, by, g_HeartImage, TRUE);
+
+    if (++g_WaitTime > 100 || g_KeyFlg & PAD_INPUT_A)
+    {
+        g_GameMode = 1;
+        g_WaitTime = 0;
+    }  
 }
 
 /***********************************************
@@ -654,7 +652,7 @@ void OpenTreasureBox()
 
     }
 
-    if (g_KeyFlg) //ミミックかカギの画像が表示されているとき何かのキーを押すと
+    if (g_KeyFlg & PAD_INPUT_A) //ミミックかカギの画像が表示されているとき何かのキーを押すと
     {
         if (g_takara[g_OpenBox].point >1)  //ミミックだった場合
         {
@@ -682,11 +680,11 @@ void OpenTreasureBox()
             g_NowStage++; //ステージに1足す
             g_OpenBox = -1;
 
-            g_BoxQuantity = GetRand(ENEMY_MAX - 2) + 2;
+            g_BoxQuantity = GetRand(TREASUREBOX_MAX - 2) + 2;
             //宝箱の中身を変える
             for (int i = 0; i < g_BoxQuantity; i++)
             {
-                g_takara[i] = g_enemy00;
+                g_takara[i] = g_treasurebox00;
                 g_takara[i].point = GetRand(3); //ランダムで値を変える→０が鍵
             }
             g_takara[GetRand(g_BoxQuantity - 1)].point = 0; //強制的に宝箱一つに０点を代入する

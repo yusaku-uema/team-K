@@ -78,6 +78,7 @@ int g_PosY; //佐久本さんが使います
 int Font, Font1, Font3, Font4, Font5;//ヘルプ画面とエンド画面のフォント変更
 
 int s_TitleBGM;//タイトルBGM用変数
+int s_RoadBGM;//廊下BGM用変数
 
 //プレイヤー矢印の構造体
 struct ARROW
@@ -216,6 +217,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
         if (g_GameState != 0) {
             StopSoundMem(s_TitleBGM);
         }
+        if (g_GameState != 5) {
+            StopSoundMem(s_RoadBGM);
+        }
 
         //裏画面の内容を表画面に反映します 
         ScreenFlip();
@@ -337,6 +341,10 @@ void GameMain(void)
     case 1:
         BackScrool(0);
         PlayerControl();
+        if (CheckSoundMem(s_RoadBGM) != 1) {
+            ChangeVolumeSoundMem(70, s_RoadBGM);
+            PlaySoundMem(s_RoadBGM, DX_PLAYTYPE_LOOP, TRUE);
+        }
         break;
     case 2:
         BackImage();
@@ -853,9 +861,8 @@ int LoadSounds()
     ////ステージ背景
     //if ((g_StageImage = LoadGraph("images/haikei.png")) == -1)return -1;
 
-    ////廊下の画像
-    //if ((g_RoadImage = LoadGraph("images/road3.png")) == -1)return -1;
-    //if ((g_RoadImage2 = LoadGraph("images/road4.png")) == -1)return -1;
+    //廊下の画像
+    if ((s_RoadBGM = LoadSoundMem("BGM/Flutter.mp3")) == -1) return -1;
 
     ////エンド画面背景
     //if ((g_EndImage = LoadGraph("images/EndImage.png")) == -1)return -1;

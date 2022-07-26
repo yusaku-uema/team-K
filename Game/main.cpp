@@ -74,6 +74,10 @@ int g_HeartImage;
 int g_HeartImage1; //ハート
 int g_DrawStageImages; //ステージ最初のみ
 int g_DrawStageImages1; //二回目以降はこの画像
+<<<<<<< HEAD
+=======
+int g_DrawStageno; //回数
+>>>>>>> parent of 504f044 (繧ｲ繝ｼ繝繧ｪ繝ｼ繝舌�ｼ逕ｻ髱｢縺ｨ繝励Ξ繧､繝､繝ｼ繧｢繧､繧ｳ繝ｳ)
 
 int g_PosY; //佐久本さんが使います
 int Font, Font1, Font3, Font4, Font5;//ヘルプ画面とエンド画面のフォント変更
@@ -635,12 +639,16 @@ void OpenTreasureBox()
               SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
               DrawGraph(180, 100, g_HeartImage1, TRUE);  //ミミックの画像を表示
 
+<<<<<<< HEAD
               if (g_player.hp == PLAYER_HP) { //HPがMAXの時に表示する
                   DrawString(230, 400, "HPがMAXだ!", 0xffffff, TRUE);
               }
               else if (g_player.hp < PLAYER_HP){ //HPが減っていた時に表示する。
                   DrawString(160, 400, "HPが１回復した!", 0xffffff, TRUE);
               }
+=======
+              DrawString(160, 400, "HPが１回復した!", 0xffffff, TRUE);
+>>>>>>> parent of 504f044 (繧ｲ繝ｼ繝繧ｪ繝ｼ繝舌�ｼ逕ｻ髱｢縺ｨ繝励Ξ繧､繝､繝ｼ繧｢繧､繧ｳ繝ｳ)
           }
           else if (g_takara[g_OpenBox].flg == FALSE)
           {

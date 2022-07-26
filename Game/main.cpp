@@ -70,6 +70,9 @@ int g_MimicImage; //ミミックの画像（神里が追加
 int g_HeartImage;
 int g_PosY; //佐久本さんが使います
 int Font, Font1, Font3, Font4, Font5;//ヘルプ画面とエンド画面のフォント変更
+
+int s_TitleBGM;//タイトルBGM用変数
+
 //プレイヤー矢印の構造体
 struct ARROW
 {
@@ -137,6 +140,9 @@ void DrawStage(); //ステージの初めに表示される（神里
 
 void InputRanking();  //ランキング入力
 void DrawRanking();   //ランキング描画
+
+int LoadSounds(); //音声読み込み
+
 /***********************************************
  * プログラムの開始
  **********************************************/
@@ -161,6 +167,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
     Font4 = CreateFontToHandle("メイリオ", 30, 9, DX_FONTTYPE_ANTIALIASING_EDGE);//"メイリオ"  の30pt,太さ3のフォントを作成
     Font5 = CreateFontToHandle("メイリオ", 20, 9, DX_FONTTYPE_ANTIALIASING_EDGE);//"メイリオ"  の30pt,太さ3のフォントを作成
     if (LoadImages() == -1) return -1; //画像読込み関数を呼び出し
+    if (LoadSounds() == -1) return -1; //音声読込み関数を呼び出し
     if (ranking.ReadRanking() == -1) return -1;
       //ゲームループ 
     while (ProcessMessage() == 0 && g_GameState != 99) {
@@ -199,6 +206,10 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
             break;
         }
 
+        if (g_GameState != 0) {
+            StopSoundMem(s_TitleBGM);
+        }
+
         //裏画面の内容を表画面に反映します 
         ScreenFlip();
     }
@@ -213,6 +224,11 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
  * ゲームタイトル表示
  ***********************************************/
 void DrawGameTitle(void) {
+
+    if (CheckSoundMem(s_TitleBGM) != 1) {
+        ChangeVolumeSoundMem(70, s_TitleBGM);
+        PlaySoundMem(s_TitleBGM, DX_PLAYTYPE_LOOP, TRUE);
+    }
 
     //メニューカーソル移動処理
     if (g_KeyFlg & PAD_INPUT_DOWN) {
@@ -763,6 +779,50 @@ int LoadImages()
     if ((g_HelpImage = LoadGraph("images/Help.png")) == -1)return -1;
     //プレイヤー画像
     if (LoadDivGraph("images/player.png", 16, 4, 4, 70, 90, g_Player) == -1) return -1;
+
+    return 0;
+}
+
+/***********************************************
+ * 音声読み込み
+ ***********************************************/
+int LoadSounds()
+{
+    //タイトル タイトル画像替えました。
+    if ((s_TitleBGM = LoadSoundMem("BGM/see.mp3")) == -1) return -1;
+
+    ////メニュー
+    //if ((g_Applec = LoadGraph("images/Applec.png")) == -1) return -1;
+
+    ////ステージ背景
+    //if ((g_StageImage = LoadGraph("images/haikei.png")) == -1)return -1;
+
+    ////廊下の画像
+    //if ((g_RoadImage = LoadGraph("images/road3.png")) == -1)return -1;
+    //if ((g_RoadImage2 = LoadGraph("images/road4.png")) == -1)return -1;
+
+    ////エンド画面背景
+    //if ((g_EndImage = LoadGraph("images/EndImage.png")) == -1)return -1;
+    ////宝箱の画像
+    //if (LoadDivGraph("images/takarabako.png", 3, 3, 1, 60, 60, g_TakaraBako) == -1) return -1;
+
+    ////鍵の画像
+    //if ((g_KeyImage = LoadGraph("images/Key.png")) == -1)return -1;
+    ////ミミックの画像
+    //if ((g_MimicImage = LoadGraph("images/Mimic.png")) == -1)return -1;
+    ////ハートの画像
+    //if ((g_HeartImage = LoadGraph("images/heart.png")) == -1)return -1;
+
+    ////キーボード諸々
+    //if (keyboard.LoadImgae() == -1) return -1;
+
+    ////プレイヤー矢印画像
+    //if ((g_Arrow = LoadGraph("images/Arrow.png")) == -1)return -1;
+
+    ////ヘルプ画面
+    //if ((g_HelpImage = LoadGraph("images/Help.png")) == -1)return -1;
+    ////プレイヤー画像
+    //if (LoadDivGraph("images/player.png", 16, 4, 4, 70, 90, g_Player) == -1) return -1;
 
     return 0;
 }

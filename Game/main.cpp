@@ -17,7 +17,7 @@ const int SCREEN_HEIGHT = 480;
 //制限時間
 const int TIMELIMIT = 30000;
 //宝箱の個数
-const int TREASUREBOX_MAX = 7;
+const int ENEMY_MAX = 7;
 const int TAKARA_TIME = 100;
 
 //プレイヤーのやつ
@@ -26,7 +26,7 @@ const int PLAYER_IMAGE_TIME = 8;
 
 //背景のやつ
 const int STAGE_NO = 0; //背景の廊下の長さ
-const int PLAYER_HP = 5;
+const int PLAYER_HP = 8;
 
 /***********************************************
  * 変数の宣言
@@ -123,10 +123,11 @@ struct TAKARA {
     int img; //画像
     int x, y; //座標x,y,幅w,高さh
     int point; //宝の得点
+    int time;
 };
 //敵機
-struct TAKARA g_takara[TREASUREBOX_MAX];
-struct TAKARA g_treasurebox00 = { TRUE,0,0,30,300,0};
+struct TAKARA g_takara[ENEMY_MAX];
+struct TAKARA g_enemy00 = { TRUE,0,0,30,300,0, TAKARA_TIME };
 
 /***********************************************
  * 関数のプロトタイプ宣言
@@ -192,6 +193,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
         switch (g_GameState) {
         case 0:
             DrawGameTitle(); //ゲームタイトル描画処理
+            g_DrawStageno = 0;
             break;
         case 1:
             GameInit();
@@ -300,7 +302,7 @@ void GameInit(void)
     //エネミーの初期処理
     for (int i = 0; i < g_BoxQuantity; i++)
     {
-        g_takara[i] = g_treasurebox00;
+        g_takara[i] = g_enemy00;
         g_takara[i].point = GetRand(3); //ランダムで値を変える→０が鍵
     }
     g_takara[GetRand(g_BoxQuantity - 1)].point = 0; //強制的に宝箱一つに０点を代入する
@@ -356,6 +358,8 @@ void GameMain(void)
         break;
     }
 
+    /*UIView();
+    TimeCount();*/
     //スペースキーでメニューに戻る　ゲームメインからタイトルに戻る追加
     if (g_KeyFlg & PAD_INPUT_M)g_GameState = 6;
     SetFontSize(16);
@@ -402,9 +406,6 @@ void DrawGameOver(void)
 
     //スペースキーでメニューに戻る
     if (g_KeyFlg & PAD_INPUT_M)   g_GameState = 0;
-
-   
-   
 
     SetDrawBlendMode(DX_BLENDMODE_ALPHA, 128);        //ブレンドモードをα(128/255)に設定
     DrawBox(50, 25, 590, 500, GetColor(0, 0, 0), TRUE);
@@ -668,13 +669,6 @@ void OpenTreasureBox()
               SetFontSize(10);
               DrawString(70, 380, "プレイヤー", 0xFFFFFF, TRUE);
           }
-              if (g_player.hp == PLAYER_HP) { //HPがMAXの時に表示する
-                  DrawString(230, 400, "HPがMAXだ!", 0xffffff, TRUE);
-              }
-              else if (g_player.hp < PLAYER_HP){ //HPが減っていた時に表示する。
-                  DrawString(160, 400, "HPが１回復した!", 0xffffff, TRUE);
-              }
-          }
           else if (g_takara[g_OpenBox].flg == FALSE)
           {
              
@@ -688,7 +682,7 @@ void OpenTreasureBox()
 
     }
 
-    if (g_KeyFlg & PAD_INPUT_A) //ミミックかカギの画像が表示されているとき何かのキーを押すと
+    if (g_KeyFlg) //ミミックかカギの画像が表示されているとき何かのキーを押すと
     {
         if (g_takara[g_OpenBox].point >1)  //ミミックだった場合
         {
@@ -700,12 +694,9 @@ void OpenTreasureBox()
             g_OpenBox = -1; //g_OpenBoxを-1にすると宝箱を選択できるようになる
         }
         else if (g_takara[g_OpenBox].point == 1) {
-            if (g_takara[g_OpenBox].flg == TRUE) {
-                if (g_player.hp < PLAYER_HP) { //最大HPなら回復しない
-                    g_player.hp++; //プレイヤーのHPをプラス１する
-                }
-                g_takara[g_OpenBox].flg = FALSE;
-            }
+            if(g_takara[g_OpenBox].flg== TRUE)g_player.hp++; //プレイヤーのHPをプラス１する
+            g_takara[g_OpenBox].flg = FALSE;
+
             if (g_player.hp <= 0)g_GameState = 6;  //HPが0になった時ゲームオーバーにする
 
             g_OpenBox = -1; //g_OpenBoxを-1にすると宝箱を選択できるようになる
@@ -716,11 +707,11 @@ void OpenTreasureBox()
             g_NowStage++; //ステージに1足す
             g_OpenBox = -1;
 
-            g_BoxQuantity = GetRand(TREASUREBOX_MAX - 2) + 2;
+            g_BoxQuantity = GetRand(ENEMY_MAX - 2) + 2;
             //宝箱の中身を変える
             for (int i = 0; i < g_BoxQuantity; i++)
             {
-                g_takara[i] = g_treasurebox00;
+                g_takara[i] = g_enemy00;
                 g_takara[i].point = GetRand(3); //ランダムで値を変える→０が鍵
             }
             g_takara[GetRand(g_BoxQuantity - 1)].point = 0; //強制的に宝箱一つに０点を代入する
@@ -795,15 +786,12 @@ void DrawEnd(void)
     //２パート
     DrawStringToHandle(225, 550 + g_PosY, "素材利用", GetColor(255, 255, 255), Font4);
     DrawStringToHandle(205, 600 + g_PosY, "BGM　 〇〇〇", GetColor(255, 255, 255), Font5);
+    //DrawStringToHandle(150, 650 + g_PosY, "   　　　 　     ", GetColor(255, 255, 255), Font01);
     DrawStringToHandle(205, 700 + g_PosY, "SE    〇〇〇", GetColor(255, 255, 255), Font5);
-   
+    //DrawStringToHandle(150, 750 + g_PosY, "    　　　　     ", GetColor(255, 255, 255), Font01);
 
     //タイムの加算処理＆終了
     if (++g_WaitTime > 2500)g_GameState = 99;
-    DrawFormatString(0, 0, 0x00ffff, "%d",g_WaitTime);
-    if (g_WaitTime > 2300) {
-        DrawStringToHandle(0, 240, "Thank you for Playing", GetColor(255, 255, 255), Font1);
-    }
 }
 
 /***********************************************
@@ -811,7 +799,8 @@ void DrawEnd(void)
  ***********************************************/
 void DrawHelp(void)
 {
-  
+    //スペースキーでメニューに戻る
+    if (g_KeyFlg & PAD_INPUT_M) g_GameState = 0;
 
     ////タイトル画面表示
     DrawGraph(0, 0, g_HelpImage, FALSE);
@@ -823,29 +812,24 @@ void DrawHelp(void)
     DrawStringToHandle(200, 50, "ヘルプ画面", GetColor(255, 255, 255), Font3);
 
     //大きい文字見出し
-    DrawStringToHandle(150, 150, "プレイヤー操作について", GetColor(255, 0, 0), Font4);
-    DrawStringToHandle(240, 250, "宝箱を選択", GetColor(255, 0, 0), Font4);
+    DrawStringToHandle(150, 150, "プレイヤー操作について", GetColor(255, 255, 255), Font4);
+    DrawStringToHandle(300, 250, "宝箱", GetColor(255, 255, 255), Font4);
 
     //小さい見出し
-    DrawStringToHandle(190, 200, "十字キーやスティックで移動", GetColor(255, 255, 255), Font5);
-    DrawStringToHandle(100, 300, "開けたい宝箱を選択する方法は十字キーや、", GetColor(255, 255, 255), Font5);
-    DrawStringToHandle(100, 320, "スティックで取りたい宝箱を選ぶ。", GetColor(255, 255, 255), Font5); 
-    DrawStringToHandle(100, 350, "開けたい宝箱の決定　Aボタン", GetColor(255, 255, 255), Font5);
+    DrawStringToHandle(250, 200, "十字キーで移動", GetColor(255, 255, 255), Font5);
+    DrawStringToHandle(100, 300, "カーソル移動　十字キーで取りたい宝箱を選ぶ", GetColor(255, 255, 255), Font5);
+    DrawStringToHandle(225, 350, "宝箱の決定　Bボタン", GetColor(255, 255, 255), Font5);
 
     //文字の表示（点滅）
     if (++g_WaitTime < 30) {
 
-        DrawStringToHandle(150, 425, "---Aボタンでタイトルに移動---", GetColor(255, 255, 255), Font5);
-        DrawStringToHandle(150, 455, "---Bボタンでタイトルに移動---", GetColor(255, 255, 255), Font5);
+        DrawStringToHandle(150, 425, "---Bボタンでゲームメインに移動---", GetColor(255, 255, 255), Font5);
     }
     else if (g_WaitTime > 60) {
         g_WaitTime = 0;
     }
 
-    //Aでメニューに戻る
-    if (g_KeyFlg & PAD_INPUT_A) g_GameState = 0;
-    //Bボタンでゲームスタート
-    if (g_KeyFlg & PAD_INPUT_B) g_GameState = 1;
+
 }
 
 /***********************************************
@@ -942,7 +926,7 @@ int LoadSounds()
     //if ((s_TitleBGM = LoadSoundMem("BGM/see.mp3")) == -1) return -1;
 
     //キーボード
-    //if (keyboard.LoadSounds() == -1) return -1;
+    if (keyboard.LoadSounds() == -1) return -1;
 
     ////メニュー
     //if ((g_Applec = LoadGraph("images/Applec.png")) == -1) return -1;

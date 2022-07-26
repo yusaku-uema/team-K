@@ -65,6 +65,7 @@ int g_Applec; //タイトルカーソル変数　消さないで
 int g_StageImage;   //ゲームメイン背景
 int g_HelpImage; //ヘルプ背景
 int g_EndImage;//エンド背景
+int g_RankingImage; //ランキング背景
 int g_RoadImage;
 int g_RoadImage2;
 int g_KeyImage; //鍵の画像（神里が追加
@@ -797,7 +798,7 @@ void DrawRanking()
     if (g_KeyFlg & PAD_INPUT_B) g_GameState = 0;
 
     //ランキング画像表示
-    //DrawGraph(0, 0, g_RankingImage, FALSE);
+    DrawGraph(0, 0, g_RankingImage, FALSE);
 
     ranking.DrawRanking();
 
@@ -805,7 +806,7 @@ void DrawRanking()
     if (++g_WaitTime < 30)
     {
         SetFontSize(24);
-        DrawString(150, 450, "--  Press B button or X Key  --", 0xFF0000);
+        DrawString(150, 450, "--  Bボタンを押して戻る  --", 0xffffed);
     }
     else if (g_WaitTime > 60) g_WaitTime = 0;
 }
@@ -832,6 +833,8 @@ int LoadImages()
 
     //エンド画面背景
     if ((g_EndImage = LoadGraph("images/EndImage.png")) == -1)return -1;
+    //ランキング背景
+    if ((g_RankingImage = LoadGraph("images/rank_back.png")) == -1) return -1;
     //宝箱の画像
     if (LoadDivGraph("images/takarabako.png", 3, 3, 1, 60, 60, g_TakaraBako) == -1) return -1;
 

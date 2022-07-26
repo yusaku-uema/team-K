@@ -97,7 +97,8 @@ void Ranking::DrawRanking()
 	SetFontSize(30);
 	for (int i = 0; i < MAX_RANKING_DATA; i++)
 	{
-		DrawFormatString(50, 170 + i * 35, 0xffd700, "%2d   %10s     %10d", g_Ranking[i].no, g_Ranking[i].name, g_Ranking[i].score);
+		//DrawFormatString(50, 170 + i * 35, 0xffd700, "%2d   %10s     %10d", g_Ranking[i].no, g_Ranking[i].name, g_Ranking[i].score);
+		DrawFormatString(70, 220 + i * 45, 0xffffff, "%3d       %10s %10d", g_Ranking[i].no, g_Ranking[i].name, g_Ranking[i].score);
 	}
 }
 

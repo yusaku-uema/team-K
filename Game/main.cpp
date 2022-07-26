@@ -388,20 +388,8 @@ void DrawStage()
 
     //ƒ^ƒCƒ€‚Ì‰ÁŽZˆ—•I—¹
     if (++g_WaitTime > 100 || g_KeyFlg & PAD_INPUT_A) {
-       /* SetFontSize(50);
-        DrawFormatString(280, 170, 0xffffff, "%dŠK", g_NowStage);
-        DrawFormatString(290, 270, 0xffffff, "~", g_NowStage);
-        DrawFormatString(360, 270, 0xffffff, "%d", g_player.hp);*/
-
-
-        DrawGraph(230, 270, g_HeartImage, TRUE);
-
-        //ƒ^ƒCƒ€‚Ì‰ÁŽZˆ—•I—¹i3•bŒãj
-        if (++g_WaitTime > 180) {
             g_GameMode = 1;
             g_WaitTime = 0;
-
-        }
     }
 }
 

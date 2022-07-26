@@ -74,7 +74,6 @@ int g_HeartImage;
 int g_HeartImage1; //ハート
 int g_DrawStageImages; //ステージ最初のみ
 int g_DrawStageImages1; //二回目以降はこの画像
-int g_DrawStageno; //回数
 
 int g_PosY; //佐久本さんが使います
 int Font, Font1, Font3, Font4, Font5;//ヘルプ画面とエンド画面のフォント変更
@@ -190,7 +189,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
         switch (g_GameState) {
         case 0:
             DrawGameTitle(); //ゲームタイトル描画処理
-            g_DrawStageno = 0;
             break;
         case 1:
             GameInit();

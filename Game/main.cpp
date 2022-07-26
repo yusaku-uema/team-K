@@ -26,7 +26,7 @@ const int PLAYER_IMAGE_TIME = 8;
 
 //背景のやつ
 const int STAGE_NO = 0; //背景の廊下の長さ
-const int PLAYER_HP = 8;
+const int PLAYER_HP = 5;
 
 /***********************************************
  * 変数の宣言
@@ -639,7 +639,12 @@ void OpenTreasureBox()
               SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
               DrawGraph(180, 100, g_HeartImage1, TRUE);  //ミミックの画像を表示
 
-              DrawString(160, 400, "HPが１回復した!", 0xffffff, TRUE);
+              if (g_player.hp == PLAYER_HP) { //HPがMAXの時に表示する
+                  DrawString(230, 400, "HPがMAXだ!", 0xffffff, TRUE);
+              }
+              else if (g_player.hp < PLAYER_HP){ //HPが減っていた時に表示する。
+                  DrawString(160, 400, "HPが１回復した!", 0xffffff, TRUE);
+              }
           }
           else if (g_takara[g_OpenBox].flg == FALSE)
           {
@@ -661,9 +666,12 @@ void OpenTreasureBox()
             g_OpenBox = -1; //g_OpenBoxを-1にすると宝箱を選択できるようになる
         }
         else if (g_takara[g_OpenBox].point == 1) {
-            if(g_takara[g_OpenBox].flg== TRUE)g_player.hp++; //プレイヤーのHPをプラス１する
-            g_takara[g_OpenBox].flg = FALSE;
-
+            if (g_takara[g_OpenBox].flg == TRUE) {
+                if (g_player.hp < PLAYER_HP) { //最大HPなら回復しない
+                    g_player.hp++; //プレイヤーのHPをプラス１する
+                }
+                g_takara[g_OpenBox].flg = FALSE;
+            }
             if (g_player.hp <= 0)g_GameState = 6;  //HPが0になった時ゲームオーバーにする
 
             g_OpenBox = -1; //g_OpenBoxを-1にすると宝箱を選択できるようになる
@@ -888,7 +896,7 @@ int LoadSounds()
     //if ((s_TitleBGM = LoadSoundMem("BGM/see.mp3")) == -1) return -1;
 
     //キーボード
-    if (keyboard.LoadSounds() == -1) return -1;
+    //if (keyboard.LoadSounds() == -1) return -1;
 
     ////メニュー
     //if ((g_Applec = LoadGraph("images/Applec.png")) == -1) return -1;

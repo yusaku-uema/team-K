@@ -454,8 +454,8 @@ void TakaraControl()
 
         if (g_takara[i].flg == FALSE)
         {
-            if (g_takara[i].point <= 0) g_takara[i].img = 2;
-            else if (g_takara[i].point > 0)g_takara[i].img = 3;
+            if (g_takara[i].point <= 0) g_takara[i].img = 1;
+            else if (g_takara[i].point > 0)g_takara[i].img = 2;
             g_takara[i].time--;
             DrawFormatString(g_takara[i].x, g_takara[i].y - 60, 0x00ffff, "%d点", g_takara[i].point);
 
@@ -576,7 +576,7 @@ int LoadImages()
     if ((g_RoadImage2 = LoadGraph("images/road4.png")) == -1)return -1;
 
     //宝箱の画像
-    if (LoadDivGraph("images/TakaraBako.png", 4, 2, 2, 60, 60, g_TakaraBako) == -1) return -1;
+    if (LoadDivGraph("images/TakaraBako.png", 3, 3, 1, 60, 60, g_TakaraBako) == -1) return -1;
 
     //プレイヤー矢印画像
     if ((g_Arrow = LoadGraph("images/Arrow.png")) == -1)return -1;

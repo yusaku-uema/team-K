@@ -4,6 +4,9 @@
 ********************************************************************/
 #include"DxLib.h"
 #include<math.h>
+#include"keyboard.h"
+#include"ranking.h"
+
 /***********************************************
  * 定数を宣言
  ***********************************************/
@@ -117,6 +120,8 @@ void PlayerControl(); //プレイヤーの処理
 void ArrowControl();  //プレイヤーの矢印の処理
 void TakaraControl(); //宝箱の処理
 
+void InputRanking();  //ランキング入力
+void DrawRanking();   //ランキング描画
 /***********************************************
  * プログラムの開始
  **********************************************/
@@ -137,6 +142,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
     Font = CreateFontToHandle("メイリオ", 30, 9, DX_FONTTYPE_ANTIALIASING_EDGE_8X8);//"メイリオ"  の30pt,太さ3のフォントを作成 
     Font1= CreateFontToHandle("メイリオ", 50, 14, DX_FONTTYPE_ANTIALIASING_EDGE);
     if (LoadImages() == -1) return -1; //画像読込み関数を呼び出し
+    if (ranking.ReadRanking() == -1) return -1;
 
     //ゲームループ 
     while (ProcessMessage() == 0 && g_GameState != 99) {
@@ -156,7 +162,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
             GameInit();
             break;
         case 2:
-            //DrawRanking();
+            DrawRanking();
             break;
         case 3:
             DrawHelp();
@@ -171,7 +177,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
             DrawGameOver();
             break;
         case 7:
-            //InputRanking();
+            InputRanking();
             break;
         }
 
@@ -256,6 +262,9 @@ void GameInit(void)
 
     //現在の経過時間を得る
     g_StartTime = GetNowCount();
+
+    //キーボード（ランキング入力）初期処理
+    keyboard.KeyBoardInit();
 
     //ゲームメイン処理へ
     g_GameState = 5;
@@ -558,6 +567,37 @@ void DrawHelp(void)
 }
 
 /***********************************************
+ * ランキング入力処理
+ ***********************************************/
+void InputRanking()
+{
+    keyboard.DrawKeyBoard();
+    keyboard.KeyBoardControl(g_NowKey);
+    keyboard.Push_B_Key(g_NowKey, &g_GameState, g_Score);
+}
+/***********************************************
+ * ランキング描画処理
+ ***********************************************/
+void DrawRanking()
+{
+    // Bボタン or Xキー でタイトルに戻る
+    if (g_KeyFlg & PAD_INPUT_B) g_GameState = 0;
+
+    //ランキング画像表示
+    //DrawGraph(0, 0, g_RankingImage, FALSE);
+
+    ranking.DrawRanking();
+
+    // 文字の表示(点滅)
+    if (++g_WaitTime < 30)
+    {
+        SetFontSize(24);
+        DrawString(150, 450, "--  Press B button or X Key  --", 0xFF0000);
+    }
+    else if (g_WaitTime > 60) g_WaitTime = 0;
+}
+
+/***********************************************
  * 画像読み込み
  ***********************************************/
 int LoadImages()
@@ -586,6 +626,9 @@ int LoadImages()
 
     //エンド画像
     if ((g_kakusibeya = LoadGraph("images/kakusibeya.png")) == -1)return -1;
+
+    //キーボード諸々
+    if (keyboard.LoadImgae() == -1) return -1;
 
     return 0;
 }

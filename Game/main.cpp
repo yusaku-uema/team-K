@@ -15,7 +15,7 @@ const int SCREEN_HEIGHT = 480;
 //制限時間
 const int TIMELIMIT = 30000;
 //宝箱の個数
-const int ENEMY_MAX = 6;
+const int ENEMY_MAX = 7;
 const int TAKARA_TIME = 100;
 
 //プレイヤーのやつ
@@ -43,11 +43,13 @@ int g_MenuY;				// メニューカーソルのＹ座標
  
 int g_Score = 0; //スコア
 
+int g_TakaraPosition;
+
 int g_WaitTime = 0; //待ち時間
 int g_StartTime;   // スタート時間
 int Time;   // 現在時間
 
-int g_TakaraBako[4]; //宝箱の画像
+int g_TakaraBako[2]; //宝箱の画像
 int g_Player[16];
 int g_Arrow;  //プレイヤーの矢印の画像
 int g_Applec; //タイトルカーソル変数　消さないで
@@ -247,8 +249,9 @@ void GameInit(void)
     for (int i = 0; i < ENEMY_MAX; i++)
     {
         g_takara[i] = g_enemy00;
-        g_takara[i].point = GetRand(5) * 1000;
+        g_takara[i].point = GetRand(9); //ランダムで値を変える→０が鍵
     }
+    g_takara[GetRand(ENEMY_MAX - 1)].point = 0; //強制的に宝箱一つに０点を代入する
 
     //プレイヤー矢印の初期処理
     g_arrow.y = g_takara[g_arrow.no].y - 100;
@@ -430,12 +433,12 @@ void ArrowControl()
     if (g_KeyFlg & PAD_INPUT_LEFT)
     {
         g_arrow.no--;
-        if (g_arrow.no < 0) g_arrow.no = 5;
+        if (g_arrow.no < 0) g_arrow.no = ENEMY_MAX - 1;
     }
     else if (g_KeyFlg & PAD_INPUT_RIGHT)
     {
         g_arrow.no++;
-        if (g_arrow.no > 5) g_arrow.no = 0;
+        if (g_arrow.no > ENEMY_MAX - 1) g_arrow.no = 0;
     }
 
     else if (g_KeyFlg & PAD_INPUT_A)
@@ -459,26 +462,19 @@ void ArrowControl()
  ***********************************************/
 void TakaraControl()
 {
+    g_TakaraPosition = (640 - ((ENEMY_MAX * 60) + ((ENEMY_MAX - 1) * 20))) / 2;
+
     for (int i = 0; i < ENEMY_MAX; i++)
     {
-        g_takara[i].x = i * 70 + 30;
+        g_takara[i].x = i * 80 + g_TakaraPosition;
         DrawGraph(g_takara[i].x, g_takara[i].y, g_TakaraBako[g_takara[i].img], TRUE); //敵の表示
 
 
         if (g_takara[i].flg == FALSE)
         {
-            if (g_takara[i].point <= 0) g_takara[i].img = 2;
-            else if (g_takara[i].point > 0)g_takara[i].img = 3;
-            g_takara[i].time--;
+            if (g_takara[i].point <= 0) g_takara[i].img = 1;
+            else if (g_takara[i].point > 0)g_takara[i].img = 1;
             DrawFormatString(g_takara[i].x, g_takara[i].y - 60, 0x00ffff, "%d点", g_takara[i].point);
-
-            if (g_takara[i].time <= 0)
-            {
-                g_takara[i].flg = TRUE;
-                g_takara[i].point = GetRand(5) * 1000;
-                g_takara[i].time = TAKARA_TIME;
-                g_takara[i].img = 0;
-            }
         }
     }
 }
@@ -608,11 +604,13 @@ int LoadImages()
     //エンド画面背景
     if ((g_EndImage = LoadGraph("images/EndImage.png")) == -1)return -1;
     //宝箱の画像
-    if (LoadDivGraph("images/TakaraBako.png", 4, 2, 2, 60, 60, g_TakaraBako) == -1) return -1;
+    if (LoadDivGraph("images/takarabako.png", 2, 2, 1, 60, 60, g_TakaraBako) == -1) return -1;
 
     //プレイヤー矢印画像
     if ((g_Arrow = LoadGraph("images/Arrow.png")) == -1)return -1;
-
+    
+    //ヘルプ画面
+    if ((g_HelpImage = LoadGraph("images/Help.png")) == -1)return -1;
     //プレイヤー画像
     if (LoadDivGraph("images/player.png", 16, 4, 4, 70, 90, g_Player) == -1) return -1;
 

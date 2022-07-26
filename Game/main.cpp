@@ -53,6 +53,7 @@ int g_StageImage;   //ゲームメイン背景
 
 int g_RoadImage;
 int g_RoadImage2;
+int g_kakusibeya;
 
 //プレイヤー矢印の構造体
 struct ARROW
@@ -498,14 +499,47 @@ void UIView(void)
  ***********************************************/
 void DrawEnd(void)
 {
-    ////エンド画像表示予定
-    //DrawGraph(0, 0, g_EndImage, FALSE);
+    //エンド画像表示予定
+    DrawGraph(0, 0, g_kakusibeya, FALSE);
+
+    // ********** フォントのロード **********
+    LPCSTR font_path = "azukiP.ttf"; // 読み込むフォントファイルのパス
+    if (AddFontResourceEx(font_path, FR_PRIVATE, NULL) > 0) {
+    }
+    else {
+        // フォント読込エラー処理
+        MessageBox(NULL, "フォント読込失敗", "", MB_OK);
+    }
 
     SetFontSize(40);
-    DrawString(100, 255,"Thank you for Playing", 0xffffff, 0);
+    ChangeFont("あずきフォントP", DX_CHARSET_DEFAULT);
+    /*DrawString(100, 255,"Thank you for Playing", 0xffffff, 0);*/
+    DrawString(255, 30, "チームK", 0xffffff, 0);
+    DrawString(100, 150, "安里和也", 0xffffff, 0);
+    DrawString(100, 100, "名嘉村亜澄真", 0xffffff, 0);
+    DrawString(400, 100, "川畑勇快", 0xffffff, 0);
+    DrawString(400, 150, "神里晃汰", 0xffffff, 0);
+    DrawString(100, 200, "上間優咲", 0xffffff, 0);
+    DrawString(400, 200, "佐久本盛杏", 0xffffff, 0);
+    DrawString(220, 255, "フリー素材", 0xffffff, 0);
+    DrawString(250, 300, "?", 0xffffff, 0);
+    DrawString(310, 300, "?", 0xffffff, 0);
+    DrawString(370, 300, "?", 0xffffff, 0);
+    DrawString(370, 350, "?", 0xffffff, 0);
+    DrawString(250, 350, "?", 0xffffff, 0);
+    DrawString(310, 350, "?", 0xffffff, 0);
+
+
+    // ********** フォントのアンロード **********
+    if (RemoveFontResourceEx(font_path, FR_PRIVATE, NULL)) {
+    }
+    else {
+        MessageBox(NULL, "remove failure", "", MB_OK);
+    }
+    
 
     //タイムの加算処理＆終了（3秒後）
-    if (++g_WaitTime > 180)g_GameState = 99;
+    if (++g_WaitTime > 300)g_GameState = 99;
 }
 
 /***********************************************
@@ -549,6 +583,9 @@ int LoadImages()
 
     //プレイヤー画像
     if (LoadDivGraph("images/player.png", 16, 4, 4, 70, 90, g_Player) == -1) return -1;
+
+    //エンド画像
+    if ((g_kakusibeya = LoadGraph("images/kakusibeya.png")) == -1)return -1;
 
     return 0;
 }

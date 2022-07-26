@@ -617,11 +617,13 @@ void OpenTreasureBox()
 		DrawBox(180, 100, 460, 380, GetColor(255, 255, 255), TRUE);
 		SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
 		DrawGraph(180, 100, g_KeyImage, TRUE); //鍵の画像を表示させる
+
 		DrawString(150, 400, "やったー！カギだ！", 0xffffff, TRUE);
 		DrawGraph(10, 380, g_PlayerIkon, TRUE);  //プレイヤーアイコン
 		SetFontSize(10);
 		DrawString(70, 380, "プレイヤー", 0xFFFFFF, TRUE);
 	}
+
 
 	else if (g_takara[g_OpenBox].point > 0) //宝箱の中身がミミック（0以外）だった時
 	{
@@ -633,6 +635,7 @@ void OpenTreasureBox()
 				DrawBox(180, 100, 460, 380, GetColor(255, 255, 255), TRUE);
 				SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
 				DrawGraph(180, 100, g_MimicImage, TRUE);  //ミミックの画像を表示
+
 				SetFontSize(40);
 				DrawString(160, 400, "ミッ、ミミックだ！", 0xffffff, TRUE);
 				DrawGraph(10, 380, g_PlayerIkon, TRUE);  //プレイヤーアイコン
@@ -651,32 +654,37 @@ void OpenTreasureBox()
 		if (g_takara[g_OpenBox].point == 1) {
 			if (g_takara[g_OpenBox].flg == TRUE)
 			{
-				g_takara[g_OpenBox].img = 1;  //空の画像に切り替える
+				g_takara[g_OpenBox].img = 1;  //ミミックの画像に切り替える
 				SetDrawBlendMode(DX_BLENDMODE_ALPHA, 150);        //ブレンドモードをα(128/255)に設定
 				DrawBox(180, 100, 460, 380, GetColor(255, 255, 255), TRUE);
 				SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
 				DrawGraph(180, 100, g_HeartImage1, TRUE);  //ミミックの画像を表示
+				if (g_player.hp == PLAYER_HP) { //HPがMAXの時に表示する
+					SetFontSize(40);
+					DrawString(230, 400, "HPがMAXだ!", 0xffffff, TRUE);
+					DrawGraph(10, 380, g_PlayerIkon, TRUE);  //プレイヤーアイコン
+					SetFontSize(10);
+					DrawString(70, 380, "プレイヤー", 0xFFFFFF, TRUE);
+				}
+				else if (g_player.hp < PLAYER_HP) { //HPが減っていた時に表示する。
+					SetFontSize(40);
+					DrawString(160, 400, "HPが１回復した!", 0xffffff, TRUE);
+					DrawGraph(10, 380, g_PlayerIkon, TRUE);  //プレイヤーアイコン
+					SetFontSize(10);
+					DrawString(70, 380, "プレイヤー", 0xFFFFFF, TRUE);
+				}
+
+			}
+			else if (g_takara[g_OpenBox].flg == FALSE)
+			{
+				SetFontSize(40);
+				DrawString(180, 400, "中身がからっぽだ！", 0xffffff, TRUE);
 				DrawGraph(10, 380, g_PlayerIkon, TRUE);  //プレイヤーアイコン
 				SetFontSize(10);
 				DrawString(70, 380, "プレイヤー", 0xFFFFFF, TRUE);
 			}
-			if (g_player.hp == PLAYER_HP) { //HPがMAXの時に表示する
-				SetFontSize(40);
-				DrawString(230, 400, "HPがMAXだ!", 0xffffff, TRUE);
-			}
-			else if (g_player.hp < PLAYER_HP) { //HPが減っていた時に表示する。
-				SetFontSize(40);
-				DrawString(160, 400, "HPが１回復した!", 0xffffff, TRUE);
-			}
 		}
-		else if (g_takara[g_OpenBox].flg == FALSE)
-		{
-			SetFontSize(40);
-			DrawString(180, 400, "中身がからっぽだ！", 0xffffff, TRUE);
-			DrawGraph(10, 380, g_PlayerIkon, TRUE);  //プレイヤーアイコン
-			SetFontSize(10);
-			DrawString(70, 380, "プレイヤー", 0xFFFFFF, TRUE);
-		}
+
 	}
 
 	if (g_KeyFlg & PAD_INPUT_A) //ミミックかカギの画像が表示されているとき何かのキーを押すと

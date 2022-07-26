@@ -315,7 +315,7 @@ void GameInit(void)
 
 
     //”wŒi‰æ‘œ(˜L‰ºj‚Ì‰Šúˆ—
-    g_stage = { STAGE_NO, g_RoadImage, 145, 0 };
+    g_stage = { STAGE_NO, g_RoadImage, 0, 0 };
 
     g_GameMode = 0;
 
@@ -519,8 +519,8 @@ void PlayerControl()
 
     DrawFormatString(0, 60, 0x111FFF, "%d", g_WalkOldKey);
 
-    if (g_player.x > g_stage.x + 350 - 60)g_player.x = g_stage.x + 350 - 60;
-    if (g_player.x < g_stage.x)g_player.x = g_stage.x;
+    if (g_player.x > 135)g_player.x = 135;
+    if (g_player.x < 145)g_player.x = 145;
     if (g_player.y > 400)g_player.y = 400;
     if (g_player.y < 59 && g_player.x >= 270 && g_player.x <= 320)g_GameMode = 2;
     if (g_player.y < 60)g_player.y = 60;
@@ -674,7 +674,7 @@ void OpenTreasureBox()
             g_player.img = 13;
 
             //”wŒi‰æ‘œ(˜L‰ºj‚Ì‰Šúˆ—
-            g_stage = { STAGE_NO, g_RoadImage, 145, 0 };
+            g_stage = { STAGE_NO, g_RoadImage, 0, 0 };
 
             g_GameMode = 0;
         }
@@ -822,7 +822,7 @@ int LoadImages()
     if ((g_Applec = LoadGraph("images/Applec.png")) == -1) return -1;
 
     //ƒXƒe[ƒW”wŒi
-    if ((g_StageImage = LoadGraph("images/haikei.png")) == -1)return -1;
+    if ((g_StageImage = LoadGraph("images/haikei1.png")) == -1)return -1;
     if ((g_DrawStageImages = LoadGraph("images/doukutu.png")) == -1)return -1;
     if ((g_DrawStageImages1 = LoadGraph("images/doukutu1 .png")) == -1)return -1;
     

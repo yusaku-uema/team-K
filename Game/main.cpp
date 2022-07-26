@@ -311,7 +311,7 @@ void GameInit(void)
 
     //ƒvƒŒƒCƒ„[‰Šúˆ—
 
-    g_player = { 285, 400, 13, PLAYER_IMAGE_TIME, PLAYER_HP};
+    g_player = { 290, 400, 13, PLAYER_IMAGE_TIME, PLAYER_HP};
 
 
     //”wŒi‰æ‘œ(˜L‰ºj‚Ì‰Šúˆ—
@@ -386,10 +386,10 @@ void DrawStage()
 
     //ƒ^ƒCƒ€‚Ì‰ÁZˆ—•I—¹
     if (++g_WaitTime > 100 || g_KeyFlg & PAD_INPUT_A) {
-        SetFontSize(50);
+       /* SetFontSize(50);
         DrawFormatString(280, 170, 0xffffff, "%dŠK", g_NowStage);
         DrawFormatString(290, 270, 0xffffff, "~", g_NowStage);
-        DrawFormatString(360, 270, 0xffffff, "%d", g_player.hp);
+        DrawFormatString(360, 270, 0xffffff, "%d", g_player.hp);*/
 
 
         DrawGraph(230, 270, g_HeartImage, TRUE);
@@ -519,7 +519,7 @@ void PlayerControl()
 
     DrawFormatString(0, 60, 0x111FFF, "%d", g_WalkOldKey);
 
-    if (g_player.x > 135)g_player.x = 135;
+    if (g_player.x > 435)g_player.x = 435;
     if (g_player.x < 145)g_player.x = 145;
     if (g_player.y > 400)g_player.y = 400;
     if (g_player.y < 59 && g_player.x >= 270 && g_player.x <= 320)g_GameMode = 2;
@@ -669,7 +669,7 @@ void OpenTreasureBox()
             g_arrow.x = g_takara[g_arrow.no].x;
 
             //ƒvƒŒƒCƒ„[‰Šúˆ—
-            g_player.x = 285;
+            g_player.x = 290;
             g_player.y = 400;
             g_player.img = 13;
 

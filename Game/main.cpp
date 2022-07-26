@@ -58,6 +58,8 @@ int g_RoadImage;
 int g_RoadImage2;
 int g_kakusibeya;
 
+int Title_BGM;
+
 //プレイヤー矢印の構造体
 struct ARROW
 {
@@ -122,6 +124,8 @@ void TakaraControl(); //宝箱の処理
 
 void InputRanking();  //ランキング入力
 void DrawRanking();   //ランキング描画
+
+int LoadSounds(); //音声読み込み
 /***********************************************
  * プログラムの開始
  **********************************************/
@@ -142,6 +146,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
     Font = CreateFontToHandle("メイリオ", 30, 9, DX_FONTTYPE_ANTIALIASING_EDGE_8X8);//"メイリオ"  の30pt,太さ3のフォントを作成 
     Font1= CreateFontToHandle("メイリオ", 50, 14, DX_FONTTYPE_ANTIALIASING_EDGE);
     if (LoadImages() == -1) return -1; //画像読込み関数を呼び出し
+    if (LoadSounds() == -1) return -1; //画像読込み関数を呼び出し
     if (ranking.ReadRanking() == -1) return -1;
 
     //ゲームループ 
@@ -181,6 +186,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
             break;
         }
 
+        if (g_GameState != 0) {
+            StopSoundMem(Title_BGM);
+        }
         //裏画面の内容を表画面に反映します 
         ScreenFlip();
     }
@@ -195,6 +203,10 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
  * ゲームタイトル表示
  ***********************************************/
 void DrawGameTitle(void) {
+    if (CheckSoundMem(Title_BGM) != 1) {
+        ChangeVolumeSoundMem(70, Title_BGM);
+        PlaySoundMem(Title_BGM, DX_PLAYTYPE_LOOP, TRUE);
+    }
 
     //メニューカーソル移動処理
     if (g_KeyFlg & PAD_INPUT_DOWN) {
@@ -629,6 +641,42 @@ int LoadImages()
 
     //キーボード諸々
     if (keyboard.LoadImgae() == -1) return -1;
+
+    return 0;
+}
+
+/***********************************************
+ * 画像読み込み
+ ***********************************************/
+int LoadSounds()
+{
+    //タイトル タイトル画像替えました。
+    if ((Title_BGM = LoadSoundMem("BGM/see.mp3")) == -1) return -1;
+
+    ////メニュー
+    //if ((g_cursor = LoadGraph("images/cursor.png")) == -1) return -1;
+
+    ////ステージ背景
+    //if ((g_StageImage = LoadGraph("images/haikei.png")) == -1)return -1;
+
+    ////廊下の画像
+    //if ((g_RoadImage = LoadGraph("images/road3.png")) == -1)return -1;
+    //if ((g_RoadImage2 = LoadGraph("images/road4.png")) == -1)return -1;
+
+    ////宝箱の画像
+    //if (LoadDivGraph("images/TakaraBako.png", 3, 3, 1, 60, 60, g_TakaraBako) == -1) return -1;
+
+    ////プレイヤー矢印画像
+    //if ((g_Arrow = LoadGraph("images/Arrow.png")) == -1)return -1;
+
+    ////プレイヤー画像
+    //if (LoadDivGraph("images/player.png", 16, 4, 4, 70, 90, g_Player) == -1) return -1;
+
+    ////エンド画像
+    //if ((g_kakusibeya = LoadGraph("images/kakusibeya.png")) == -1)return -1;
+
+    ////キーボード諸々
+    //if (keyboard.LoadImgae() == -1) return -1;
 
     return 0;
 }

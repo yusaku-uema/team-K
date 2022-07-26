@@ -207,7 +207,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
             DrawGameOver();
             break;
         case 7:
-            //InputRanking();
+            InputRanking();
             break;
         }
 
@@ -829,6 +829,9 @@ int LoadSounds()
 {
     //タイトル タイトル画像替えました。
     if ((s_TitleBGM = LoadSoundMem("BGM/see.mp3")) == -1) return -1;
+
+    //キーボード
+    if (keyboard.LoadSounds() == -1) return -1;
 
     ////メニュー
     //if ((g_Applec = LoadGraph("images/Applec.png")) == -1) return -1;

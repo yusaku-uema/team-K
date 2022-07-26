@@ -20,6 +20,9 @@ public:
 	//画像読み込み
 	int LoadImgae();
 
+	//効果音読み込み
+	int LoadSounds();
+
 	//描画
 	void DrawKeyBoard();
 
@@ -54,6 +57,10 @@ private:
 	//「OK」カーソル画像
 	int OKimage[2] = { 0 };
 
+	//SE
+	int SE_push = 0;   //通常入力
+	int SE_cancel = 0; //「×」
+	int SE_ok = 0;     //「ok」
 
 	//移動量
 	int movekeyX = 0;

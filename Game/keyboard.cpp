@@ -66,6 +66,14 @@ int KeyBoard::LoadImgae()
 	if ((LoadDivGraph("images/KeyBoard/N_Link_Space.png", 2, 2, 1, 200, 40, OKimage)) == -1) return -1;
 }
 
+//効果音読み込み
+int KeyBoard::LoadSounds()
+{
+	if ((SE_push = LoadSoundMem("BGM/SE_Key_push.wav")) == -1) return -1;
+	if ((SE_cancel = LoadSoundMem("BGM/SE_Key_cancel.wav")) == -1) return -1;
+	if ((SE_ok = LoadSoundMem("BGM/SE_Key_ok.wav")) == -1) return -1;
+}
+
 //描画
 void KeyBoard::DrawKeyBoard()
 {
@@ -200,6 +208,9 @@ void KeyBoard::Push_B_Key(int NowKey, int* GameState, int Score)
 				//入力タイミング
 				if (InputControl() == 0)
 				{
+					//SE
+					PlaySoundMem(SE_push, DX_PLAYTYPE_BACK);
+
 					++namePos;
 					//上限は9文字
 					if (namePos >= 8) namePos = 8;
@@ -217,6 +228,8 @@ void KeyBoard::Push_B_Key(int NowKey, int* GameState, int Score)
 			//入力タイミング
 			if (InputControl() == 0)
 			{
+				PlaySoundMem(SE_cancel, DX_PLAYTYPE_BACK);
+
 				InputName[namePos] = 0;
 
 				//０文字以下にはならない
@@ -234,10 +247,17 @@ void KeyBoard::Push_B_Key(int NowKey, int* GameState, int Score)
 				//未入力での確定は不可
 				if (InputName[0] != '\0')
 				{
+					//SE
+					PlaySoundMem(SE_ok, DX_PLAYTYPE_BACK);
+
 					InputName[namePos + 1] = '\0';
 
 					//ランキング変数へ name・Score を代入 --> 画面遷移
 					ranking.SetRanking(InputName, GameState, Score);
+				}
+				{
+					//SE 未入力時はカチカチなります
+					PlaySoundMem(SE_push, DX_PLAYTYPE_BACK);
 				}
 			}
 		}

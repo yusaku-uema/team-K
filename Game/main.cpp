@@ -33,7 +33,7 @@ const int PLAYER_HP = 8;
  ***********************************************/
 int g_OldKey;  // 前回の入力キー 
 int g_NowKey;  // 今回の入力キー 
-int g_KeyFlg;  // 入力キー情報
+int g_KeyFlg;  // 入力キー情報 
 
 int g_WalkOldKey  = 0;
 
@@ -348,7 +348,6 @@ void GameMain(void)
 
     /*UIView();
     TimeCount();*/
-
     //スペースキーでメニューに戻る　ゲームメインからタイトルに戻る追加
     if (g_KeyFlg & PAD_INPUT_M)g_GameState = 6;
     SetFontSize(16);
@@ -379,6 +378,16 @@ void DrawStage()
 
     //タイムの加算処理＆終了
     if (++g_WaitTime > 100|| g_KeyFlg & PAD_INPUT_A) {
+    SetFontSize(50);
+    DrawFormatString(280, 170, 0xffffff, "%d階", g_NowStage);
+    DrawFormatString(290, 270, 0xffffff, "×", g_NowStage);
+    DrawFormatString(360, 270, 0xffffff, "%d", g_player.hp);
+
+
+    DrawGraph(230, 270, g_HeartImage, TRUE);
+   
+    //タイムの加算処理＆終了（3秒後）
+    if (++g_WaitTime > 180) {
         g_GameMode = 1;
         g_WaitTime = 0;
     }
@@ -676,14 +685,15 @@ void TimeCount(void)
 
 void UIView(void)
 {
-    //UI「TIME」表示
-    SetFontSize(50);
-    DrawString(520, 40, "TIME", 0xffffff, 0);
+    
+    ////UI「TIME」表示
+    //SetFontSize(50);
+    //DrawString(520, 40, "TIME", 0xffffff, 0);
 
-    //UI「SCORE」表示
-    SetFontSize(45);
-    DrawString(510, 320, "SCORE", 0xffffff, 0);
-    DrawFormatString(510, 360, 0x00ffff, "%d", g_Score);
+    ////UI「SCORE」表示
+    //SetFontSize(45);
+    //DrawString(510, 320, "SCORE", 0xffffff, 0);
+    //DrawFormatString(510, 360, 0x00ffff, "%d", g_Score);
 }
 
 /***********************************************

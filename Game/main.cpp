@@ -21,7 +21,8 @@ const int PLAYER_SPEED = 3;
 const int PLAYER_IMAGE_TIME = 8;
 
 //背景のやつ
-const int STAGE_NO = 2; //背景の廊下の長さ
+const int STAGE_NO = 1; //背景の廊下の長さ
+const int PLAYER_HP = 8;
 
 /***********************************************
  * 変数の宣言
@@ -39,15 +40,18 @@ int g_Menu; //メニュー画面
 int	g_MenuNumber = 0;		// メニューカーソル位置
 int g_MenuY;				// メニューカーソルのＹ座標
  
+int g_BoxQuantity;  //宝箱の個数
 int g_Score = 0; //スコア
 
-int g_TakaraPosition;
+int g_TakaraPosition; //宝箱の表示に使う（神里
+int g_OpenBox;//宝箱を開けた時の変数（神里
+int g_NowStage; //現在の階数
 
 int g_WaitTime = 0; //待ち時間
 int g_StartTime;   // スタート時間
 int Time;   // 現在時間
 
-int g_TakaraBako[2]; //宝箱の画像
+int g_TakaraBako[3]; //宝箱の画像
 int g_Player[16];
 int g_Arrow;  //プレイヤーの矢印の画像
 int g_Applec; //タイトルカーソル変数　消さないで
@@ -57,6 +61,9 @@ int g_HelpImage; //ヘルプ背景
 int g_EndImage;//エンド背景
 int g_RoadImage;
 int g_RoadImage2;
+int g_KeyImage; //鍵の画像（神里が追加
+int g_MimicImage; //ミミックの画像（神里が追加
+int g_HeartImage;
 int g_PosY; //佐久本さんが使います
 int Font,Font1,Font3, Font4, Font5;//ヘルプ画面とエンド画面のフォント変更
 //プレイヤー矢印の構造体
@@ -75,6 +82,7 @@ struct PLAYER
     int x, y;      //座標x,y
     int img;
     int imgtime;
+    int hp;
 };
 //プレイヤー
 struct PLAYER g_player;
@@ -116,10 +124,12 @@ int LoadImages(); //画像読み込み
 void UIView();
 void TimeCount();
 void BackScrool(int a); //背景画像スクロール処理
-void BackImage();
+void BackImage(); //宝箱選択時の背景画像
+void OpenTreasureBox();  //宝箱を開けた時の関数（神里
 void PlayerControl(); //プレイヤーの処理
 void ArrowControl();  //プレイヤーの矢印の処理
 void TakaraControl(); //宝箱の処理
+void DrawStage(); //ステージの初めに表示される（神里
 
 /***********************************************
  * プログラムの開始
@@ -242,21 +252,30 @@ void GameInit(void)
     //スコアの初期処理6
     g_Score = 0;
 
+    //現在のステージ
+    g_NowStage = 1;
+
+    //宝箱を開けてるかの処理
+    g_OpenBox = -1;
+
+    g_BoxQuantity = 2;
+
     //エネミーの初期処理
-    for (int i = 0; i < ENEMY_MAX; i++)
+    for (int i = 0; i < g_BoxQuantity; i++)
     {
         g_takara[i] = g_enemy00;
-        g_takara[i].point = GetRand(9); //ランダムで値を変える→０が鍵
+        g_takara[i].point = GetRand(3); //ランダムで値を変える→０が鍵
     }
-    g_takara[GetRand(ENEMY_MAX - 1)].point = 0; //強制的に宝箱一つに０点を代入する
+    g_takara[GetRand(g_BoxQuantity - 1)].point = 0; //強制的に宝箱一つに０点を代入する
 
     //プレイヤー矢印の初期処理
+    g_arrow.no = 0;
     g_arrow.y = g_takara[g_arrow.no].y - 100;
     g_arrow.x = g_takara[g_arrow.no].x;
-    g_arrow.no = 0;
+    
 
     //プレイヤー初期処理
-    g_player = { 139, 200, 13, PLAYER_IMAGE_TIME };
+    g_player = { 139, 400, 13, PLAYER_IMAGE_TIME, PLAYER_HP};
 
     //背景画像(廊下）の初期処理
     g_stage = { STAGE_NO, g_RoadImage, 0, 0 };
@@ -277,13 +296,17 @@ void GameMain(void)
 {
     switch (g_GameMode) {
     case 0:
-       /* BackScrool(0);
-        PlayerControl();
-        break;*/
+        DrawStage();
+        break;
     case 1:
+        BackScrool(0);
+        PlayerControl();
+        break;
+    case 2:
         BackImage();
         TakaraControl();
         ArrowControl();
+        if (g_OpenBox > -1)OpenTreasureBox();
         break;
     }
     
@@ -294,6 +317,16 @@ void GameMain(void)
     if (g_KeyFlg & PAD_INPUT_M)g_GameState = 6;
     SetFontSize(16);
     DrawString(150, 450, "---スペースキーを押してゲームオーバーへ---", 0xffffff, 0);
+}
+
+/***********************************************
+ *ゲームステージ表示
+ ***********************************************/
+void DrawStage()
+{
+    SetFontSize(50);
+    DrawFormatString(200, 170, 0xffffff, "%d階", g_NowStage);
+    if (g_KeyFlg & PAD_INPUT_A)   g_GameMode = 1;
 }
 
 /***********************************************
@@ -313,7 +346,7 @@ void DrawGameOver(void)
     DrawString(220, 170, "ゲームオーバー", 0xcc0000);
     SetFontSize(35);
 
-    DrawFormatString(180, 250, 0xFFFFFF, "スコア = %6d", g_Score);
+    DrawFormatString(180, 250, 0xFFFFFF, "最終階層 = %02d階", g_NowStage);
 
     SetFontSize(20);
     DrawString(150, 450, "---スペースキーを押してタイトルへ戻る ---", 0xffffff, 0);
@@ -407,8 +440,13 @@ void PlayerControl()
     if (g_player.x > 280)g_player.x = 280;
     if (g_player.x < 0)g_player.x = 0;
     if (g_player.y > 400)g_player.y = 400;
-    if (g_player.y < 59 && g_player.x >= 130 && g_player.x <= 150)g_GameMode = 1;
+    if (g_player.y < 59 && g_player.x >= 130 && g_player.x <= 150)g_GameMode = 2;
     if (g_player.y < 60)g_player.y = 60;
+
+    for (int i = 0; i < g_player.hp; i++)
+    {
+        DrawGraph(55 * i, 10, g_HeartImage, TRUE);
+    }
 
     DrawFormatString(0, 0, 0x111FFF, "キャラ画像 = %d", g_player.img);
     DrawFormatString(0, 20, 0x111FFF, "X = %d", g_player.x);
@@ -424,51 +462,115 @@ void PlayerControl()
  ***********************************************/
 void ArrowControl()
 {
-    if (g_KeyFlg & PAD_INPUT_LEFT)
+    if (g_OpenBox == -1)
     {
-        g_arrow.no--;
-        if (g_arrow.no < 0) g_arrow.no = ENEMY_MAX - 1;
-    }
-    else if (g_KeyFlg & PAD_INPUT_RIGHT)
-    {
-        g_arrow.no++;
-        if (g_arrow.no > ENEMY_MAX - 1) g_arrow.no = 0;
-    }
-
-    else if (g_KeyFlg & PAD_INPUT_A)
-    {
-        if (g_takara[g_arrow.no].flg == TRUE)
+        if (g_KeyFlg & PAD_INPUT_LEFT)
         {
-            g_Score += g_takara[g_arrow.no].point;
-            g_takara[g_arrow.no].flg = FALSE;
+            g_arrow.no--;
+            if (g_arrow.no < 0) g_arrow.no = g_BoxQuantity - 1;
+        }
+        else if (g_KeyFlg & PAD_INPUT_RIGHT)
+        {
+            g_arrow.no++;
+            if (g_arrow.no > g_BoxQuantity - 1) g_arrow.no = 0;
+        }
+
+        else if (g_KeyFlg & PAD_INPUT_A)
+        {
+            if (g_takara[g_arrow.no].flg == TRUE)
+            {
+                g_Score += g_takara[g_arrow.no].point;
+                g_OpenBox = g_arrow.no;
+                g_KeyFlg = 0;
+            }
         }
     }
 
     g_arrow.x = g_takara[g_arrow.no].x;
 
+    for (int i = 0; i < g_player.hp; i++)
+    {
+        DrawGraph(55 * i, 10, g_HeartImage, TRUE);
+    }
     DrawGraph(g_arrow.x, g_arrow.y, g_Arrow, TRUE);
 }
 
 /***********************************************
- * 宝箱の生成
+ * 宝箱の表示
  * 引  数:なし
  * 戻り値:TRUE成功、FALSE失敗
  ***********************************************/
 void TakaraControl()
 {
-    g_TakaraPosition = (640 - ((ENEMY_MAX * 60) + ((ENEMY_MAX - 1) * 20))) / 2;
+    g_TakaraPosition = (640 - ((g_BoxQuantity * 60) + ((g_BoxQuantity - 1) * 20))) / 2;
 
-    for (int i = 0; i < ENEMY_MAX; i++)
+    for (int i = 0; i < g_BoxQuantity; i++)
     {
         g_takara[i].x = i * 80 + g_TakaraPosition;
-        DrawGraph(g_takara[i].x, g_takara[i].y, g_TakaraBako[g_takara[i].img], TRUE); //敵の表示
+        DrawGraph(g_takara[i].x, g_takara[i].y, g_TakaraBako[g_takara[i].img], TRUE); //宝箱の表示
+    }
+}
 
+/***********************************************
+ * 宝箱を開けたとき
+ * 引  数:なし
+ * 戻り値:なし
+ ***********************************************/
+void OpenTreasureBox()
+{
+    g_takara[g_OpenBox].flg = FALSE;
 
-        if (g_takara[i].flg == FALSE)
+    SetDrawBlendMode(DX_BLENDMODE_ALPHA, 128);        //ブレンドモードをα(128/255)に設定
+    DrawBox(170, 70, 470, 370, GetColor(255, 255, 255), TRUE);
+    SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
+
+    if (g_takara[g_OpenBox].point <= 0) //宝箱の中身がカギ（0）だった時
+    {
+        g_takara[g_OpenBox].img = 1;  //からの宝箱の画像に切り替える
+        DrawGraph(170, 70, g_KeyImage, TRUE); //鍵の画像を表示させる
+    }
+    else if (g_takara[g_OpenBox].point > 0) //宝箱の中身がミミック（0以外）だった時
+    {
+        g_takara[g_OpenBox].img = 2;  //ミミックの画像に切り替える
+        DrawGraph(170, 70, g_MimicImage, TRUE);  //ミミックの画像を表示
+    }
+
+    if (g_KeyFlg) //ミミックかカギの画像が表示されているとき何かのキーを押すと
+    {
+        if (g_takara[g_OpenBox].point > 0)  //ミミックだった場合
         {
-            if (g_takara[i].point <= 0) g_takara[i].img = 1;
-            else if (g_takara[i].point > 0)g_takara[i].img = 1;
-            DrawFormatString(g_takara[i].x, g_takara[i].y - 60, 0x00ffff, "%d点", g_takara[i].point);
+            g_player.hp--; //プレイヤーのHPをマイナス1する
+            if (g_player.hp <= 0)g_GameState = 6;  //HPが0になった時ゲームオーバーにする
+            g_OpenBox = -1; //g_OpenBoxを-1にすると宝箱を選択できるようになる
+        }
+        else //鍵を取った時はいろいろ初期化する
+        {
+            g_NowStage++; //ステージに1足す
+            g_OpenBox = -1;
+
+            g_BoxQuantity = GetRand(ENEMY_MAX - 2) + 2;
+            //宝箱の中身を変える
+            for (int i = 0; i < g_BoxQuantity; i++)
+            {
+                g_takara[i] = g_enemy00;
+                g_takara[i].point = GetRand(3); //ランダムで値を変える→０が鍵
+            }
+            g_takara[GetRand(g_BoxQuantity - 1)].point = 0; //強制的に宝箱一つに０点を代入する
+
+            //選択カーソルの位置を初期位置に戻す
+            g_arrow.no = 0;
+            g_arrow.y = g_takara[g_arrow.no].y - 100;
+            g_arrow.x = g_takara[g_arrow.no].x;
+
+            //プレイヤー初期処理
+            g_player.x = 139;
+            g_player.y = 400;
+            g_player.img = 13;
+
+            //背景画像(廊下）の初期処理
+            g_stage = { STAGE_NO, g_RoadImage, 0, 0 };
+
+            g_GameMode = 0;
         }
     }
 }
@@ -591,7 +693,14 @@ int LoadImages()
     //エンド画面背景
     if ((g_EndImage = LoadGraph("images/EndImage.png")) == -1)return -1;
     //宝箱の画像
-    if (LoadDivGraph("images/takarabako.png", 2, 2, 1, 60, 60, g_TakaraBako) == -1) return -1;
+    if (LoadDivGraph("images/takarabako.png", 3, 3, 1, 60, 60, g_TakaraBako) == -1) return -1;
+
+    //鍵の画像
+    if ((g_KeyImage = LoadGraph("images/Key.png")) == -1)return -1;
+    //ミミックの画像
+    if ((g_MimicImage = LoadGraph("images/Mimic.png")) == -1)return -1;
+    //ハートの画像
+    if ((g_HeartImage = LoadGraph("images/heart.png")) == -1)return -1;
 
     //プレイヤー矢印画像
     if ((g_Arrow = LoadGraph("images/Arrow.png")) == -1)return -1;

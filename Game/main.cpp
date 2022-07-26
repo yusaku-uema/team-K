@@ -33,7 +33,9 @@ const int PLAYER_HP = 8;
  ***********************************************/
 int g_OldKey;  // 前回の入力キー 
 int g_NowKey;  // 今回の入力キー 
-int g_KeyFlg;  // 入力キー情報 
+int g_KeyFlg;  // 入力キー情報
+
+int g_WalkOldKey  = 0;
 
 int g_GameState = 0;  // ゲームモード 
 
@@ -300,8 +302,6 @@ void GameInit(void)
 
     //プレイヤー初期処理
 
-    //g_player = { 139, 400, 13, PLAYER_IMAGE_TIME, PLAYER_HP };
-
     g_player = { 285, 400, 13, PLAYER_IMAGE_TIME, PLAYER_HP};
 
 
@@ -426,12 +426,12 @@ void BackImage()
  ***********************************************/
 void PlayerControl()
 {
-    if (g_player.imgtime <= 0)g_player.imgtime = PLAYER_IMAGE_TIME;
-    g_player.imgtime--;
+    
 
     if (g_NowKey & PAD_INPUT_UP)
     {
-        if (g_NowKey != g_OldKey)g_player.img = 12;
+        if (g_WalkOldKey != 8)g_player.img = 12;
+        g_WalkOldKey = 8;
         if (g_player.imgtime <= 0)
         {
             g_player.img++;
@@ -446,7 +446,8 @@ void PlayerControl()
     }
     else if (g_NowKey & PAD_INPUT_DOWN)
     {
-        if (g_NowKey != g_OldKey)g_player.img = 0;
+        if (g_WalkOldKey != 1)g_player.img = 0;
+        g_WalkOldKey = 1;
         if (g_player.imgtime <= 0)
         {
             g_player.img++;
@@ -457,7 +458,8 @@ void PlayerControl()
     }
     else if (g_NowKey & PAD_INPUT_LEFT)
     {
-        if (g_NowKey != g_OldKey) g_player.img = 8;
+        if (g_WalkOldKey != 2) g_player.img = 8;
+        g_WalkOldKey = 2;
         if (g_player.imgtime <= 0)
         {
             g_player.img++;
@@ -467,7 +469,8 @@ void PlayerControl()
     }
     else if (g_NowKey & PAD_INPUT_RIGHT)
     {
-        if (g_NowKey != g_OldKey) g_player.img = 4;
+        if (g_WalkOldKey != 4) g_player.img = 4;
+        g_WalkOldKey = 4;
         if (g_player.imgtime <= 0)
         {
             g_player.img++;
@@ -475,6 +478,11 @@ void PlayerControl()
         }
         g_player.x += PLAYER_SPEED;
     }
+
+    if (g_player.imgtime <= 0)g_player.imgtime = PLAYER_IMAGE_TIME;
+    g_player.imgtime--;
+
+    DrawFormatString(0, 60, 0x111FFF, "%d", g_WalkOldKey);
 
     if (g_player.x > g_stage.x + 350 - 60)g_player.x = g_stage.x + 350 - 60;
     if (g_player.x < g_stage.x)g_player.x = g_stage.x;
@@ -523,6 +531,12 @@ void ArrowControl()
             g_OpenBox = g_arrow.no;
             g_KeyFlg = 0;
         }
+    }
+
+    if (g_OpenBox <= -1)
+    {
+        SetFontSize(40);
+        DrawString(150, 400, "どれにしようかな？", 0xffffff, TRUE);
     }
 
     g_arrow.x = g_takara[g_arrow.no].x;

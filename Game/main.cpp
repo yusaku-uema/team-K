@@ -68,6 +68,7 @@ int g_RoadImage2;
 int g_KeyImage; //鍵の画像（神里が追加
 int g_MimicImage; //ミミックの画像（神里が追加
 int g_HeartImage;
+int g_HeartImage1; //ハート
 int g_DrawStageImages; //ステージ最初のみ
 int g_DrawStageImages1; //二回目以降はこの画像
 int g_DrawStageno; //回数
@@ -154,7 +155,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
     LPSTR lpCmdLine, int nCmdShow)
 {
     //タイトルを設定
-    SetMainWindowText("宝箱をあけろ");
+    SetMainWindowText("アケロダンジョン君（仮）");
     //ウィンドウモードで起動する 
     ChangeWindowMode(TRUE);
 
@@ -587,8 +588,11 @@ void OpenTreasureBox()
 
         DrawString(150, 400, "やったー！カギだ！", 0xffffff, TRUE);
     }
+
+
     else if (g_takara[g_OpenBox].point > 0) //宝箱の中身がミミック（0以外）だった時
     {
+      if(g_takara[g_OpenBox].point>=2){
         if (g_takara[g_OpenBox].flg == TRUE)
         {
             g_takara[g_OpenBox].img = 2;  //ミミックの画像に切り替える
@@ -603,11 +607,29 @@ void OpenTreasureBox()
         {
             DrawString(180, 400, "さわると危険だ！", 0xffffff, TRUE);
         }
+      }
+      if (g_takara[g_OpenBox].point == 1) {
+          if (g_takara[g_OpenBox].flg == TRUE)
+          {
+              g_takara[g_OpenBox].img = 1;  //ミミックの画像に切り替える
+              SetDrawBlendMode(DX_BLENDMODE_ALPHA, 150);        //ブレンドモードをα(128/255)に設定
+              DrawBox(180, 100, 460, 380, GetColor(255, 255, 255), TRUE);
+              SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
+              DrawGraph(180, 100, g_HeartImage1, TRUE);  //ミミックの画像を表示
+
+              DrawString(160, 400, "HPが１回復した!", 0xffffff, TRUE);
+          }
+          else if (g_takara[g_OpenBox].flg == FALSE)
+          {
+              DrawString(180, 400, "中身がからっぽだ！", 0xffffff, TRUE);
+          }
+      }
+
     }
 
     if (g_KeyFlg) //ミミックかカギの画像が表示されているとき何かのキーを押すと
     {
-        if (g_takara[g_OpenBox].point > 0)  //ミミックだった場合
+        if (g_takara[g_OpenBox].point >1)  //ミミックだった場合
         {
             if(g_takara[g_OpenBox].flg == TRUE) g_player.hp--; //プレイヤーのHPをマイナス1する
             g_takara[g_OpenBox].flg = FALSE;
@@ -615,6 +637,15 @@ void OpenTreasureBox()
             if (g_player.hp <= 0)g_GameState = 6;  //HPが0になった時ゲームオーバーにする
 
             g_OpenBox = -1; //g_OpenBoxを-1にすると宝箱を選択できるようになる
+        }
+        else if (g_takara[g_OpenBox].point == 1) {
+            if(g_takara[g_OpenBox].flg== TRUE)g_player.hp++; //プレイヤーのHPをプラス１する
+            g_takara[g_OpenBox].flg = FALSE;
+
+            if (g_player.hp <= 0)g_GameState = 6;  //HPが0になった時ゲームオーバーにする
+
+            g_OpenBox = -1; //g_OpenBoxを-1にすると宝箱を選択できるようになる
+
         }
         else //鍵を取った時はいろいろ初期化する
         {
@@ -785,7 +816,7 @@ int LoadImages()
     if ((g_TitleImage = LoadGraph("images/Title.png")) == -1) return -1;
 
     //メニュー
-    if ((g_Applec = LoadGraph("images/Applec.png")) == -1) return -1;
+   // if ((g_Applec = LoadGraph("images/Applec.png")) == -1) return -1;
 
     //ステージ背景
     if ((g_StageImage = LoadGraph("images/haikei.png")) == -1)return -1;
@@ -807,6 +838,7 @@ int LoadImages()
     if ((g_MimicImage = LoadGraph("images/Mimic.png")) == -1)return -1;
     //ハートの画像
     if ((g_HeartImage = LoadGraph("images/heart.png")) == -1)return -1;
+    if ((g_HeartImage1 = LoadGraph("images/HP.png")) == -1)return -1;
 
     //キーボード諸々
     if (keyboard.LoadImgae() == -1) return -1;
@@ -828,7 +860,7 @@ int LoadImages()
 int LoadSounds()
 {
     //タイトル タイトル画像替えました。
-    if ((s_TitleBGM = LoadSoundMem("BGM/see.mp3")) == -1) return -1;
+    //if ((s_TitleBGM = LoadSoundMem("BGM/see.mp3")) == -1) return -1;
 
     ////メニュー
     //if ((g_Applec = LoadGraph("images/Applec.png")) == -1) return -1;

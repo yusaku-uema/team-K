@@ -770,8 +770,7 @@ void DrawEnd(void)
  ***********************************************/
 void DrawHelp(void)
 {
-    //スペースキーでメニューに戻る
-    if (g_KeyFlg & PAD_INPUT_M) g_GameState = 0;
+  
 
     ////タイトル画面表示
     DrawGraph(0, 0, g_HelpImage, FALSE);
@@ -783,24 +782,29 @@ void DrawHelp(void)
     DrawStringToHandle(200, 50, "ヘルプ画面", GetColor(255, 255, 255), Font3);
 
     //大きい文字見出し
-    DrawStringToHandle(150, 150, "プレイヤー操作について", GetColor(255, 255, 255), Font4);
-    DrawStringToHandle(300, 250, "宝箱", GetColor(255, 255, 255), Font4);
+    DrawStringToHandle(150, 150, "プレイヤー操作について", GetColor(255, 0, 0), Font4);
+    DrawStringToHandle(240, 250, "宝箱を選択", GetColor(255, 0, 0), Font4);
 
     //小さい見出し
-    DrawStringToHandle(250, 200, "十字キーで移動", GetColor(255, 255, 255), Font5);
-    DrawStringToHandle(100, 300, "カーソル移動　十字キーで取りたい宝箱を選ぶ", GetColor(255, 255, 255), Font5);
-    DrawStringToHandle(225, 350, "宝箱の決定　Bボタン", GetColor(255, 255, 255), Font5);
+    DrawStringToHandle(190, 200, "十字キーやスティックで移動", GetColor(255, 255, 255), Font5);
+    DrawStringToHandle(100, 300, "開けたい宝箱を選択する方法は十字キーや、", GetColor(255, 255, 255), Font5);
+    DrawStringToHandle(100, 320, "スティックで取りたい宝箱を選ぶ。", GetColor(255, 255, 255), Font5); 
+    DrawStringToHandle(100, 350, "開けたい宝箱の決定　Aボタン", GetColor(255, 255, 255), Font5);
 
     //文字の表示（点滅）
     if (++g_WaitTime < 30) {
 
-        DrawStringToHandle(150, 425, "---Bボタンでゲームメインに移動---", GetColor(255, 255, 255), Font5);
+        DrawStringToHandle(150, 425, "---Aボタンでタイトルに移動---", GetColor(255, 255, 255), Font5);
+        DrawStringToHandle(150, 455, "---Bボタンでタイトルに移動---", GetColor(255, 255, 255), Font5);
     }
     else if (g_WaitTime > 60) {
         g_WaitTime = 0;
     }
 
-
+    //Aでメニューに戻る
+    if (g_KeyFlg & PAD_INPUT_A) g_GameState = 0;
+    //Bボタンでゲームスタート
+    if (g_KeyFlg & PAD_INPUT_B) g_GameState = 1;
 }
 
 /***********************************************

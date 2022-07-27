@@ -18,7 +18,7 @@ const int SCREEN_HEIGHT = 480;
 const int TIMELIMIT = 30000;
 //宝箱の個数
 const int TREASUREBOX_MAX = 7;
-const int TAKARA_TIME = 100;
+//const int TAKARA_TIME = 100;
 
 //プレイヤーのやつ
 const int PLAYER_SPEED = 3;
@@ -88,8 +88,6 @@ int g_DrawStageImages; //ステージ最初のみ
 int g_DrawStageImages1; //二回目以降はこの画像
 int g_DrawStageno; //回数
 int g_PlayerIkon;//プレイヤーアイコン背景
-int g_GameOverImage;//ゲームオバー背景
-
 int g_GameOverImage;//ゲームオバー背景
 
 int g_PosY; //佐久本さんが使います
@@ -722,12 +720,14 @@ void ArrowControl()
     }
 
     if (g_OpenBox <= -1)
-
-    g_arrow.x = g_treasurebox[g_arrow.no].x;
+    {
+        SetFontSize(40);
+        /*g_arrow.x = g_treasurebox[g_arrow.no].x;*/
         DrawString(150, 400, "どれにしようかな？", 0xffffff, TRUE);
     }
+    
   
-    g_arrow.x = g_takara[g_arrow.no].x;
+    g_arrow.x = g_treasurebox[g_arrow.no].x;
 
     for (int i = 0; i < g_player.hp; i++)
     {
@@ -786,45 +786,36 @@ void OpenTreasureBox()
 
             DrawString(160, 400, "ミッ、ミミックだ！", 0xffffff, TRUE);
         }
-      }
-      if (g_takara[g_OpenBox].point == 1) {
-          if (g_takara[g_OpenBox].flg == TRUE)
+
+        else if (g_treasurebox[g_OpenBox].flg == FALSE)
+        {
+            DrawString(160, 400, "触るときけんだ！", 0xffffff, TRUE);
+        }
+    }
+      if (g_treasurebox[g_OpenBox].point == 1)
+      {
+          if (g_treasurebox[g_OpenBox].flg == TRUE)
           {
-              g_takara[g_OpenBox].img = 1;  //ミミックの画像に切り替える
+              g_treasurebox[g_OpenBox].img = 1;  //ミミックの画像に切り替える
               SetDrawBlendMode(DX_BLENDMODE_ALPHA, 150);        //ブレンドモードをα(128/255)に設定
               DrawBox(180, 100, 460, 380, GetColor(255, 255, 255), TRUE);
               SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
               DrawGraph(180, 100, g_HeartImage1, TRUE);  //ミミックの画像を表示
-              if (g_player.hp == PLAYER_HP) { //HPがMAXの時に表示する
+              if (g_player.hp == PLAYER_HP)//HPがMAXの時に表示する
+              { 
                   DrawString(230, 400, "HPがMAXだ!", 0xffffff, TRUE);
               }
-              else if (g_player.hp < PLAYER_HP){ //HPが減っていた時に表示する。
+              else if (g_player.hp < PLAYER_HP) //HPが減っていた時に表示する。
+              { 
                   DrawString(160, 400, "HPが１回復した!", 0xffffff, TRUE);
               }
              
           }
-          else if (g_takara[g_OpenBox].flg == FALSE)
+          else if (g_treasurebox[g_OpenBox].flg == FALSE)
           {
               DrawString(180, 400, "中身がからっぽだ！", 0xffffff, TRUE);
           }
       }
-
-          else if (g_takara[g_OpenBox].flg == FALSE)
-          {
-             
-              DrawString(180, 400, "中身がからっぽだ！", 0xffffff, TRUE);
-
-              DrawGraph(10, 380, g_PlayerIkon, TRUE);  //プレイヤーアイコン
-              SetFontSize(10);
-              DrawString(70, 380, "プレイヤー", 0xFFFFFF, TRUE);
-          }
-      }
-
-              DrawString(70, 380, "プレイヤー", 0xFFFFFF, TRUE);
-          }
-      }
-
-    }
 
     if (g_KeyFlg & PAD_INPUT_A) //取ったアイテムの画像が表示されているときZキーを押すと
     {
@@ -917,20 +908,22 @@ void DrawEnd(void)
 /***********************************************
  * ゲームヘルプ描画処理
  ***********************************************/
+void DrawHelp(void)
+{
     DrawStringToHandle(150, 150, "プレイヤー操作について", GetColor(255, 0, 0), Font4);
     DrawStringToHandle(240, 250, "宝箱を選択", GetColor(255, 0, 0), Font4);
     //スペースキーでメニューに戻る
     if (g_KeyFlg & PAD_INPUT_M) g_GameState = 0;
     DrawStringToHandle(190, 200, "十字キーやスティックで移動", GetColor(255, 255, 255), Font5);
     DrawStringToHandle(100, 300, "開けたい宝箱を選択する方法は十字キーや、", GetColor(255, 255, 255), Font5);
-    DrawStringToHandle(100, 320, "スティックで取りたい宝箱を選ぶ。", GetColor(255, 255, 255), Font5); 
+    DrawStringToHandle(100, 320, "スティックで取りたい宝箱を選ぶ。", GetColor(255, 255, 255), Font5);
     DrawStringToHandle(100, 350, "開けたい宝箱の決定　Aボタン", GetColor(255, 255, 255), Font5);
 
     SetDrawBlendMode(DX_BLENDMODE_ALPHA, 128);        //ブレンドモードをα(128/255)に設定
     DrawBox(50, 25, 590, 500, GetColor(255, 255, 255), TRUE);
     SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
-        DrawStringToHandle(150, 425, "---Aボタンでタイトルに移動---", GetColor(255, 255, 255), Font5);
-        DrawStringToHandle(150, 455, "---Bボタンでタイトルに移動---", GetColor(255, 255, 255), Font5);
+    DrawStringToHandle(150, 425, "---Aボタンでタイトルに移動---", GetColor(255, 255, 255), Font5);
+    DrawStringToHandle(150, 455, "---Bボタンでタイトルに移動---", GetColor(255, 255, 255), Font5);
     DrawStringToHandle(200, 50, "ヘルプ画面", GetColor(255, 255, 255), Font3);
 
     //大きい文字見出し
@@ -946,16 +939,16 @@ void DrawEnd(void)
     DrawStringToHandle(225, 350, "宝箱の決定　Bボタン", GetColor(255, 255, 255), Font5);
 
     //文字の表示（点滅）
-    if (++g_WaitTime < 30) {
-
+    if (++g_WaitTime < 30)
+    {
         DrawStringToHandle(150, 425, "---Bボタンでゲームメインに移動---", GetColor(255, 255, 255), Font5);
     }
-    else if (g_WaitTime > 60) {
+    else if (g_WaitTime > 60)
+    {
         g_WaitTime = 0;
     }
-
-
 }
+
 
 /***********************************************
  * ランキング入力処理

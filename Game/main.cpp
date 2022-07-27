@@ -907,7 +907,7 @@ void DrawEnd(void)
     DrawStringToHandle(150, 260 + g_PosY, "       è„ä‘Å@ÅZÅZÅZÇ≥ÇÒ", GetColor(255, 255, 255), Font5);
     DrawFormatString(0, 0, 0x00ffff, "%d",g_WaitTime);
     if (g_WaitTime > 2300) {
-        DrawStringToHandle(0, 240, "Thank you for Playing", GetColor(255, 255, 255), Font1);
+        DrawStringToHandle(0, 240, "Thank you for Playing", GetColor(255, 0, 0), Font1);
     }
     DrawStringToHandle(150, 290 + g_PosY, "       ê_ó¢Å@ÅZÅZÅZÇ≥ÇÒ", GetColor(255, 255, 255), Font5);
     DrawStringToHandle(150, 320 + g_PosY, "       ç≤ãvñ{Å@ÅZÅZÅZÇ≥ÇÒ", GetColor(255, 255, 255), Font5);
@@ -1046,6 +1046,9 @@ int LoadImages()
 
     //ÉQÅ[ÉÄÉIÅ[ÉoÅ[
     if ((g_GameOverImage = LoadGraph("images/GameOverImage.png")) == -1)return -1;
+
+    if ((g_PlayerIkon = LoadGraph("images/PlayerIkon.png")) == -1)return -1;
+
     return 0;
 }
 

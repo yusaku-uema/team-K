@@ -1,5 +1,5 @@
- 1      neko1      20300
- 2      neko2      11050
- 3      neko3      10650
- 4      neko4      10250
+ 1      neko1         40
+ 2      neko2         30
+ 3      neko3         20
+ 4      neko4         10
  5         vv          0

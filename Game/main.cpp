@@ -344,7 +344,7 @@ void GameInit(void)
     g_Score = 0;
 
     //現在のステージ
-    g_NowStage = 98;
+    g_NowStage = 1;
 
     //最初のステージは宝箱は2個
     g_BoxQuantity = 2;
@@ -455,8 +455,8 @@ void GameMain(void)
     }
 
     //スペースキーでメニューに戻る　ゲームメインからタイトルに戻る追加
-    if (g_KeyFlg & PAD_INPUT_M)g_GameState = 6;
-    SetFontSize(16);
+    //if (g_KeyFlg & PAD_INPUT_M)g_GameState = 6;
+    //SetFontSize(16);
     //DrawString(150, 450, "---スペースキーを押してゲームオーバーへ---", 0xffffff, 0);
 }
 

@@ -94,9 +94,16 @@ int g_GameOverImage;//ゲームオバー背景
 
 int g_PosY; //佐久本さんが使います
 int Font, Font1, Font3, Font4, Font5;//ヘルプ画面とエンド画面のフォント変更
-//矢印の構造体
+
 int s_TitleBGM;//タイトルBGM用変数
 int s_RoadBGM;//廊下BGM用変数
+int s_EndBGM;//エンドロールBGM用変数
+
+bool SE_flg;//SE再生用フラグ
+int s_DamageSE;//ダメージ用変数
+int s_MimicSE;//ミミック用変数
+int s_KeySE;//階層移動用変数
+int s_HeartSE;//回復用変数
 
 //矢印の構造体
 struct ARROW
@@ -256,7 +263,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
             break;
         }
 
-        if (g_GameState != 0) {
+        if (g_GameState != 0 && g_GameState != 2 && g_GameState != 3) {
             StopSoundMem(s_TitleBGM);
         }
         if (g_GameState != 5) {
@@ -349,6 +356,9 @@ void GameInit(void)
 
     //キーボード（ランキング入力）初期処理
     keyboard.KeyBoardInit();
+
+    //SE初期処理
+    SE_flg = false;
 
     //ゲームメイン処理へ
     g_GameState = 5;
@@ -572,7 +582,11 @@ void EnemyControl()
 
         if (HitBoxPlayer(&g_player, &g_enemy[i]) == TRUE)
         {
-            if (g_player.flg == TRUE)g_player.hp--;
+            if (g_player.flg == TRUE) {
+                ChangeVolumeSoundMem(70, s_DamageSE);
+                PlaySoundMem(s_DamageSE, DX_PLAYTYPE_BACK, TRUE);
+                g_player.hp--;
+            }
 
             if (g_player.hp <= 0)
             {
@@ -787,6 +801,9 @@ void OpenTreasureBox()
 
     if (g_treasurebox[g_OpenBox].point <= 0) //宝箱の中身がカギ（0）だった時
     {
+        ChangeVolumeSoundMem(70, s_KeySE);
+        PlaySoundMem(s_KeySE, DX_PLAYTYPE_BACK, TRUE);
+
         g_treasurebox[g_OpenBox].img = 1;  //からの宝箱の画像に切り替える
         SetDrawBlendMode(DX_BLENDMODE_ALPHA, 150);        //ブレンドモードをα(128/255)に設定
         DrawBox(180, 100, 460, 380, GetColor(255, 255, 255), TRUE);
@@ -805,6 +822,13 @@ void OpenTreasureBox()
             DrawBox(180, 100, 460, 380, GetColor(255, 255, 255), TRUE);
             SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
             DrawGraph(180, 100, g_MimicImage, TRUE);  //ミミックの画像を表示
+            if (CheckSoundMem(s_MimicSE) == 0) {
+                if (SE_flg == false) {
+                    ChangeVolumeSoundMem(70, s_MimicSE);
+                    PlaySoundMem(s_MimicSE, DX_PLAYTYPE_BACK, TRUE);
+                }
+                SE_flg = true;
+            }
 
             DrawString(160, 400, "ミッ、ミミックだ！", 0xffffff, TRUE);
         }
@@ -824,6 +848,13 @@ void OpenTreasureBox()
             DrawBox(180, 100, 460, 380, GetColor(255, 255, 255), TRUE);
             SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
             DrawGraph(180, 100, g_HeartImage1, TRUE);  //ハートの画像を表示
+            if (CheckSoundMem(s_MimicSE) == 0) {
+                if (SE_flg == false) {
+                    ChangeVolumeSoundMem(80, s_HeartSE);
+                    PlaySoundMem(s_HeartSE, DX_PLAYTYPE_BACK, TRUE);
+                }
+                SE_flg = true;
+            }
 
             if(g_player.hp < PLAYER_HP)DrawString(160, 400, "HPが１回復した!", 0xffffff, TRUE);
             else DrawString(220, 400, "HPはMAXだ！", 0xffffff, TRUE);
@@ -838,7 +869,11 @@ void OpenTreasureBox()
     {
         if (g_treasurebox[g_OpenBox].point > 1)  //ミミックだった場合
         {
-            if (g_treasurebox[g_OpenBox].flg == TRUE) g_player.hp--; //プレイヤーのHPをマイナス1する
+            if (g_treasurebox[g_OpenBox].flg == TRUE) {
+                ChangeVolumeSoundMem(70, s_DamageSE);
+                PlaySoundMem(s_DamageSE, DX_PLAYTYPE_BACK, TRUE);
+                g_player.hp--; //プレイヤーのHPをマイナス1する
+            }
             g_treasurebox[g_OpenBox].flg = FALSE;
             if (g_player.hp <= 0)g_GameState = 6;  //HPが0になった時ゲームオーバーにする
         }
@@ -860,6 +895,7 @@ void OpenTreasureBox()
         }
 
         g_AcceptKey = TRUE; //TRUEにすると宝箱を選択できるようになる
+        SE_flg = false;
     }
 }
 
@@ -893,6 +929,10 @@ void UIView(void)
  ***********************************************/
 void DrawEnd(void)
 {
+    if (CheckSoundMem(s_EndBGM) == 0) {
+        ChangeVolumeSoundMem(70, s_EndBGM);
+        PlaySoundMem(s_EndBGM, DX_PLAYTYPE_LOOP, TRUE);
+    }
 
     //エンド画像表示
     DrawGraph(0, 0, g_EndImage, FALSE);
@@ -909,6 +949,11 @@ void DrawEnd(void)
     if (g_WaitTime > 2300) {
         DrawStringToHandle(0, 240, "Thank you for Playing", GetColor(255, 0, 0), Font1);
     }
+
+    if (g_WaitTime > 2400) {
+        StopSoundMem(s_EndBGM);
+    }
+
     DrawStringToHandle(150, 290 + g_PosY, "       神里　〇〇〇さん", GetColor(255, 255, 255), Font5);
     DrawStringToHandle(150, 320 + g_PosY, "       佐久本　〇〇〇さん", GetColor(255, 255, 255), Font5);
     DrawStringToHandle(150, 350 + g_PosY, "       川端　〇〇〇さん", GetColor(255, 255, 255), Font5);
@@ -1057,8 +1102,8 @@ int LoadImages()
  ***********************************************/
 int LoadSounds()
 {
-    //タイトル タイトル画像替えました。
-    //if ((s_TitleBGM = LoadSoundMem("BGM/see.mp3")) == -1) return -1;
+    //タイトルBGM
+    if ((s_TitleBGM = LoadSoundMem("BGM/see.mp3")) == -1) return -1;
 
     //キーボード
     if (keyboard.LoadSounds() == -1) return -1;
@@ -1069,20 +1114,23 @@ int LoadSounds()
     ////ステージ背景
     //if ((g_StageImage = LoadGraph("images/haikei.png")) == -1)return -1;
 
-    //廊下の画像
+    //廊下BGM
     if ((s_RoadBGM = LoadSoundMem("BGM/Flutter.mp3")) == -1) return -1;
 
-    ////エンド画面背景
-    //if ((g_EndImage = LoadGraph("images/EndImage.png")) == -1)return -1;
-    ////宝箱の画像
-    //if (LoadDivGraph("images/takarabako.png", 3, 3, 1, 60, 60, g_TakaraBako) == -1) return -1;
+    //エンド画面背景
+    if ((s_EndBGM = LoadSoundMem("BGM/ワクワクアリクイ.mp3")) == -1)return -1;
+    
+    //ダメージSE
+    if ((s_DamageSE = LoadSoundMem("BGM/レトロアクション_3.mp3")) == -1) return -1;
 
-    ////鍵の画像
-    //if ((g_KeyImage = LoadGraph("images/Key.png")) == -1)return -1;
-    ////ミミックの画像
-    //if ((g_MimicImage = LoadGraph("images/Mimic.png")) == -1)return -1;
-    ////ハートの画像
-    //if ((g_HeartImage = LoadGraph("images/heart.png")) == -1)return -1;
+    //階層移動のSE
+    if ((s_KeySE = LoadSoundMem("BGM/お金・財宝・アイテムゲット.mp3")) == -1)return -1;
+
+    //ミミックのSE
+    if ((s_MimicSE = LoadSoundMem("BGM/ポップな爆発.mp3")) == -1)return -1;
+
+    //ハートの画像
+    if ((s_HeartSE = LoadSoundMem("BGM/HP回復.mp3")) == -1)return -1;
 
     ////キーボード諸々
     //if (keyboard.LoadImgae() == -1) return -1;

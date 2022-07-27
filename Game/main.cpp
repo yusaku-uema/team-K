@@ -529,7 +529,7 @@ void BackScrool(int a)
     {
         g_enemy[i].y += (PLAYER_SPEED * a);
         DrawGraph(g_enemy[i].x, g_enemy[i].y, g_EnemyImage[g_enemy[i].type][g_enemy[i].img], TRUE);
-        DrawFormatString(g_enemy[i].x, g_enemy[i].y - 30, GetColor(255, 255, 255), "%d", g_enemy[i].type);
+        //DrawFormatString(g_enemy[i].x, g_enemy[i].y - 30, GetColor(255, 255, 255), "%d", g_enemy[i].type);
     }
 
     if (g_stage.y >= 480)
@@ -718,8 +718,6 @@ void PlayerControl()
     if (g_player.imgtime <= 0)g_player.imgtime = PLAYER_IMAGE_TIME;
     g_player.imgtime--;
 
-    DrawFormatString(0, 60, 0x111FFF, "%d", g_WalkOldKey);
-
     if (g_player.x > 440)g_player.x = 440;
     if (g_player.x < 145)g_player.x = 145;
     if (g_player.y > 400)g_player.y = 400;
@@ -731,9 +729,9 @@ void PlayerControl()
         DrawGraph(22, 10 + 95 * i, g_HeartImage, TRUE);
     }
 
-    DrawFormatString(0, 0, 0x111FFF, "キャラ画像 = %d", g_player.img);
+    /*DrawFormatString(0, 0, 0x111FFF, "キャラ画像 = %d", g_player.img);
     DrawFormatString(0, 20, 0x111FFF, "X = %d", g_player.x);
-    DrawFormatString(0, 40, 0x111FFF, "Y = %d", g_player.y);
+    DrawFormatString(0, 40, 0x111FFF, "Y = %d", g_player.y);*/
     if (g_Blinking == TRUE)DrawGraph(g_player.x, g_player.y, g_Player[g_player.img], TRUE);
 }
 
@@ -798,7 +796,7 @@ void TakaraControl()
     {
         g_treasurebox[i].x = i * 80 + g_TakaraPosition;
         DrawGraph(g_treasurebox[i].x, g_treasurebox[i].y, g_TakaraBako[g_treasurebox[i].img], TRUE); //宝箱の表示
-        DrawFormatString(g_treasurebox[i].x, g_treasurebox[i].y - 20, 0xFFFFFF, "%d", g_treasurebox[i].point);
+        //DrawFormatString(g_treasurebox[i].x, g_treasurebox[i].y - 20, 0xFFFFFF, "%d", g_treasurebox[i].point);
     }
 }
 
@@ -1105,11 +1103,10 @@ int LoadImages()
 
     //ステージ背景
     if ((g_StageImage = LoadGraph("images/haikei1.png")) == -1)return -1;
-
     if ((g_DrawStageImages = LoadGraph("images/state1.png")) == -1)return -1;
     if ((g_DrawStageImages1 = LoadGraph("images/doukutu1.png")) == -1)return -1;
 
-    if ((g_DrawStageImages1 = LoadGraph("images/state1.png")) == -1)return -1;
+    //if ((g_DrawStageImages1 = LoadGraph("images/state1.png")) == -1)return -1;
 
 
     //廊下の画像

@@ -474,7 +474,7 @@ void DrawGameOver(void)
     DrawFormatString(180, 250, 0xFFFFFF, "最終階層 = %02d階", g_NowStage);
 
     SetFontSize(20);
-    DrawString(150, 450, "---Aボタンを押してタイトルへ戻る ---", 0xffffff, 0);
+    DrawString(150, 450, "---Aボタンを押してタイトルへ戻る ---", 0xffffff, 0);//zキーで戻る
     if (g_KeyFlg & PAD_INPUT_A) g_GameState = 0;
 }
 
@@ -1005,8 +1005,8 @@ int LoadImages()
     if ((g_DrawStageImages1 = LoadGraph("images/doukutu1 .png")) == -1)return -1;
 
     //廊下の画像
-    if ((g_RoadImage = LoadGraph("images/road3.png")) == -1)return -1;
-    if ((g_RoadImage2 = LoadGraph("images/road4.png")) == -1)return -1;
+    if ((g_RoadImage = LoadGraph("images/road7.png")) == -1)return -1;
+    if ((g_RoadImage2 = LoadGraph("images/road8.png")) == -1)return -1;
 
     //エンド画面背景
     if ((g_EndImage = LoadGraph("images/EndImage.png")) == -1)return -1;

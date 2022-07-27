@@ -1010,18 +1010,20 @@ void DrawEnd(void)
     DrawStringToHandle(260, 1340 + g_PosY, "イラスト作成", GetColor(255, 255, 255), Font5);
     DrawStringToHandle(260, 1370 + g_PosY, "佐久本　盛杏", GetColor(255, 255, 255), Font5);
 
-    if (g_WaitTime > 2300) {
-        StopSoundMem(s_EndBGM);
+    if (g_WaitTime > 1600) {
         DrawStringToHandle(0, 240, "Thank you for Playing", GetColor(255, 0, 0), Font1);
+    }
+    if (g_WaitTime > 1650) {
+        StopSoundMem(s_EndBGM);
     }
 
     //タイムの加算処理＆終了
-    if (++g_WaitTime > 2500)g_GameState = 99;
+    if (++g_WaitTime > 1750)g_GameState = 99;
 
-    /////////////////////////////////////////////////////////////
-    //*デバッグ用*//
+    ///////////////////////////////////////////////////////////////
+    ////*デバッグ用*//
 
-    DrawFormatString(0, 0, 0x00ffff, "%d", g_WaitTime);
+    //DrawFormatString(0, 0, 0x00ffff, "%d", g_WaitTime);
     ////////////////////////////////////////////////////////////
 }
 

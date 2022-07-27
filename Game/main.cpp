@@ -18,7 +18,6 @@ const int SCREEN_HEIGHT = 480;
 const int TIMELIMIT = 30000;
 //宝箱の個数
 const int TREASUREBOX_MAX = 7;
-//const int TAKARA_TIME = 100;
 
 //プレイヤーのやつ
 const int PLAYER_SPEED = 3;
@@ -30,8 +29,6 @@ const int PLAYER_HP = 5;
 
 //敵キャラ
 const int ENEMY_MAX = 5;
-//const int ENEMY_WIDTH = 40;
-//const int ENEMY_HEIGHT = 40;
 const int ENEMY_IMAGE_TIME = 8;
 
 /***********************************************
@@ -333,6 +330,9 @@ void GameInit(void)
     //現在の経過時間を得る
     g_StartTime = GetNowCount();
 
+    //プレイヤー初期処理
+    g_player = { 290, 400, 70, 90, 13, PLAYER_IMAGE_TIME, PLAYER_HP, TRUE };
+
     //ステージごとの初期処理
     StageInit();
 
@@ -367,7 +367,8 @@ void StageInit(void)
     g_Blinking = TRUE;  //FALSEの時はプレイヤーを表示しない（点滅の時に使用）
 
     //プレイヤー初期処理
-    g_player = { 290, 400, 70, 90, 13, PLAYER_IMAGE_TIME, PLAYER_HP, TRUE };
+    g_player = { 290, 400, 70, 90, 13, PLAYER_IMAGE_TIME, g_player.hp, TRUE };
+
 
     g_EnemyQuantity = GetRand(ENEMY_MAX);
     int g_EnemyType = GetRand(2);
@@ -468,13 +469,13 @@ void DrawGameOver(void)
     SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
 
     DrawStringToHandle(130, 100, "GAME   OVER", GetColor(255,0, 0), Font3);
-   \
     SetFontSize(35);
 
     DrawFormatString(180, 250, 0xFFFFFF, "最終階層 = %02d階", g_NowStage);
 
     SetFontSize(20);
-    DrawString(150, 450, "---スペースキーを押してタイトルへ戻る ---", 0xffffff, 0);
+    DrawString(150, 450, "---Aボタンを押してタイトルへ戻る ---", 0xffffff, 0);
+    if (g_KeyFlg & PAD_INPUT_A) g_GameState = 0;
 }
 
 
@@ -557,7 +558,12 @@ void EnemyControl()
         if (HitBoxPlayer(&g_player, &g_enemy[i]) == TRUE)
         {
             if (g_player.flg == TRUE)g_player.hp--;
-            if (g_player.hp <= 0)g_GameState = 6;
+            if (g_player.hp <= 0)
+            {
+                g_WaitTime = 0;
+                g_GameState = 6;
+            }
+                
             if (g_player.flg == TRUE)g_AcceptKey = FALSE; //マリオみたいに一瞬止める
             g_player.flg = FALSE;
 

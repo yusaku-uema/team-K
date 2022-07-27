@@ -450,10 +450,6 @@ void GameMain(void)
         break;
     }
 
-    //スペースキーでメニューに戻る　ゲームメインからタイトルに戻る追加
-    if (g_KeyFlg & PAD_INPUT_M)g_GameState = 6;
-    SetFontSize(16);
-    //DrawString(150, 450, "---スペースキーを押してゲームオーバーへ---", 0xffffff, 0);
 }
 
 /***********************************************

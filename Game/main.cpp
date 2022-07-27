@@ -43,7 +43,7 @@ int g_OldKey;  // 前回の入力キー
 int g_NowKey;  // 今回の入力キー 
 int g_KeyFlg;  // 入力キー情報 
 
-int g_WalkOldKey  = 0;
+int g_WalkOldKey = 0;
 
 int g_GameState = 0;  // ゲームモード 
 
@@ -71,7 +71,7 @@ int Time;   // 現在時間
 
 int g_TakaraBako[3]; //宝箱の画像
 int g_Player[16];
-int g_EnemyImage[3][6];
+int g_EnemyImage[4][6];
 int g_Arrow;  //プレイヤーの矢印の画像
 int g_Applec; //タイトルカーソル変数　消さないで
 
@@ -130,9 +130,10 @@ struct ENEMY
     int type;
 };
 struct ENEMY g_enemy[ENEMY_MAX];
-struct ENEMY g_enemy1 = { 0, 0, 50, 50, TRUE, 3, ENEMY_IMAGE_TIME, 0, 0 };
-struct ENEMY g_enemy2 = { 0, 0, 50, 50, TRUE, 3, ENEMY_IMAGE_TIME, 0, 1 };
-struct ENEMY g_enemy3 = { 0, 0, 57, 60, TRUE, 3, ENEMY_IMAGE_TIME, 0, 2 };
+struct ENEMY g_enemy0 = { 0, 0, 50, 50, TRUE, 3, ENEMY_IMAGE_TIME, 0, 0 };
+struct ENEMY g_enemy1 = { 0, 0, 50, 50, TRUE, 3, ENEMY_IMAGE_TIME, 0, 1 };
+struct ENEMY g_enemy2 = { 0, 0, 57, 60, TRUE, 3, ENEMY_IMAGE_TIME, 0, 2 };
+struct ENEMY g_enemy3 = { 0, 0, 48, 60, TRUE, 3, ENEMY_IMAGE_TIME, 0, 3 };
 
 //廊下の背景画像の構造体（神里が使う）
 struct STAGE
@@ -155,7 +156,7 @@ struct TAKARA {
 };
 //敵機
 struct TAKARA g_treasurebox[TREASUREBOX_MAX];
-struct TAKARA g_treasurebox00 = { TRUE,0,0,30,300,0};
+struct TAKARA g_treasurebox00 = { TRUE,0,0,30,300,0 };
 
 /***********************************************
  * 関数のプロトタイプ宣言
@@ -205,7 +206,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
     SetDrawScreen(DX_SCREEN_BACK);
 
     //フォントの見た目替えるよう
-    Font =  CreateFontToHandle("メイリオ", 30, 9, DX_FONTTYPE_ANTIALIASING_EDGE);
+    Font = CreateFontToHandle("メイリオ", 30, 9, DX_FONTTYPE_ANTIALIASING_EDGE);
     Font1 = CreateFontToHandle("メイリオ", 50, 9, DX_FONTTYPE_ANTIALIASING_EDGE);
     Font3 = CreateFontToHandle("メイリオ", 50, 9, DX_FONTTYPE_ANTIALIASING_EDGE);//"メイリオ"  の30pt,太さ3のフォントを作成
     Font4 = CreateFontToHandle("メイリオ", 30, 9, DX_FONTTYPE_ANTIALIASING_EDGE);//"メイリオ"  の30pt,太さ3のフォントを作成
@@ -213,7 +214,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
     if (LoadImages() == -1) return -1; //画像読込み関数を呼び出し
     if (LoadSounds() == -1) return -1; //音声読込み関数を呼び出し
     if (ranking.ReadRanking() == -1) return -1;
-      //ゲームループ 
+    //ゲームループ 
     while (ProcessMessage() == 0 && g_GameState != 99) {
         //キー入力取得 
         g_OldKey = g_NowKey;
@@ -292,7 +293,7 @@ void DrawGameTitle(void) {
     //タイトル画像表示
     DrawGraph(0, 0, g_TitleImage, FALSE);
     SetDrawBlendMode(DX_BLENDMODE_ALPHA, 128);
-    DrawBox(160, 245, 480, 450, GetColor(255,255,255), TRUE); //透明なボックス追加
+    DrawBox(160, 245, 480, 450, GetColor(255, 255, 255), TRUE); //透明なボックス追加
     SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
 
     g_MenuY = g_MenuNumber * 52;
@@ -309,9 +310,9 @@ void DrawGameTitle(void) {
     DrawBox(160, 245, 480, 450, GetColor(0, 0, 0), FALSE); //透明なボックスに黒い線を追加
     SetFontSize(40);
     //ゲームタイトルを載せる予定
-    DrawStringToHandle(100, 130, "ゲームタイトル予定",GetColor(255, 255, 255), Font1);
-   
-    DrawStringToHandle(210, 255, "ゲームスタート",GetColor(255, 0, 0), Font);
+    DrawStringToHandle(100, 130, "ゲームタイトル予定", GetColor(255, 255, 255), Font1);
+
+    DrawStringToHandle(210, 255, "ゲームスタート", GetColor(255, 0, 0), Font);
     DrawStringToHandle(240, 305, "ランキング", GetColor(255, 0, 0), Font);
     DrawStringToHandle(275, 355, "ヘルプ", GetColor(255, 0, 0), Font);
     DrawStringToHandle(275, 405, "エンド", GetColor(255, 0, 0), Font);
@@ -371,16 +372,19 @@ void StageInit(void)
     g_player = { 290, 400, 70, 90, 13, PLAYER_IMAGE_TIME, PLAYER_HP, TRUE };
 
     g_EnemyQuantity = GetRand(ENEMY_MAX);
-    int g_EnemyType = GetRand(2);
+    int g_EnemyType = GetRand(3);
     //エネミーの初期処理
     for (int i = 0; i < g_EnemyQuantity; i++)
     {
+        if (g_EnemyType == 0)g_enemy[i] = g_enemy0;
         if (g_EnemyType == 1)g_enemy[i] = g_enemy1;
-        if (g_EnemyType == 2)g_enemy[i] = g_enemy3;
-        if (g_EnemyType == 0)g_enemy[i] = g_enemy2;
-       
+        if (g_EnemyType == 2)g_enemy[i] = g_enemy2;
+        if (g_EnemyType == 3)g_enemy[i] = g_enemy3;
+
+        
+
         g_enemy[i].x = GetRand(290) + 145;
-        g_enemy[i].y = - 200 + ((GetRand(10) * 50));
+        g_enemy[i].y = -200 + ((GetRand(10) * 50));
         g_enemy[i].speed = GetRand(2) + 1;
     }
 
@@ -437,7 +441,7 @@ void DrawStage()
         DrawGraph(0, 0, g_DrawStageImages, FALSE);
         ay = 170, by = 270;
     }
-    else if (g_NowStage >= 2) 
+    else if (g_NowStage >= 2)
     {
         DrawGraph(0, 100, g_DrawStageImages1, FALSE);
         ay = 40, by = 430;
@@ -452,7 +456,7 @@ void DrawStage()
     {
         g_GameMode = 1;
         g_WaitTime = 0;
-    }  
+    }
 }
 
 /***********************************************
@@ -488,13 +492,13 @@ void DrawGameOver(void)
 void BackScrool(int a)
 {
     DrawGraph(g_stage.x, g_stage.y, g_stage.img, FALSE);
-    
+
 
     if (g_stage.no > 0)DrawGraph(g_stage.x, g_stage.y - 480, g_stage.img, FALSE);
     else if (g_stage.no <= 0) DrawGraph(g_stage.x, g_stage.y - 480, g_RoadImage2, FALSE);
 
     g_stage.y += (PLAYER_SPEED * a);
-    
+
     for (int i = 0; i < g_EnemyQuantity; i++)
     {
         g_enemy[i].y += (PLAYER_SPEED * a);
@@ -522,7 +526,7 @@ void BackImage()
 // ***********************************************/
 void EnemyControl()
 {
-    
+
 
     for (int i = 0; i < g_EnemyQuantity; i++)
     {
@@ -557,11 +561,11 @@ void EnemyControl()
 
         if (HitBoxPlayer(&g_player, &g_enemy[i]) == TRUE)
         {
-            if(g_player.flg == TRUE)g_player.hp--;
+            if (g_player.flg == TRUE)g_player.hp--;
             if (g_player.hp <= 0)g_GameState = 6;
-            if(g_player.flg == TRUE)g_AcceptKey = FALSE; //マリオみたいに一瞬止める
+            if (g_player.flg == TRUE)g_AcceptKey = FALSE; //マリオみたいに一瞬止める
             g_player.flg = FALSE;
-            
+
         }
     }
 }
@@ -684,7 +688,7 @@ void PlayerControl()
     DrawFormatString(0, 0, 0x111FFF, "キャラ画像 = %d", g_player.img);
     DrawFormatString(0, 20, 0x111FFF, "X = %d", g_player.x);
     DrawFormatString(0, 40, 0x111FFF, "Y = %d", g_player.y);
-    if(g_Blinking == TRUE)DrawGraph(g_player.x, g_player.y, g_Player[g_player.img], TRUE);
+    if (g_Blinking == TRUE)DrawGraph(g_player.x, g_player.y, g_Player[g_player.img], TRUE);
 }
 
 
@@ -749,7 +753,7 @@ void TakaraControl()
     {
         g_treasurebox[i].x = i * 80 + g_TakaraPosition;
         DrawGraph(g_treasurebox[i].x, g_treasurebox[i].y, g_TakaraBako[g_treasurebox[i].img], TRUE); //宝箱の表示
-        DrawFormatString(g_treasurebox[i].x,  g_treasurebox[i].y - 20, 0xFFFFFF, "%d", g_treasurebox[i].point);
+        DrawFormatString(g_treasurebox[i].x, g_treasurebox[i].y - 20, 0xFFFFFF, "%d", g_treasurebox[i].point);
     }
 }
 
@@ -811,23 +815,23 @@ void OpenTreasureBox()
 
     if (g_KeyFlg & PAD_INPUT_A) //取ったアイテムの画像が表示されているときZキーを押すと
     {
-        if (g_treasurebox[g_OpenBox].point >1)  //ミミックだった場合
+        if (g_treasurebox[g_OpenBox].point > 1)  //ミミックだった場合
         {
-            if(g_treasurebox[g_OpenBox].flg == TRUE) g_player.hp--; //プレイヤーのHPをマイナス1する
+            if (g_treasurebox[g_OpenBox].flg == TRUE) g_player.hp--; //プレイヤーのHPをマイナス1する
             g_treasurebox[g_OpenBox].flg = FALSE;
             if (g_player.hp <= 0)g_GameState = 6;  //HPが0になった時ゲームオーバーにする
         }
         else if (g_treasurebox[g_OpenBox].point == 1)
         {
-            if(g_treasurebox[g_OpenBox].flg == TRUE)g_player.hp++; //プレイヤーのHPをプラス１する
+            if (g_treasurebox[g_OpenBox].flg == TRUE)g_player.hp++; //プレイヤーのHPをプラス１する
             g_treasurebox[g_OpenBox].flg = FALSE;
         }
         else //鍵を取った時はいろいろ初期化する
         {
             g_NowStage++; //ステージに1足す
-            
+
             g_BoxQuantity = GetRand(TREASUREBOX_MAX - 2) + 2;
-            
+
             StageInit();
         }
 
@@ -849,7 +853,7 @@ void TimeCount(void)
 
 void UIView(void)
 {
-    
+
     ////UI「TIME」表示
     //SetFontSize(50);
     //DrawString(520, 40, "TIME", 0xffffff, 0);
@@ -979,7 +983,7 @@ int LoadImages()
     if ((g_StageImage = LoadGraph("images/haikei1.png")) == -1)return -1;
     if ((g_DrawStageImages = LoadGraph("images/doukutu.png")) == -1)return -1;
     if ((g_DrawStageImages1 = LoadGraph("images/doukutu1 .png")) == -1)return -1;
-    
+
     //廊下の画像
     if ((g_RoadImage = LoadGraph("images/road3.png")) == -1)return -1;
     if ((g_RoadImage2 = LoadGraph("images/road4.png")) == -1)return -1;
@@ -994,6 +998,7 @@ int LoadImages()
     if (LoadDivGraph("images/marimo.png", 6, 3, 2, 50, 50, g_EnemyImage[0]) == -1) return -1;
     if (LoadDivGraph("images/koumori.png", 6, 3, 2, 50, 50, g_EnemyImage[1]) == -1) return -1;
     if (LoadDivGraph("images/obake.png", 6, 3, 2, 57, 60, g_EnemyImage[2]) == -1) return -1;
+    if (LoadDivGraph("images/hone.png", 6, 3, 2, 48, 60, g_EnemyImage[3]) == -1) return -1;
     //鍵の画像
     if ((g_KeyImage = LoadGraph("images/Key.png")) == -1)return -1;
     //ミミックの画像

@@ -946,42 +946,54 @@ void TimeCount(void)
 void DrawEnd(void)
 {
     if (CheckSoundMem(s_EndBGM) == 0) {
-        ChangeVolumeSoundMem(70, s_EndBGM);
-        PlaySoundMem(s_EndBGM, DX_PLAYTYPE_LOOP, TRUE);
+        if (SE_flg == false) {
+            ChangeVolumeSoundMem(70, s_EndBGM);
+            PlaySoundMem(s_EndBGM, DX_PLAYTYPE_LOOP, TRUE);
+        }
+        SE_flg = true;
     }
 
     //エンド画像表示
     DrawGraph(0, 0, g_EndImage, FALSE);
 
     //エンディング表示
-    if (++g_WaitTime < 10000) g_PosY = 400 - g_WaitTime / 2;
+    //if (++g_WaitTime < 10000) g_PosY = 400 - g_WaitTime / 2;
 
-    DrawStringToHandle(200, 100 + g_PosY, "タイトル", GetColor(255, 255, 255), Font3);
+    if (g_WaitTime > 200)g_PosY--;
+
+    DrawStringToHandle(15, 80 + g_PosY, "アケロ☆だんじょん君！！", GetColor(255, 255, 255), Font3);
    
-    DrawStringToHandle(250, 200 + g_PosY, "制作者", GetColor(255, 255, 255), Font4);
+    DrawStringToHandle(270, 180 + g_PosY, "制作者", GetColor(255, 255, 255), Font4);
 
 
-    DrawStringToHandle(150, 260 + g_PosY, "       上間　〇〇〇さん", GetColor(255, 255, 255), Font5);
-    DrawStringToHandle(150, 290 + g_PosY, "       神里　〇〇〇さん", GetColor(255, 255, 255), Font5);
-    DrawStringToHandle(150, 320 + g_PosY, "       佐久本　〇〇〇さん", GetColor(255, 255, 255), Font5);
-    DrawStringToHandle(150, 350 + g_PosY, "       川端　〇〇〇さん", GetColor(255, 255, 255), Font5);
-    DrawStringToHandle(150, 380 + g_PosY, "       安里　〇〇〇さん", GetColor(255, 255, 255), Font5);
-    DrawStringToHandle(150, 410 + g_PosY, "       名嘉村　亜澄真さん", GetColor(255, 255, 255), Font5);
+    DrawStringToHandle(110, 240 + g_PosY, "       　上間　優咲(ゆうさく)さん", GetColor(255, 255, 255), Font5);
+    DrawStringToHandle(110, 270 + g_PosY, "       　神里　晃汰(こうた)　さん", GetColor(255, 255, 255), Font5);
+    DrawStringToHandle(110, 300 + g_PosY, "       佐久本　盛杏(せあん)　さん", GetColor(255, 255, 255), Font5);
+    DrawStringToHandle(110, 330 + g_PosY, "       　川端　勇快(ゆかい)　さん", GetColor(255, 255, 255), Font5);
+    DrawStringToHandle(110, 360 + g_PosY, "       　安里　和也(かずや)　さん", GetColor(255, 255, 255), Font5);
+    DrawStringToHandle(110, 390 + g_PosY, "       名嘉村　亜澄真(あすま)さん", GetColor(255, 255, 255), Font5);
 
-    //２パート
-    DrawStringToHandle(205, 940 + g_PosY, "BGM   〇〇〇", GetColor(255, 255, 255), Font5);
+    DrawStringToHandle(270, 480 + g_PosY, "BGM", GetColor(255, 255, 255), Font4);
+    DrawStringToHandle(180, 530 + g_PosY, "タイトルBGM：Flutter", GetColor(255, 255, 255), Font5);
+    DrawStringToHandle(230, 560 + g_PosY, "製作者：かずち 様", GetColor(255, 255, 255), Font5);
+    DrawStringToHandle(230, 600 + g_PosY, "メインBGM：see", GetColor(255, 255, 255), Font5);
+    DrawStringToHandle(200, 630 + g_PosY, "製作者：F3（フフフ）様", GetColor(255, 255, 255), Font5);
+    DrawStringToHandle(130, 670 + g_PosY, "エンドロールBGM：ワクワクアリクイ", GetColor(255, 255, 255), Font5);
+    DrawStringToHandle(230, 700 + g_PosY, "製作者：かずち 様", GetColor(255, 255, 255), Font5);
 
     //DrawStringToHandle(150, 650 + g_PosY, "   　　　 　     ", GetColor(255, 255, 255), Font01);
-    DrawStringToHandle(100, 700 + g_PosY, "ダメージSE：レトロアクション_3", GetColor(255, 255, 255), Font5);
-    DrawStringToHandle(100, 730 + g_PosY, "    製作者：稿屋 隆 様", GetColor(255, 255, 255), Font5);
-    DrawStringToHandle(100, 760 + g_PosY, "ミミックSE：ポップな爆発", GetColor(255, 255, 255), Font5);
-    DrawStringToHandle(100, 790 + g_PosY, "    製作者：チョコミント 様", GetColor(255, 255, 255), Font5);
-    DrawStringToHandle(100, 820 + g_PosY, "回復SE    ：HP回復", GetColor(255, 255, 255), Font5);
-    DrawStringToHandle(100, 850 + g_PosY, "    製作者：Make a field Music 様", GetColor(255, 255, 255), Font5);
-    DrawStringToHandle(100, 880 + g_PosY, "階層移動SE：お金・財宝・アイテムゲット", GetColor(255, 255, 255), Font5);
-    DrawStringToHandle(100, 910 + g_PosY, "    製作者：Causality Sound 様", GetColor(255, 255, 255), Font5);
+    DrawStringToHandle(290, 750 + g_PosY, "SE", GetColor(255, 255, 255), Font4);
+    DrawStringToHandle(150, 800 + g_PosY, "ダメージSE：レトロアクション_3", GetColor(255, 255, 255), Font5);
+    DrawStringToHandle(150, 830 + g_PosY, "        製作者：稿屋 隆 様", GetColor(255, 255, 255), Font5);
+    DrawStringToHandle(150, 870 + g_PosY, "     ミミックSE：ポップな爆発", GetColor(255, 255, 255), Font5);
+    DrawStringToHandle(150, 900 + g_PosY, "      製作者：チョコミント 様", GetColor(255, 255, 255), Font5);
+    DrawStringToHandle(150, 940 + g_PosY, "         回復SE：HP回復", GetColor(255, 255, 255), Font5);
+    DrawStringToHandle(150, 970 + g_PosY, "製作者：Make a field Music 様", GetColor(255, 255, 255), Font5);
+    DrawStringToHandle(120, 1010 + g_PosY, "階層移動SE：お金・財宝・アイテムゲット", GetColor(255, 255, 255), Font5);
+    DrawStringToHandle(150, 1040 + g_PosY, "  製作者：Causality Sound 様", GetColor(255, 255, 255), Font5);
 
-    //DrawStringToHandle(150, 750 + g_PosY, "    　　　　     ", GetColor(255, 255, 255), Font01);
+    DrawStringToHandle(260, 1090 + g_PosY, "イラスト", GetColor(255, 255, 255), Font4);
+    DrawStringToHandle(150, 1140 + g_PosY, "", GetColor(255, 255, 255), Font5);
 
     if (g_WaitTime > 2300) {
         StopSoundMem(s_EndBGM);

@@ -1066,7 +1066,6 @@ int LoadImages()
 
     //ステージ背景
     if ((g_StageImage = LoadGraph("images/haikei1.png")) == -1)return -1;
-    //if ((g_DrawStageImages = LoadGraph("images/state1.png")) == -1)return -1;
     if ((g_DrawStageImages1 = LoadGraph("images/state1.png")) == -1)return -1;
 
     //廊下の画像
@@ -1093,7 +1092,7 @@ int LoadImages()
     if ((g_HeartImage = LoadGraph("images/heart.png")) == -1)return -1;
     if ((g_HeartImage1 = LoadGraph("images/HP.png")) == -1)return -1;
 
-    if ((g_TowerImage = LoadGraph("images/tower.png")) == -1)return -1;
+    if ((g_TowerImage = LoadGraph("images/tower2.png")) == -1)return -1;
     if ((g_YajirusiImage = LoadGraph("images/yajirusi.png")) == -1)return -1;
 
     //キーボード諸々

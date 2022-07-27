@@ -23,12 +23,10 @@ const int TAKARA_TIME = 100;
 //プレイヤーのやつ
 const int PLAYER_SPEED = 3;
 const int PLAYER_IMAGE_TIME = 8;
-//const int PLAYER_WIDTH = 30;
-//const int PLAYER_HEIGHT = 40;
 
 //背景のやつ
 const int STAGE_NO = 0; //背景の廊下の長さ
-const int PLAYER_HP = 8;
+const int PLAYER_HP = 5;
 
 //敵キャラ
 const int ENEMY_MAX = 5;
@@ -89,10 +87,14 @@ int g_HeartImage1; //ハート
 int g_DrawStageImages; //ステージ最初のみ
 int g_DrawStageImages1; //二回目以降はこの画像
 int g_DrawStageno; //回数
+int g_PlayerIkon;//プレイヤーアイコン背景
+int g_GameOverImage;//ゲームオバー背景
+
+int g_GameOverImage;//ゲームオバー背景
 
 int g_PosY; //佐久本さんが使います
 int Font, Font1, Font3, Font4, Font5;//ヘルプ画面とエンド画面のフォント変更
-
+//矢印の構造体
 int s_TitleBGM;//タイトルBGM用変数
 int s_RoadBGM;//廊下BGM用変数
 
@@ -201,7 +203,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
     // DX ライブラリの初期化処理:エラーが起きたら直ちに終了 
     if (DxLib_Init() == -1) return -1;
 
-    //描画先画面を裏にする 
+    Font = CreateFontToHandle("メイリオ", 30, 9, DX_FONTTYPE_ANTIALIASING_EDGE);
     SetDrawScreen(DX_SCREEN_BACK);
 
     //フォントの見た目替えるよう
@@ -222,7 +224,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 
         // 画面の初期化 
         ClearDrawScreen();
-
         switch (g_GameState) {
         case 0:
             DrawGameTitle(); //ゲームタイトル描画処理
@@ -288,7 +289,7 @@ void DrawGameTitle(void) {
 
     //Ｚキーでメニュー選択
     if (g_KeyFlg & PAD_INPUT_A) g_GameState = g_MenuNumber + 1;
-
+    DrawBox(160, 245, 480, 450, GetColor(255, 255, 255), TRUE); //透明なボックス追加
     //タイトル画像表示
     DrawGraph(0, 0, g_TitleImage, FALSE);
     SetDrawBlendMode(DX_BLENDMODE_ALPHA, 128);
@@ -461,15 +462,15 @@ void DrawStage()
 void DrawGameOver(void)
 {
     //BackScrool();
-
-    //スペースキーでメニューに戻る
-    if (g_KeyFlg & PAD_INPUT_M)   g_GameState = 0;
-
     DrawBox(150, 150, 490, 330, 0x009900, TRUE);
     DrawBox(150, 150, 490, 330, 0x000000, FALSE);
 
     SetFontSize(20);
     DrawString(220, 170, "ゲームオーバー", 0xcc0000);
+    SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
+
+    DrawStringToHandle(130, 100, "GAME   OVER", GetColor(255,0, 0), Font3);
+   \
     SetFontSize(35);
 
     DrawFormatString(180, 250, 0xFFFFFF, "最終階層 = %02d階", g_NowStage);
@@ -721,12 +722,12 @@ void ArrowControl()
     }
 
     if (g_OpenBox <= -1)
-    {
-        SetFontSize(40);
-        DrawString(150, 400, "どれにしようかな？", 0xffffff, TRUE);
-    }
 
     g_arrow.x = g_treasurebox[g_arrow.no].x;
+        DrawString(150, 400, "どれにしようかな？", 0xffffff, TRUE);
+    }
+  
+    g_arrow.x = g_takara[g_arrow.no].x;
 
     for (int i = 0; i < g_player.hp; i++)
     {
@@ -785,28 +786,44 @@ void OpenTreasureBox()
 
             DrawString(160, 400, "ミッ、ミミックだ！", 0xffffff, TRUE);
         }
-        else if (g_treasurebox[g_OpenBox].flg == FALSE)
-        {
-            DrawString(180, 400, "さわると危険だ！", 0xffffff, TRUE);
-        }
-    }
+      }
+      if (g_takara[g_OpenBox].point == 1) {
+          if (g_takara[g_OpenBox].flg == TRUE)
+          {
+              g_takara[g_OpenBox].img = 1;  //ミミックの画像に切り替える
+              SetDrawBlendMode(DX_BLENDMODE_ALPHA, 150);        //ブレンドモードをα(128/255)に設定
+              DrawBox(180, 100, 460, 380, GetColor(255, 255, 255), TRUE);
+              SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
+              DrawGraph(180, 100, g_HeartImage1, TRUE);  //ミミックの画像を表示
+              if (g_player.hp == PLAYER_HP) { //HPがMAXの時に表示する
+                  DrawString(230, 400, "HPがMAXだ!", 0xffffff, TRUE);
+              }
+              else if (g_player.hp < PLAYER_HP){ //HPが減っていた時に表示する。
+                  DrawString(160, 400, "HPが１回復した!", 0xffffff, TRUE);
+              }
+             
+          }
+          else if (g_takara[g_OpenBox].flg == FALSE)
+          {
+              DrawString(180, 400, "中身がからっぽだ！", 0xffffff, TRUE);
+          }
+      }
 
-    else if (g_treasurebox[g_OpenBox].point == 1) //宝箱の中身がハートだった場合
-    {
-        if (g_treasurebox[g_OpenBox].flg == TRUE)
-        {
-            g_treasurebox[g_OpenBox].img = 1;  //ハートの画像に切り替える
-            SetDrawBlendMode(DX_BLENDMODE_ALPHA, 150);        //ブレンドモードをα(128/255)に設定
-            DrawBox(180, 100, 460, 380, GetColor(255, 255, 255), TRUE);
-            SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
-            DrawGraph(180, 100, g_HeartImage1, TRUE);  //ハートの画像を表示
+          else if (g_takara[g_OpenBox].flg == FALSE)
+          {
+             
+              DrawString(180, 400, "中身がからっぽだ！", 0xffffff, TRUE);
 
-            DrawString(160, 400, "HPが１回復した!", 0xffffff, TRUE);
-        }
-        else if (g_treasurebox[g_OpenBox].flg == FALSE)
-        {
-            DrawString(180, 400, "中身がからっぽだ！", 0xffffff, TRUE);
-        }
+              DrawGraph(10, 380, g_PlayerIkon, TRUE);  //プレイヤーアイコン
+              SetFontSize(10);
+              DrawString(70, 380, "プレイヤー", 0xFFFFFF, TRUE);
+          }
+      }
+
+              DrawString(70, 380, "プレイヤー", 0xFFFFFF, TRUE);
+          }
+      }
+
     }
 
     if (g_KeyFlg & PAD_INPUT_A) //取ったアイテムの画像が表示されているときZキーを押すと
@@ -872,12 +889,15 @@ void DrawEnd(void)
     //エンディング表示
     if (++g_WaitTime < 10000) g_PosY = 400 - g_WaitTime / 2;
 
-    //大きい文字見出し
     DrawStringToHandle(200, 100 + g_PosY, "タイトル", GetColor(255, 255, 255), Font3);
-
+   
     DrawStringToHandle(250, 200 + g_PosY, "制作者", GetColor(255, 255, 255), Font4);
 
     DrawStringToHandle(150, 260 + g_PosY, "       上間　〇〇〇さん", GetColor(255, 255, 255), Font5);
+    DrawFormatString(0, 0, 0x00ffff, "%d",g_WaitTime);
+    if (g_WaitTime > 2300) {
+        DrawStringToHandle(0, 240, "Thank you for Playing", GetColor(255, 255, 255), Font1);
+    }
     DrawStringToHandle(150, 290 + g_PosY, "       神里　〇〇〇さん", GetColor(255, 255, 255), Font5);
     DrawStringToHandle(150, 320 + g_PosY, "       佐久本　〇〇〇さん", GetColor(255, 255, 255), Font5);
     DrawStringToHandle(150, 350 + g_PosY, "       川端　〇〇〇さん", GetColor(255, 255, 255), Font5);
@@ -885,8 +905,7 @@ void DrawEnd(void)
     DrawStringToHandle(150, 410 + g_PosY, "       名嘉村　〇〇〇さん", GetColor(255, 255, 255), Font5);
 
     //２パート
-    DrawStringToHandle(225, 550 + g_PosY, "素材利用", GetColor(255, 255, 255), Font4);
-    DrawStringToHandle(205, 600 + g_PosY, "BGM　 〇〇〇", GetColor(255, 255, 255), Font5);
+  
     //DrawStringToHandle(150, 650 + g_PosY, "   　　　 　     ", GetColor(255, 255, 255), Font01);
     DrawStringToHandle(205, 700 + g_PosY, "SE    〇〇〇", GetColor(255, 255, 255), Font5);
     //DrawStringToHandle(150, 750 + g_PosY, "    　　　　     ", GetColor(255, 255, 255), Font01);
@@ -898,24 +917,29 @@ void DrawEnd(void)
 /***********************************************
  * ゲームヘルプ描画処理
  ***********************************************/
-void DrawHelp(void)
-{
+    DrawStringToHandle(150, 150, "プレイヤー操作について", GetColor(255, 0, 0), Font4);
+    DrawStringToHandle(240, 250, "宝箱を選択", GetColor(255, 0, 0), Font4);
     //スペースキーでメニューに戻る
     if (g_KeyFlg & PAD_INPUT_M) g_GameState = 0;
-
-    ////タイトル画面表示
-    DrawGraph(0, 0, g_HelpImage, FALSE);
+    DrawStringToHandle(190, 200, "十字キーやスティックで移動", GetColor(255, 255, 255), Font5);
+    DrawStringToHandle(100, 300, "開けたい宝箱を選択する方法は十字キーや、", GetColor(255, 255, 255), Font5);
+    DrawStringToHandle(100, 320, "スティックで取りたい宝箱を選ぶ。", GetColor(255, 255, 255), Font5); 
+    DrawStringToHandle(100, 350, "開けたい宝箱の決定　Aボタン", GetColor(255, 255, 255), Font5);
 
     SetDrawBlendMode(DX_BLENDMODE_ALPHA, 128);        //ブレンドモードをα(128/255)に設定
     DrawBox(50, 25, 590, 500, GetColor(255, 255, 255), TRUE);
     SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
-
+        DrawStringToHandle(150, 425, "---Aボタンでタイトルに移動---", GetColor(255, 255, 255), Font5);
+        DrawStringToHandle(150, 455, "---Bボタンでタイトルに移動---", GetColor(255, 255, 255), Font5);
     DrawStringToHandle(200, 50, "ヘルプ画面", GetColor(255, 255, 255), Font3);
 
     //大きい文字見出し
     DrawStringToHandle(150, 150, "プレイヤー操作について", GetColor(255, 255, 255), Font4);
     DrawStringToHandle(300, 250, "宝箱", GetColor(255, 255, 255), Font4);
-
+    //Aでメニューに戻る
+    if (g_KeyFlg & PAD_INPUT_A) g_GameState = 0;
+    //Bボタンでゲームスタート
+    if (g_KeyFlg & PAD_INPUT_B) g_GameState = 1;
     //小さい見出し
     DrawStringToHandle(250, 200, "十字キーで移動", GetColor(255, 255, 255), Font5);
     DrawStringToHandle(100, 300, "カーソル移動　十字キーで取りたい宝箱を選ぶ", GetColor(255, 255, 255), Font5);

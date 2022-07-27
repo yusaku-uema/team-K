@@ -340,7 +340,7 @@ void GameInit(void)
     g_Score = 0;
 
     //現在のステージ
-    g_NowStage = 98;
+    g_NowStage = 1;
 
     //最初のステージは宝箱は2個
     g_BoxQuantity = 2;
@@ -464,9 +464,9 @@ void DrawStage()
     SetFontSize(50);
     if (g_NowStage <= 100)
     {
-        DrawFormatString(280, 40, GetColor(255, 255, 255), "%03d階", g_NowStage);
-        DrawFormatString(290, 400, GetColor(255, 255, 255), "×", g_NowStage);
-        DrawFormatString(360, 400, GetColor(255, 255, 255), "%d", g_player.hp);
+        DrawFormatString(260, 40, GetColor(255, 255, 255), "%03d階", g_NowStage);
+        DrawFormatString(300, 400, GetColor(255, 255, 255), "×", g_NowStage);
+        DrawFormatString(370, 400, GetColor(255, 255, 255), "%d", g_player.hp);
         DrawGraph(220, 385, g_HeartImage, TRUE);
     }
 

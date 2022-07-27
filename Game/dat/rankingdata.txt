@@ -1,5 +1,5 @@
- 1         AA        100
+ 1        AAA        100
  1          4        100
- 3      neko1         40
- 4      neko2         30
- 5      neko3         20
+ 1         AA        100
+ 4      neko1         40
+ 5      neko2         30

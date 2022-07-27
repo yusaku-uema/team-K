@@ -344,7 +344,7 @@ void GameInit(void)
     g_Score = 0;
 
     //現在のステージ
-    g_NowStage = 1;
+    g_NowStage = 98;
 
     //最初のステージは宝箱は2個
     g_BoxQuantity = 2;
@@ -855,7 +855,7 @@ void OpenTreasureBox()
             }
 
             DrawString(160, 400, "ミッ、ミミックだ！", 0xffffff, TRUE);
-            int g_IconNo = 2;
+            g_IconNo = 2;
 
                 SetDrawBlendMode(DX_BLENDMODE_ALPHA, 150);        //ブレンドモードをα(128/255)に設定
                 DrawBox(0, 100, 640, 380, GetColor(255, 0, 0), TRUE);
@@ -871,7 +871,7 @@ void OpenTreasureBox()
                DrawBox(0, 100, 640, 380, GetColor(255, 0, 0), TRUE);
                SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
 
-               DrawString(180, 400, "あれ？", 0xffffff, TRUE);
+               DrawString(210, 400, "あれ？", 0xffffff, TRUE);
            }
         }
     }

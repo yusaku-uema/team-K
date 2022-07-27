@@ -88,9 +88,13 @@ int g_HeartImage;
 int g_HeartImage1; //ハート
 int g_DrawStageImages; //ステージ最初のみ
 int g_DrawStageImages1; //二回目以降はこの画像
-int g_DrawStageno; //回数
 int g_PlayerIkon;//プレイヤーアイコン背景
 int g_GameOverImage;//ゲームオバー背景
+
+
+int g_TowerImage;
+int g_YajirusiImage;
+
 
 int g_PosY; //佐久本さんが使います
 int Font, Font1, Font3, Font4, Font5;//ヘルプ画面とエンド画面のフォント変更
@@ -231,7 +235,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
         switch (g_GameState) {
         case 0:
             DrawGameTitle(); //ゲームタイトル描画処理
-            g_DrawStageno = 0;
             break;
         case 1:
             GameInit();
@@ -331,7 +334,7 @@ void GameInit(void)
     g_Score = 0;
 
     //現在のステージ
-    g_NowStage = 1;
+    g_NowStage = 100;
 
     //最初のステージは宝箱は2個
     g_BoxQuantity = 2;
@@ -442,16 +445,19 @@ void GameMain(void)
  ***********************************************/
 void DrawStage()
 {
-    int ay, by;
+
 
     if (g_NowStage <= 1)DrawGraph(0, 100, g_DrawStageImages, FALSE);
     else if (g_NowStage >= 2)DrawGraph(0, 100, g_DrawStageImages1, FALSE);
    
     SetFontSize(50);
+
     DrawFormatString(280, 40, GetColor(255, 255, 255), "%d階", g_NowStage);
     DrawFormatString(290, 400, GetColor(255, 255, 255), "×", g_NowStage);
     DrawFormatString(360, 400, GetColor(255, 255, 255), "%d", g_player.hp);
     DrawGraph(220, 385, g_HeartImage, TRUE);
+
+
 
     if (++g_WaitTime > 100 || g_KeyFlg & PAD_INPUT_A)
     {
@@ -516,6 +522,14 @@ void BackScrool(int a)
         g_stage.no--;
         if (g_stage.no < 0)g_stage.img = g_RoadImage2;
     }
+
+    SetFontSize(50);  //画面の右側の表示
+    DrawFormatString(540, 10, 0xFFFFFF, "%03d", g_NowStage);
+    DrawString(555, 70, "階", 0xFFFFFF, TRUE);
+    DrawGraph(560, 150, g_TowerImage, TRUE);
+    DrawGraph(525,450 - (g_NowStage * 3) - 12 ,g_YajirusiImage,TRUE);
+
+    SetFontSize(20);
 }
 
 void BackImage()
@@ -694,7 +708,7 @@ void PlayerControl()
 
     for (int i = 0; i < g_player.hp; i++)
     {
-        DrawGraph(22, 10 + 80 * i, g_HeartImage, TRUE);
+        DrawGraph(22, 10 + 95 * i, g_HeartImage, TRUE);
     }
 
     DrawFormatString(0, 0, 0x111FFF, "キャラ画像 = %d", g_player.img);
@@ -739,7 +753,6 @@ void ArrowControl()
     if (g_OpenBox <= -1)
     {
         SetFontSize(40);
-        /*g_arrow.x = g_treasurebox[g_arrow.no].x;*/
         DrawString(150, 400, "どれにしようかな？", 0xffffff, TRUE);
     }
     g_arrow.x = g_treasurebox[g_arrow.no].x;
@@ -891,19 +904,6 @@ void TimeCount(void)
     DrawFormatString(570, 100, 0xffffff, "%2d", Time / 1000);
 }
 
-void UIView(void)
-{
-
-    ////UI「TIME」表示
-    //SetFontSize(50);
-    //DrawString(520, 40, "TIME", 0xffffff, 0);
-
-    ////UI「SCORE」表示
-    //SetFontSize(45);
-    //DrawString(510, 320, "SCORE", 0xffffff, 0);
-    //DrawFormatString(510, 360, 0x00ffff, "%d", g_Score);
-}
-
 /***********************************************
  * ゲームエンド描画処理
  ***********************************************/
@@ -987,7 +987,7 @@ void InputRanking()
 {
     keyboard.DrawKeyBoard();
     keyboard.KeyBoardControl(g_NowKey);
-    keyboard.Push_B_Key(g_NowKey, &g_GameState, g_Score);
+    keyboard.Push_A_Key(g_NowKey, &g_GameState, g_NowStage);
 }
 /***********************************************
  * ランキング描画処理
@@ -1048,6 +1048,8 @@ int LoadImages()
     if ((g_HeartImage = LoadGraph("images/heart.png")) == -1)return -1;
     if ((g_HeartImage1 = LoadGraph("images/HP.png")) == -1)return -1;
 
+    if ((g_TowerImage = LoadGraph("images/tower.png")) == -1)return -1;
+    if ((g_YajirusiImage = LoadGraph("images/yajirusi.png")) == -1)return -1;
 
     //キーボード諸々
     if (keyboard.LoadImgae() == -1) return -1;

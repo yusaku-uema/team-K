@@ -1000,7 +1000,15 @@ void DrawEnd(void)
     DrawStringToHandle(150, 1040 + g_PosY, "  製作者：Causality Sound 様", GetColor(255, 255, 255), Font5);
 
     DrawStringToHandle(260, 1090 + g_PosY, "イラスト", GetColor(255, 255, 255), Font4);
-    DrawStringToHandle(150, 1140 + g_PosY, "", GetColor(255, 255, 255), Font5);
+    DrawStringToHandle(270, 1140 + g_PosY, "フリー画像", GetColor(255, 255, 255), Font5);
+    DrawStringToHandle(210, 1170 + g_PosY, "publicdomainq.net", GetColor(255, 255, 255), Font5);
+    DrawStringToHandle(280, 1200 + g_PosY, "freepik", GetColor(255, 255, 255), Font5);
+    DrawStringToHandle(285, 1230 + g_PosY, "123RF", GetColor(255, 255, 255), Font5);
+    DrawStringToHandle(265, 1260 + g_PosY, "いらすとや", GetColor(255, 255, 255), Font5);
+    DrawStringToHandle(275, 1290 + g_PosY, "花姫パパ", GetColor(255, 255, 255), Font5);
+
+    DrawStringToHandle(260, 1340 + g_PosY, "イラスト作成", GetColor(255, 255, 255), Font5);
+    DrawStringToHandle(260, 1370 + g_PosY, "佐久本　盛杏", GetColor(255, 255, 255), Font5);
 
     if (g_WaitTime > 2300) {
         StopSoundMem(s_EndBGM);

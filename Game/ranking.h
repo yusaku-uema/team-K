@@ -21,6 +21,7 @@ public:
 	int SaveRanking();   //ランキングデータ保存
 
 	void DrawRanking();  //ランキング描画
+	int GetFifthScore();  //ランキング5番目のスコア取得
 
 	//"KeyBoard"で使用
 	void SetRanking(char* name, int* GameState, int Score);  //ランキングデータセット・画面遷移

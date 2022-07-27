@@ -102,6 +102,12 @@ void Ranking::DrawRanking()
 	}
 }
 
+//ランキング5番目のスコア取得
+int Ranking::GetFifthScore()
+{
+	return g_Ranking[MAX_RANKING_DATA - 1].score;
+}
+
 //↓↓　"KeyBoard"で使用　↓↓
 
 //ランキングデータセット・画面遷移

@@ -471,7 +471,15 @@ void DrawGameOver(void)
     DrawFormatString(180, 250, 0xFFFFFF, "最終階層 = %02d階", g_NowStage);
     SetFontSize(20);
     DrawString(150, 450, "---Aボタンを押してタイトルへ戻る ---", 0xffffff, 0);
-    if (g_KeyFlg & PAD_INPUT_A) g_GameState = 0;
+    //if (g_KeyFlg & PAD_INPUT_A) g_GameState = 0;
+
+    //Aボタンでランキングorタイトルへ
+    if (g_KeyFlg & PAD_INPUT_A)
+    {
+        //スコアがランキングの5番目より大きい場合、ランキング入力へ
+        if (ranking.GetFifthScore() <= g_Score) g_GameState = 7;
+        else g_GameState = 0;  //そうでない場合、タイトルへ
+    }
 }
 
 

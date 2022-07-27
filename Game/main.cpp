@@ -1,6 +1,6 @@
 /********************************************************************
 **   ゲームジャム
-** 　宝箱をアケルゲーム
+** 　アケロ☆だんじょん君！！
 ********************************************************************/
 #include"DxLib.h"
 #define _USE_MATH_DEFINES
@@ -22,8 +22,6 @@ const int TREASUREBOX_MAX = 7;
 //プレイヤーのやつ
 const int PLAYER_SPEED = 3;
 const int PLAYER_IMAGE_TIME = 8;
-//const int PLAYER_WIDTH = 30;
-//const int PLAYER_HEIGHT = 40;
 
 //背景のやつ
 const int STAGE_NO = 0; //背景の廊下の長さ
@@ -211,7 +209,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
     LPSTR lpCmdLine, int nCmdShow)
 {
     //タイトルを設定
-    SetMainWindowText("アケロダンジョン君（仮）");
+    SetMainWindowText("アケロ☆だんじょん君！！");
     //ウィンドウモードで起動する 
     ChangeWindowMode(TRUE);
 

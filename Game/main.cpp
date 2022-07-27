@@ -460,19 +460,15 @@ void DrawStage()
  ***********************************************/
 void DrawGameOver(void)
 {
-    //BackScrool();
-    DrawBox(150, 150, 490, 330, 0x009900, TRUE);
-    DrawBox(150, 150, 490, 330, 0x000000, FALSE);
-
-    SetFontSize(20);
-    DrawString(220, 170, "ゲームオーバー", 0xcc0000);
+    DrawGraph(0, 0, g_GameOverImage, 0);
+    SetDrawBlendMode(DX_BLENDMODE_ALPHA, 128);        //ブレンドモードをα(128/255)に設定
+    DrawBox(50, 25, 590, 500, GetColor(0, 0, 0), TRUE);
     SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
 
-    DrawStringToHandle(130, 100, "GAME   OVER", GetColor(255,0, 0), Font3);
+    DrawStringToHandle(130, 100, "GAME   OVER", GetColor(255, 0, 0), Font3);
+
     SetFontSize(35);
-
     DrawFormatString(180, 250, 0xFFFFFF, "最終階層 = %02d階", g_NowStage);
-
     SetFontSize(20);
     DrawString(150, 450, "---Aボタンを押してタイトルへ戻る ---", 0xffffff, 0);
     if (g_KeyFlg & PAD_INPUT_A) g_GameState = 0;
@@ -917,38 +913,32 @@ void DrawEnd(void)
  ***********************************************/
 void DrawHelp(void)
 {
+    //エンド画像表示
+    DrawGraph(0, 0, g_HelpImage, FALSE);
+
+    SetDrawBlendMode(DX_BLENDMODE_ALPHA, 128);        //ブレンドモードをα(128/255)に設定
+    DrawBox(50, 25, 590, 500, GetColor(255, 255, 255), TRUE);
+    SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
+    DrawStringToHandle(200, 50, "ヘルプ画面", GetColor(255, 255, 255), Font3);
+
     DrawStringToHandle(150, 150, "プレイヤー操作について", GetColor(255, 0, 0), Font4);
     DrawStringToHandle(240, 250, "宝箱を選択", GetColor(255, 0, 0), Font4);
-    //スペースキーでメニューに戻る
-    if (g_KeyFlg & PAD_INPUT_M) g_GameState = 0;
     DrawStringToHandle(190, 200, "十字キーやスティックで移動", GetColor(255, 255, 255), Font5);
     DrawStringToHandle(100, 300, "開けたい宝箱を選択する方法は十字キーや、", GetColor(255, 255, 255), Font5);
     DrawStringToHandle(100, 320, "スティックで取りたい宝箱を選ぶ。", GetColor(255, 255, 255), Font5);
     DrawStringToHandle(100, 350, "開けたい宝箱の決定　Aボタン", GetColor(255, 255, 255), Font5);
 
-    SetDrawBlendMode(DX_BLENDMODE_ALPHA, 128);        //ブレンドモードをα(128/255)に設定
-    DrawBox(50, 25, 590, 500, GetColor(255, 255, 255), TRUE);
-    SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
-    DrawStringToHandle(150, 425, "---Aボタンでタイトルに移動---", GetColor(255, 255, 255), Font5);
-    DrawStringToHandle(150, 455, "---Bボタンでタイトルに移動---", GetColor(255, 255, 255), Font5);
-    DrawStringToHandle(200, 50, "ヘルプ画面", GetColor(255, 255, 255), Font3);
-
-    //大きい文字見出し
-    DrawStringToHandle(150, 150, "プレイヤー操作について", GetColor(255, 255, 255), Font4);
-    DrawStringToHandle(300, 250, "宝箱", GetColor(255, 255, 255), Font4);
     //Aでメニューに戻る
     if (g_KeyFlg & PAD_INPUT_A) g_GameState = 0;
     //Bボタンでゲームスタート
     if (g_KeyFlg & PAD_INPUT_B) g_GameState = 1;
-    //小さい見出し
-    DrawStringToHandle(250, 200, "十字キーで移動", GetColor(255, 255, 255), Font5);
-    DrawStringToHandle(100, 300, "カーソル移動　十字キーで取りたい宝箱を選ぶ", GetColor(255, 255, 255), Font5);
-    DrawStringToHandle(225, 350, "宝箱の決定　Bボタン", GetColor(255, 255, 255), Font5);
+  
 
     //文字の表示（点滅）
     if (++g_WaitTime < 30)
     {
-        DrawStringToHandle(150, 425, "---Bボタンでゲームメインに移動---", GetColor(255, 255, 255), Font5);
+        DrawStringToHandle(150, 425, "---Aボタンでタイトルに移動---", GetColor(255, 255, 255), Font5);
+        DrawStringToHandle(150, 455, "---Bボタンでゲームスタート---", GetColor(255, 255, 255), Font5);
     }
     else if (g_WaitTime > 60)
     {
@@ -996,9 +986,6 @@ int LoadImages()
     //タイトル タイトル画像替えました。
     if ((g_TitleImage = LoadGraph("images/Title.png")) == -1) return -1;
 
-    //メニュー
-   // if ((g_Applec = LoadGraph("images/Applec.png")) == -1) return -1;
-
     //ステージ背景
     if ((g_StageImage = LoadGraph("images/haikei1.png")) == -1)return -1;
     if ((g_DrawStageImages = LoadGraph("images/doukutu.png")) == -1)return -1;
@@ -1026,7 +1013,6 @@ int LoadImages()
     if ((g_HeartImage = LoadGraph("images/heart.png")) == -1)return -1;
     if ((g_HeartImage1 = LoadGraph("images/HP.png")) == -1)return -1;
 
-
     //キーボード諸々
     if (keyboard.LoadImgae() == -1) return -1;
 
@@ -1038,6 +1024,8 @@ int LoadImages()
     //プレイヤー画像
     if (LoadDivGraph("images/player.png", 16, 4, 4, 70, 90, g_Player) == -1) return -1;
 
+    //ゲームオーバー
+    if ((g_GameOverImage = LoadGraph("images/GameOverImage.png")) == -1)return -1;
     return 0;
 }
 

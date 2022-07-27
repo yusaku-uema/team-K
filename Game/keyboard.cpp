@@ -187,13 +187,13 @@ void KeyBoard::KeyBoardControl(int NowKey)
 	//testPush_B_Key2(NowKey);
 }
 
-//Bボタンが押された時の処理　引数はrankingで使います
-void KeyBoard::Push_B_Key(int NowKey, int* GameState, int Score)
+//Aボタンが押された時の処理　引数はrankingで使います
+void KeyBoard::Push_A_Key(int NowKey, int* GameState, int Score)
 {
 	//"押した瞬間"を判定
 	static int push_B;
 
-	if (NowKey & PAD_INPUT_B)
+	if (NowKey & PAD_INPUT_A)
 	{
 		push_B++;
 
@@ -238,7 +238,7 @@ void KeyBoard::Push_B_Key(int NowKey, int* GameState, int Score)
 		}
 		else if (PUSH_NOW == KEY_TYPE::DONE)   //「OK」キー上で押して確定（ランキング変数に代入）
 		{
-			//B押されたよフラグ　TRUE
+			//A押されたよフラグ　TRUE
 			PushFlg = TRUE;
 
 			//入力タイミング

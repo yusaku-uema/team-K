@@ -29,8 +29,8 @@ public:
 	//移動
 	void KeyBoardControl(int NowKey);
 
-	//Bボタンが押された時の処理
-	void Push_B_Key(int NowKey, int* GameState, int Score);
+	//Aボタンが押された時の処理
+	void Push_A_Key(int NowKey, int* GameState, int Score);
 
 	//入力情報表示
 	void DrawInputInfo();

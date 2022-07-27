@@ -971,7 +971,7 @@ void InputRanking()
 {
     keyboard.DrawKeyBoard();
     keyboard.KeyBoardControl(g_NowKey);
-    keyboard.Push_B_Key(g_NowKey, &g_GameState, g_Score);
+    keyboard.Push_A_Key(g_NowKey, &g_GameState, g_NowStage);
 }
 /***********************************************
  * ƒ‰ƒ“ƒLƒ“ƒO•`‰æˆ—

@@ -187,7 +187,7 @@ void DrawGameTitle(void); //タイトル描画処理
 void DrawGameOver(void); //ゲームオーバ
 int LoadImages(); //画像読み込み
 void GameClear();
-void TimeCount();
+//void TimeCount();
 void BackScrool(int a); //背景画像スクロール処理
 void BackImage(); //宝箱選択時の背景画像
 void OpenTreasureBox();  //宝箱を開けた時の関数（神里
@@ -554,6 +554,9 @@ void BackScrool(int a)
 void BackImage()
 {
     DrawGraph(0, 100, g_StageImage, FALSE);
+    DrawGraph(10, 380, g_PlayerIkon, TRUE);  //プレイヤーアイコン
+    SetFontSize(10);
+    DrawString(70, 380, "プレイヤー", 0xFFFFFF, TRUE);
 }
 
 //***********************************************
@@ -761,21 +764,16 @@ void ArrowControl()
 
         else if (g_KeyFlg & PAD_INPUT_A)
         {
-            if (g_treasurebox[g_arrow.no].flg == TRUE)
-            {
-                g_Score += g_treasurebox[g_arrow.no].point;
-            }
             g_OpenBox = g_arrow.no;
             g_AcceptKey = FALSE;
             g_KeyFlg = 0;
         }
-    }
 
-    if (g_OpenBox <= -1)
-    {
+
         SetFontSize(40);
         DrawString(150, 400, "どれにしようかな？", 0xffffff, TRUE);
     }
+
     g_arrow.x = g_treasurebox[g_arrow.no].x;
 
     for (int i = 0; i < g_player.hp; i++)
@@ -848,19 +846,11 @@ void OpenTreasureBox()
             }
 
             DrawString(160, 400, "ミッ、ミミックだ！", 0xffffff, TRUE);
-
-            DrawGraph(10, 380, g_PlayerIkon, TRUE);  //プレイヤーアイコン
-            SetFontSize(10);
-            DrawString(70, 380, "プレイヤー", 0xFFFFFF, TRUE);
         }
 
         else if (g_treasurebox[g_OpenBox].flg == FALSE)
         {
             DrawString(160, 400, "触るときけんだ！", 0xffffff, TRUE);
-
-            DrawGraph(10, 380, g_PlayerIkon, TRUE);  //プレイヤーアイコン
-            SetFontSize(10);
-            DrawString(70, 380, "プレイヤー", 0xFFFFFF, TRUE);
         }
     }
 
@@ -881,25 +871,13 @@ void OpenTreasureBox()
                 }
                 SE_flg = true;
             }
-            DrawGraph(10, 380, g_PlayerIkon, TRUE);  //プレイヤーアイコン
-
-
-           
+               
             if(g_player.hp < PLAYER_HP)DrawString(160, 400, "HPが１回復した!", 0xffffff, TRUE);
-
             else DrawString(220, 400, "HPはMAXだ！", 0xffffff, TRUE);
-
-            DrawGraph(10, 380, g_PlayerIkon, TRUE);  //プレイヤーアイコン
-            SetFontSize(10);
-            DrawString(70, 380, "プレイヤー", 0xFFFFFF, TRUE);
         }
         else if (g_treasurebox[g_OpenBox].flg == FALSE)
         {
             DrawString(180, 400, "中身はからっぽだ！", 0xffffff, TRUE);
-
-            DrawGraph(10, 380, g_PlayerIkon, TRUE);  //プレイヤーアイコン
-            SetFontSize(10);
-            DrawString(70, 380, "プレイヤー", 0xFFFFFF, TRUE);
         }
     }
 
@@ -1033,7 +1011,7 @@ void DrawEnd(void)
 void GameClear()
 {
     DrawGraph(0, 0, g_GameClearImage, TRUE);
-    if (g_KeyFlg & PAD_INPUT_A) g_GameState = 0;
+    if (g_KeyFlg & PAD_INPUT_A) g_GameState = 7;
 }
 
 /***********************************************

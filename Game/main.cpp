@@ -87,7 +87,8 @@ int g_HeartImage;
 int g_HeartImage1; //ハート
 int g_DrawStageImages; //ステージ最初のみ
 int g_DrawStageImages1; //二回目以降はこの画像
-int g_PlayerIkon;//プレイヤーアイコン背景
+int g_PlayerIkon[4];//プレイヤーアイコン背景
+int g_IconNo; //アイコン画像繰り替え変数
 int g_GameOverImage;//ゲームオバー背景
 int g_GameClearImage;//ゲームクリア画面
 
@@ -416,6 +417,9 @@ void StageInit(void)
 
     g_AcceptKey = TRUE;
 
+    //アイコン画像切り替え変数
+    g_IconNo = 0;
+
     //ゲームモードを0にする
     g_GameMode = 0;  //０の場合ステージ表示画面へ
 }
@@ -554,7 +558,7 @@ void BackScrool(int a)
 void BackImage()
 {
     DrawGraph(0, 100, g_StageImage, FALSE);
-    DrawGraph(10, 380, g_PlayerIkon, TRUE);  //プレイヤーアイコン
+    DrawGraph(10, 380, g_PlayerIkon[g_IconNo], TRUE);  //プレイヤーアイコン
     SetFontSize(10);
     DrawString(70, 380, "プレイヤー", 0xFFFFFF, TRUE);
 }
@@ -605,19 +609,14 @@ void EnemyControl()
                 ChangeVolumeSoundMem(70, s_DamageSE);
                 PlaySoundMem(s_DamageSE, DX_PLAYTYPE_BACK, TRUE);
                 g_player.hp--;
+                g_AcceptKey = FALSE;//マリオみたいに一瞬止める
+                g_player.flg = FALSE;
             }
 
-            if (g_player.hp <= 0)
-            {
-                g_WaitTime = 0;
-                g_GameState = 6;
-            }
+           
                 
-            if (g_player.hp <= 0)g_GameState = 6;
-
-            if (g_player.flg == TRUE)g_AcceptKey = FALSE; //マリオみたいに一瞬止める
-            g_player.flg = FALSE;
-
+          
+            
         }
     }
 }
@@ -711,15 +710,21 @@ void PlayerControl()
 
     if (g_player.flg == FALSE)
     {
-        if (g_WaitTime >= 20)g_AcceptKey = TRUE;
+        if (g_WaitTime >= 20 && g_player.hp > 0)g_AcceptKey = TRUE;
         if (g_WaitTime % 10 == 0 || g_WaitTime == 0)g_Blinking = ~g_Blinking;
         if (++g_WaitTime > 100)
         {
-            g_player.flg = TRUE;
-            g_Blinking = TRUE;
+            if (g_player.hp > 0)
+            {
+                g_player.flg = TRUE;
+                g_Blinking = TRUE;
+            }
+            else g_GameState = 6;
+
             g_WaitTime = 0;
         }
     }
+
 
     if (g_player.imgtime <= 0)g_player.imgtime = PLAYER_IMAGE_TIME;
     g_player.imgtime--;
@@ -727,7 +732,12 @@ void PlayerControl()
     if (g_player.x > 440)g_player.x = 440;
     if (g_player.x < 145)g_player.x = 145;
     if (g_player.y > 400)g_player.y = 400;
-    if (g_player.y < 59 && g_player.x >= 270 && g_player.x <= 320)g_GameMode = 2;
+    if (g_player.y < 59 && g_player.x >= 270 && g_player.x <= 320)
+    {
+        g_WaitTime = 0;
+        g_player.flg = TRUE;
+        g_GameMode = 2;
+    }
     if (g_player.y < 60)g_player.y = 60;
 
     for (int i = 0; i < g_player.hp; i++)
@@ -822,10 +832,8 @@ void OpenTreasureBox()
         DrawGraph(180, 100, g_KeyImage, TRUE); //鍵の画像を表示させる
 
         DrawString(150, 400, "やったー！カギだ！", 0xffffff, TRUE);
-
-        DrawGraph(10, 380, g_PlayerIkon, TRUE);  //プレイヤーアイコン
-        SetFontSize(10);
-        DrawString(70, 380, "プレイヤー", 0xFFFFFF, TRUE);
+        g_IconNo = 3;
+        
     }
 
     else if (g_treasurebox[g_OpenBox].point >= 2) //宝箱の中身がミミックだった場合
@@ -837,6 +845,7 @@ void OpenTreasureBox()
             DrawBox(180, 100, 460, 380, GetColor(255, 255, 255), TRUE);
             SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
             DrawGraph(180, 100, g_MimicImage, TRUE);  //ミミックの画像を表示
+
             if (CheckSoundMem(s_MimicSE) == 0) {
                 if (SE_flg == false) {
                     ChangeVolumeSoundMem(70, s_MimicSE);
@@ -846,11 +855,24 @@ void OpenTreasureBox()
             }
 
             DrawString(160, 400, "ミッ、ミミックだ！", 0xffffff, TRUE);
+            int g_IconNo = 2;
+
+                SetDrawBlendMode(DX_BLENDMODE_ALPHA, 150);        //ブレンドモードをα(128/255)に設定
+                DrawBox(0, 100, 640, 380, GetColor(255, 0, 0), TRUE);
+                SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
         }
 
         else if (g_treasurebox[g_OpenBox].flg == FALSE)
         {
-            DrawString(160, 400, "触るときけんだ！", 0xffffff, TRUE);
+           if(g_player.flg == TRUE) DrawString(160, 400, "触るときけんだ！", 0xffffff, TRUE);
+           if (g_player.flg == FALSE)
+           {
+               SetDrawBlendMode(DX_BLENDMODE_ALPHA, 200);        //ブレンドモードをα(128/255)に設定
+               DrawBox(0, 100, 640, 380, GetColor(255, 0, 0), TRUE);
+               SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
+
+               DrawString(180, 400, "あれ？", 0xffffff, TRUE);
+           }
         }
     }
 
@@ -872,7 +894,11 @@ void OpenTreasureBox()
                 SE_flg = true;
             }
                
-            if(g_player.hp < PLAYER_HP)DrawString(160, 400, "HPが１回復した!", 0xffffff, TRUE);
+            if (g_player.hp < PLAYER_HP)
+            {
+                DrawString(160, 400, "HPが１回復した!", 0xffffff, TRUE);
+                g_IconNo = 1;
+            }
             else DrawString(220, 400, "HPはMAXだ！", 0xffffff, TRUE);
         }
         else if (g_treasurebox[g_OpenBox].flg == FALSE)
@@ -891,7 +917,13 @@ void OpenTreasureBox()
                 g_player.hp--; //プレイヤーのHPをマイナス1する
             }
             g_treasurebox[g_OpenBox].flg = FALSE;
-            if (g_player.hp <= 0)g_GameState = 6;  //HPが0になった時ゲームオーバーにする
+            if (g_player.flg == FALSE) g_GameState = 6; //HPが0になった時ゲームオーバーにする
+            if (g_player.hp <= 0)g_player.flg = FALSE;
+            if (g_player.hp > 0)
+            {
+                g_IconNo = 0;
+                g_AcceptKey = TRUE; //TRUEにすると宝箱を選択できるようになる
+            }
         }
         else if (g_treasurebox[g_OpenBox].point == 1) //ハートだった場合
         {
@@ -900,6 +932,9 @@ void OpenTreasureBox()
                 if (g_player.hp < PLAYER_HP) g_player.hp++; //プレイヤーのHPをプラス１する
             }
             g_treasurebox[g_OpenBox].flg = FALSE;
+
+            g_IconNo = 0;
+            g_AcceptKey = TRUE; //TRUEにすると宝箱を選択できるようになる
         }
         else //鍵を取った時はいろいろ初期化する
         {
@@ -909,22 +944,10 @@ void OpenTreasureBox()
             StageInit();
         }
 
-        g_AcceptKey = TRUE; //TRUEにすると宝箱を選択できるようになる
+       
         SE_flg = false;
     }
 }
-
-//void TimeCount(void)
-//{
-//    //制限時間を過ぎたらゲームオーバー
-//    Time = TIMELIMIT - (GetNowCount() - g_StartTime);
-//    if (Time <= 0)
-//    {
-//        g_GameState = 6;
-//    }
-//    SetFontSize(50);
-//    DrawFormatString(570, 100, 0xffffff, "%2d", Time / 1000);
-//}
 
 /***********************************************
  * ゲームエンド描画処理
@@ -1141,7 +1164,8 @@ int LoadImages()
     //ゲームオーバー
     if ((g_GameOverImage = LoadGraph("images/GameOverImage.png")) == -1)return -1;
 
-    if ((g_PlayerIkon = LoadGraph("images/PlayerIkon.png")) == -1)return -1;
+    //if ((g_PlayerIkon = LoadGraph("images/PlayerIkon.png")) == -1)return -1;
+    if (LoadDivGraph("images/PlayerIcon1.png", 4, 4, 1, 75, 51, g_PlayerIkon) == -1) return -1;
 
     //ゲームクリア画面
     if ((g_GameClearImage = LoadGraph("images/GameClearImage.png")) == -1)return -1;

@@ -834,6 +834,7 @@ void OpenTreasureBox()
         else if (g_treasurebox[g_OpenBox].point == 1)
         {
             if (g_treasurebox[g_OpenBox].flg == TRUE)g_player.hp++; //プレイヤーのHPをプラス１する
+            if (g_player.hp > PLAYER_HP)g_player.hp = PLAYER_HP;
             g_treasurebox[g_OpenBox].flg = FALSE;
         }
         else //鍵を取った時はいろいろ初期化する

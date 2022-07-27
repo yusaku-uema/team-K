@@ -444,21 +444,14 @@ void DrawStage()
 {
     int ay, by;
 
-    if (g_NowStage <= 1)
-    {
-        DrawGraph(0, 0, g_DrawStageImages, FALSE);
-        ay = 170, by = 250;
-    }
-    else if (g_NowStage >= 2)
-    {
-        DrawGraph(0, 100, g_DrawStageImages1, FALSE);
-        ay = 40, by = 400;
-    }
+    if (g_NowStage <= 1)DrawGraph(0, 100, g_DrawStageImages, FALSE);
+    else if (g_NowStage >= 2)DrawGraph(0, 100, g_DrawStageImages1, FALSE);
+   
     SetFontSize(50);
-    DrawFormatString(280, ay, GetColor(255, 255, 255), "%d階", g_NowStage);
-    DrawFormatString(290, by, GetColor(255, 255, 255), "×", g_NowStage);
-    DrawFormatString(360, by, GetColor(255, 255, 255), "%d", g_player.hp);
-    DrawGraph(220, by - 15, g_HeartImage, TRUE);
+    DrawFormatString(280, 40, GetColor(255, 255, 255), "%d階", g_NowStage);
+    DrawFormatString(290, 400, GetColor(255, 255, 255), "×", g_NowStage);
+    DrawFormatString(360, 400, GetColor(255, 255, 255), "%d", g_player.hp);
+    DrawGraph(220, 385, g_HeartImage, TRUE);
 
     if (++g_WaitTime > 100 || g_KeyFlg & PAD_INPUT_A)
     {
@@ -794,6 +787,10 @@ void OpenTreasureBox()
         DrawGraph(180, 100, g_KeyImage, TRUE); //鍵の画像を表示させる
 
         DrawString(150, 400, "やったー！カギだ！", 0xffffff, TRUE);
+
+        DrawGraph(10, 380, g_PlayerIkon, TRUE);  //プレイヤーアイコン
+        SetFontSize(10);
+        DrawString(70, 380, "プレイヤー", 0xFFFFFF, TRUE);
     }
 
     else if (g_treasurebox[g_OpenBox].point >= 2) //宝箱の中身がミミックだった場合
@@ -807,11 +804,19 @@ void OpenTreasureBox()
             DrawGraph(180, 100, g_MimicImage, TRUE);  //ミミックの画像を表示
 
             DrawString(160, 400, "ミッ、ミミックだ！", 0xffffff, TRUE);
+
+            DrawGraph(10, 380, g_PlayerIkon, TRUE);  //プレイヤーアイコン
+            SetFontSize(10);
+            DrawString(70, 380, "プレイヤー", 0xFFFFFF, TRUE);
         }
 
         else if (g_treasurebox[g_OpenBox].flg == FALSE)
         {
             DrawString(160, 400, "触るときけんだ！", 0xffffff, TRUE);
+
+            DrawGraph(10, 380, g_PlayerIkon, TRUE);  //プレイヤーアイコン
+            SetFontSize(10);
+            DrawString(70, 380, "プレイヤー", 0xFFFFFF, TRUE);
         }
     }
 
@@ -824,13 +829,24 @@ void OpenTreasureBox()
             DrawBox(180, 100, 460, 380, GetColor(255, 255, 255), TRUE);
             SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
             DrawGraph(180, 100, g_HeartImage1, TRUE);  //ハートの画像を表示
+            DrawGraph(10, 380, g_PlayerIkon, TRUE);  //プレイヤーアイコン
 
+           
             if(g_player.hp < PLAYER_HP)DrawString(160, 400, "HPが１回復した!", 0xffffff, TRUE);
+
             else DrawString(220, 400, "HPはMAXだ！", 0xffffff, TRUE);
+
+            DrawGraph(10, 380, g_PlayerIkon, TRUE);  //プレイヤーアイコン
+            SetFontSize(10);
+            DrawString(70, 380, "プレイヤー", 0xFFFFFF, TRUE);
         }
         else if (g_treasurebox[g_OpenBox].flg == FALSE)
         {
             DrawString(180, 400, "中身はからっぽだ！", 0xffffff, TRUE);
+
+            DrawGraph(10, 380, g_PlayerIkon, TRUE);  //プレイヤーアイコン
+            SetFontSize(10);
+            DrawString(70, 380, "プレイヤー", 0xFFFFFF, TRUE);
         }
     }
 
@@ -1005,7 +1021,7 @@ int LoadImages()
 
     //ステージ背景
     if ((g_StageImage = LoadGraph("images/haikei1.png")) == -1)return -1;
-    if ((g_DrawStageImages = LoadGraph("images/doukutu.png")) == -1)return -1;
+    if ((g_DrawStageImages = LoadGraph("images/state.png")) == -1)return -1;
     if ((g_DrawStageImages1 = LoadGraph("images/doukutu1 .png")) == -1)return -1;
 
     //廊下の画像

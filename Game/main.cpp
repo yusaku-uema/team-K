@@ -88,6 +88,7 @@ int g_DrawStageImages; //ステージ最初のみ
 int g_DrawStageImages1; //二回目以降はこの画像
 int g_PlayerIkon;//プレイヤーアイコン背景
 int g_GameOverImage;//ゲームオバー背景
+int g_GameClearImage;//ゲームクリア画面
 
 
 int g_TowerImage;
@@ -184,7 +185,7 @@ void DrawHelp(void); //ヘルプ画面
 void DrawGameTitle(void); //タイトル描画処理
 void DrawGameOver(void); //ゲームオーバ
 int LoadImages(); //画像読み込み
-void UIView();
+void GameClear();
 void TimeCount();
 void BackScrool(int a); //背景画像スクロール処理
 void BackImage(); //宝箱選択時の背景画像
@@ -339,7 +340,7 @@ void GameInit(void)
     g_Score = 0;
 
     //現在のステージ
-    g_NowStage = 100;
+    g_NowStage = 98;
 
     //最初のステージは宝箱は2個
     g_BoxQuantity = 2;
@@ -391,7 +392,8 @@ void StageInit(void)
     //プレイヤー初期処理
     g_player = { 290, 400, 70, 90, 13, PLAYER_IMAGE_TIME, g_player.hp, TRUE };
 
-    g_EnemyQuantity = GetRand(ENEMY_MAX);
+    if (g_NowStage < 100)g_EnemyQuantity = GetRand(ENEMY_MAX);
+    else if (g_NowStage >= 100)g_EnemyQuantity = 0;
     int g_EnemyType = GetRand(3);
     //エネミーの初期処理
     for (int i = 0; i < g_EnemyQuantity; i++)
@@ -440,6 +442,9 @@ void GameMain(void)
         ArrowControl();
         if (g_AcceptKey == FALSE)OpenTreasureBox();
         break;
+    case 3:
+        GameClear();
+        break;
     }
 
     //スペースキーでメニューに戻る　ゲームメインからタイトルに戻る追加
@@ -453,23 +458,26 @@ void GameMain(void)
  ***********************************************/
 void DrawStage()
 {
-
-
     if (g_NowStage <= 1)DrawGraph(0, 100, g_DrawStageImages, FALSE);
     else if (g_NowStage >= 2)DrawGraph(0, 100, g_DrawStageImages1, FALSE);
    
     SetFontSize(50);
-
-    DrawFormatString(280, 40, GetColor(255, 255, 255), "%d階", g_NowStage);
-    DrawFormatString(290, 400, GetColor(255, 255, 255), "×", g_NowStage);
-    DrawFormatString(360, 400, GetColor(255, 255, 255), "%d", g_player.hp);
-    DrawGraph(220, 385, g_HeartImage, TRUE);
-
-
+    if (g_NowStage <= 100)
+    {
+        DrawFormatString(280, 40, GetColor(255, 255, 255), "%03d階", g_NowStage);
+        DrawFormatString(290, 400, GetColor(255, 255, 255), "×", g_NowStage);
+        DrawFormatString(360, 400, GetColor(255, 255, 255), "%d", g_player.hp);
+        DrawGraph(220, 385, g_HeartImage, TRUE);
+    }
 
     if (++g_WaitTime > 100 || g_KeyFlg & PAD_INPUT_A)
     {
-        g_GameMode = 1;
+        if (g_NowStage <= 100)g_GameMode = 1;
+        else
+        {
+            g_NowStage = 100;
+            g_GameMode = 3;
+        }
         g_WaitTime = 0;
     }
 }
@@ -917,9 +925,8 @@ void OpenTreasureBox()
         else //鍵を取った時はいろいろ初期化する
         {
             g_NowStage++; //ステージに1足す
-
-            g_BoxQuantity = GetRand(TREASUREBOX_MAX - 2) + 2;
-
+            if (g_NowStage < 100)g_BoxQuantity = GetRand(TREASUREBOX_MAX - 2) + 2;
+            else if(g_NowStage >= 100) g_BoxQuantity = 1;
             StageInit();
         }
 
@@ -928,17 +935,17 @@ void OpenTreasureBox()
     }
 }
 
-void TimeCount(void)
-{
-    //制限時間を過ぎたらゲームオーバー
-    Time = TIMELIMIT - (GetNowCount() - g_StartTime);
-    if (Time <= 0)
-    {
-        g_GameState = 6;
-    }
-    SetFontSize(50);
-    DrawFormatString(570, 100, 0xffffff, "%2d", Time / 1000);
-}
+//void TimeCount(void)
+//{
+//    //制限時間を過ぎたらゲームオーバー
+//    Time = TIMELIMIT - (GetNowCount() - g_StartTime);
+//    if (Time <= 0)
+//    {
+//        g_GameState = 6;
+//    }
+//    SetFontSize(50);
+//    DrawFormatString(570, 100, 0xffffff, "%2d", Time / 1000);
+//}
 
 /***********************************************
  * ゲームエンド描画処理
@@ -949,7 +956,6 @@ void DrawEnd(void)
         ChangeVolumeSoundMem(70, s_EndBGM);
         PlaySoundMem(s_EndBGM, DX_PLAYTYPE_LOOP, TRUE);
     }
-
     //エンド画像表示
     DrawGraph(0, 0, g_EndImage, FALSE);
 
@@ -996,6 +1002,15 @@ void DrawEnd(void)
 
     DrawFormatString(0, 0, 0x00ffff, "%d", g_WaitTime);
     ////////////////////////////////////////////////////////////
+}
+
+/***********************************************
+ * ゲームクリア画面
+ ***********************************************/
+void GameClear()
+{
+    DrawGraph(0, 0, g_GameClearImage, TRUE);
+    if (g_KeyFlg & PAD_INPUT_A) g_GameState = 0;
 }
 
 /***********************************************
@@ -1078,8 +1093,8 @@ int LoadImages()
 
     //ステージ背景
     if ((g_StageImage = LoadGraph("images/haikei1.png")) == -1)return -1;
-    //if ((g_DrawStageImages = LoadGraph("images/state1.png")) == -1)return -1;
-    if ((g_DrawStageImages1 = LoadGraph("images/state1.png")) == -1)return -1;
+    if ((g_DrawStageImages = LoadGraph("images/state1.png")) == -1)return -1;
+    if ((g_DrawStageImages1 = LoadGraph("images/doukutu1.png")) == -1)return -1;
 
     //廊下の画像
     if ((g_RoadImage = LoadGraph("images/road7.png")) == -1)return -1;
@@ -1123,6 +1138,9 @@ int LoadImages()
     if ((g_GameOverImage = LoadGraph("images/GameOverImage.png")) == -1)return -1;
 
     if ((g_PlayerIkon = LoadGraph("images/PlayerIkon.png")) == -1)return -1;
+
+    //ゲームクリア画面
+    if ((g_GameClearImage = LoadGraph("images/GameClearImage.png")) == -1)return -1;
 
     return 0;
 }

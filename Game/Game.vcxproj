@@ -151,11 +151,13 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="fps_mngr.cpp" />
     <ClCompile Include="keyboard.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="ranking.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="fps_mngr.h" />
     <ClInclude Include="keyboard.h" />
     <ClInclude Include="ranking.h" />
   </ItemGroup>

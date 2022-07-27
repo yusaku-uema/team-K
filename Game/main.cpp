@@ -7,7 +7,8 @@
 #include<math.h>
 #include"keyboard.h"
 #include"ranking.h"
-
+#include"fps_mngr.h"
+Fps fps;
 /***********************************************
  * 定数を宣言
  ***********************************************/
@@ -228,15 +229,16 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
     if (LoadImages() == -1) return -1; //画像読込み関数を呼び出し
     if (LoadSounds() == -1) return -1; //音声読込み関数を呼び出し
     if (ranking.ReadRanking() == -1) return -1;
+    
     //ゲームループ 
     while (ProcessMessage() == 0 && g_GameState != 99) {
         //キー入力取得 
         g_OldKey = g_NowKey;
         g_NowKey = GetJoypadInputState(DX_INPUT_KEY_PAD1); //ゲームパッドを持ってきていない人用に後でゲームパッドのみに変更
         g_KeyFlg = g_NowKey & ~g_OldKey;
-
         // 画面の初期化 
         ClearDrawScreen();
+        fps.Avg();
         switch (g_GameState) {
         case 0:
             DrawGameTitle(); //ゲームタイトル描画処理
@@ -273,6 +275,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 
         //裏画面の内容を表画面に反映します 
         ScreenFlip();
+        fps.Wait();
     }
     //DX ライブラリ使用の終了処理 
     DxLib_End();

@@ -89,9 +89,12 @@ int g_GameOverImage;//ゲームオバー背景
 
 int g_PosY; //佐久本さんが使います
 int Font, Font1, Font3, Font4, Font5;//ヘルプ画面とエンド画面のフォント変更
-//矢印の構造体
+
 int s_TitleBGM;//タイトルBGM用変数
 int s_RoadBGM;//廊下BGM用変数
+int s_KeySE;//カギ発見用変数
+int s_DamageSE;//ダメージ用変数
+int s_MimicSE;//ミミック用変数
 
 //矢印の構造体
 struct ARROW
@@ -557,7 +560,11 @@ void EnemyControl()
 
         if (HitBoxPlayer(&g_player, &g_enemy[i]) == TRUE)
         {
-            if (g_player.flg == TRUE)g_player.hp--;
+            if (g_player.flg == TRUE) {
+                ChangeVolumeSoundMem(70, s_DamageSE);
+                PlaySoundMem(s_DamageSE, DX_PLAYTYPE_BACK, TRUE);
+                g_player.hp--;
+            }
             if (g_player.hp <= 0)
             {
                 g_WaitTime = 0;
@@ -776,6 +783,8 @@ void OpenTreasureBox()
         DrawBox(180, 100, 460, 380, GetColor(255, 255, 255), TRUE);
         SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
         DrawGraph(180, 100, g_KeyImage, TRUE); //鍵の画像を表示させる
+        ChangeVolumeSoundMem(70, s_KeySE);
+        PlaySoundMem(s_KeySE, DX_PLAYTYPE_BACK, TRUE);
 
         DrawString(150, 400, "やったー！カギだ！", 0xffffff, TRUE);
     }
@@ -784,6 +793,9 @@ void OpenTreasureBox()
     {
         if (g_treasurebox[g_OpenBox].flg == TRUE)
         {
+            ChangeVolumeSoundMem(70, s_MimicSE);
+            PlaySoundMem(s_MimicSE, DX_PLAYTYPE_BACK, TRUE);
+
             g_treasurebox[g_OpenBox].img = 2;  //ミミックの画像に切り替える
             SetDrawBlendMode(DX_BLENDMODE_ALPHA, 150);        //ブレンドモードをα(128/255)に設定
             DrawBox(180, 100, 460, 380, GetColor(255, 255, 255), TRUE);
@@ -798,36 +810,41 @@ void OpenTreasureBox()
             DrawString(160, 400, "触るときけんだ！", 0xffffff, TRUE);
         }
     }
-      if (g_treasurebox[g_OpenBox].point == 1)
-      {
-          if (g_treasurebox[g_OpenBox].flg == TRUE)
-          {
-              g_treasurebox[g_OpenBox].img = 1;  //ミミックの画像に切り替える
-              SetDrawBlendMode(DX_BLENDMODE_ALPHA, 150);        //ブレンドモードをα(128/255)に設定
-              DrawBox(180, 100, 460, 380, GetColor(255, 255, 255), TRUE);
-              SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
-              DrawGraph(180, 100, g_HeartImage1, TRUE);  //ミミックの画像を表示
-              if (g_player.hp == PLAYER_HP)//HPがMAXの時に表示する
-              { 
-                  DrawString(230, 400, "HPがMAXだ!", 0xffffff, TRUE);
-              }
-              else if (g_player.hp < PLAYER_HP) //HPが減っていた時に表示する。
-              { 
-                  DrawString(160, 400, "HPが１回復した!", 0xffffff, TRUE);
-              }
+
+    if (g_treasurebox[g_OpenBox].point == 1)
+    {
+        if (g_treasurebox[g_OpenBox].flg == TRUE)
+        {
+            g_treasurebox[g_OpenBox].img = 1;  //からの宝箱の画像に切り替える
+            SetDrawBlendMode(DX_BLENDMODE_ALPHA, 150);        //ブレンドモードをα(128/255)に設定
+            DrawBox(180, 100, 460, 380, GetColor(255, 255, 255), TRUE);
+            SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
+            DrawGraph(180, 100, g_HeartImage1, TRUE);  //ハートの画像を表示
+            if (g_player.hp == PLAYER_HP)//HPがMAXの時に表示する
+            { 
+                DrawString(230, 400, "HPがMAXだ!", 0xffffff, TRUE);
+            }
+            else if (g_player.hp < PLAYER_HP) //HPが減っていた時に表示する。
+            { 
+                DrawString(160, 400, "HPが１回復した!", 0xffffff, TRUE);
+            }
              
-          }
-          else if (g_treasurebox[g_OpenBox].flg == FALSE)
-          {
-              DrawString(180, 400, "中身がからっぽだ！", 0xffffff, TRUE);
-          }
-      }
+        }
+        else if (g_treasurebox[g_OpenBox].flg == FALSE)
+        {
+            DrawString(180, 400, "中身がからっぽだ！", 0xffffff, TRUE);
+        }
+    }
 
     if (g_KeyFlg & PAD_INPUT_A) //取ったアイテムの画像が表示されているときZキーを押すと
     {
         if (g_treasurebox[g_OpenBox].point > 1)  //ミミックだった場合
         {
-            if (g_treasurebox[g_OpenBox].flg == TRUE) g_player.hp--; //プレイヤーのHPをマイナス1する
+            if (g_treasurebox[g_OpenBox].flg == TRUE) {
+                ChangeVolumeSoundMem(70, s_DamageSE);
+                PlaySoundMem(s_DamageSE, DX_PLAYTYPE_BACK, TRUE);
+                g_player.hp--; //プレイヤーのHPをマイナス1する
+            }
             g_treasurebox[g_OpenBox].flg = FALSE;
             if (g_player.hp <= 0)g_GameState = 6;  //HPが0になった時ゲームオーバーにする
         }
@@ -1046,8 +1063,8 @@ int LoadImages()
  ***********************************************/
 int LoadSounds()
 {
-    //タイトル タイトル画像替えました。
-    //if ((s_TitleBGM = LoadSoundMem("BGM/see.mp3")) == -1) return -1;
+    //タイトルBGM
+    if ((s_TitleBGM = LoadSoundMem("BGM/see.mp3")) == -1) return -1;
 
     //キーボード
     if (keyboard.LoadSounds() == -1) return -1;
@@ -1058,7 +1075,7 @@ int LoadSounds()
     ////ステージ背景
     //if ((g_StageImage = LoadGraph("images/haikei.png")) == -1)return -1;
 
-    //廊下の画像
+    //廊下BGM
     if ((s_RoadBGM = LoadSoundMem("BGM/Flutter.mp3")) == -1) return -1;
 
     ////エンド画面背景
@@ -1066,10 +1083,13 @@ int LoadSounds()
     ////宝箱の画像
     //if (LoadDivGraph("images/takarabako.png", 3, 3, 1, 60, 60, g_TakaraBako) == -1) return -1;
 
-    ////鍵の画像
-    //if ((g_KeyImage = LoadGraph("images/Key.png")) == -1)return -1;
-    ////ミミックの画像
-    //if ((g_MimicImage = LoadGraph("images/Mimic.png")) == -1)return -1;
+    //鍵の画像
+    if ((s_KeySE = LoadSoundMem("BGM/お金・財宝・アイテムゲット.mp3")) == -1)return -1;
+    //ミミックの音声
+    if ((s_MimicSE = LoadSoundMem("BGM/ポップな爆発.mp3")) == -1)return -1;
+
+    //ダメージの音声
+    if ((s_DamageSE = LoadSoundMem("BGM/レトロアクション_3.mp3")) == -1)return -1;
     ////ハートの画像
     //if ((g_HeartImage = LoadGraph("images/heart.png")) == -1)return -1;
 

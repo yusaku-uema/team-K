@@ -941,30 +941,42 @@ void DrawEnd(void)
    
     DrawStringToHandle(250, 200 + g_PosY, "制作者", GetColor(255, 255, 255), Font4);
 
+
     DrawStringToHandle(150, 260 + g_PosY, "       上間　〇〇〇さん", GetColor(255, 255, 255), Font5);
-    DrawFormatString(0, 0, 0x00ffff, "%d",g_WaitTime);
-    if (g_WaitTime > 2300) {
-        DrawStringToHandle(0, 240, "Thank you for Playing", GetColor(255, 0, 0), Font1);
-    }
-
-    if (g_WaitTime > 2400) {
-        StopSoundMem(s_EndBGM);
-    }
-
     DrawStringToHandle(150, 290 + g_PosY, "       神里　〇〇〇さん", GetColor(255, 255, 255), Font5);
     DrawStringToHandle(150, 320 + g_PosY, "       佐久本　〇〇〇さん", GetColor(255, 255, 255), Font5);
     DrawStringToHandle(150, 350 + g_PosY, "       川端　〇〇〇さん", GetColor(255, 255, 255), Font5);
     DrawStringToHandle(150, 380 + g_PosY, "       安里　〇〇〇さん", GetColor(255, 255, 255), Font5);
-    DrawStringToHandle(150, 410 + g_PosY, "       名嘉村　〇〇〇さん", GetColor(255, 255, 255), Font5);
+    DrawStringToHandle(150, 410 + g_PosY, "       名嘉村　亜澄真さん", GetColor(255, 255, 255), Font5);
 
     //２パート
-  
+    DrawStringToHandle(205, 940 + g_PosY, "BGM   〇〇〇", GetColor(255, 255, 255), Font5);
+
     //DrawStringToHandle(150, 650 + g_PosY, "   　　　 　     ", GetColor(255, 255, 255), Font01);
-    DrawStringToHandle(205, 700 + g_PosY, "SE    〇〇〇", GetColor(255, 255, 255), Font5);
+    DrawStringToHandle(100, 700 + g_PosY, "ダメージSE：レトロアクション_3", GetColor(255, 255, 255), Font5);
+    DrawStringToHandle(100, 730 + g_PosY, "    製作者：稿屋 隆 様", GetColor(255, 255, 255), Font5);
+    DrawStringToHandle(100, 760 + g_PosY, "ミミックSE：ポップな爆発", GetColor(255, 255, 255), Font5);
+    DrawStringToHandle(100, 790 + g_PosY, "    製作者：チョコミント 様", GetColor(255, 255, 255), Font5);
+    DrawStringToHandle(100, 820 + g_PosY, "回復SE    ：HP回復", GetColor(255, 255, 255), Font5);
+    DrawStringToHandle(100, 850 + g_PosY, "    製作者：Make a field Music 様", GetColor(255, 255, 255), Font5);
+    DrawStringToHandle(100, 880 + g_PosY, "階層移動SE：お金・財宝・アイテムゲット", GetColor(255, 255, 255), Font5);
+    DrawStringToHandle(100, 910 + g_PosY, "    製作者：Causality Sound 様", GetColor(255, 255, 255), Font5);
+
     //DrawStringToHandle(150, 750 + g_PosY, "    　　　　     ", GetColor(255, 255, 255), Font01);
+
+    if (g_WaitTime > 2300) {
+        StopSoundMem(s_EndBGM);
+        DrawStringToHandle(0, 240, "Thank you for Playing", GetColor(255, 0, 0), Font1);
+    }
 
     //タイムの加算処理＆終了
     if (++g_WaitTime > 2500)g_GameState = 99;
+
+    /////////////////////////////////////////////////////////////
+    //*デバッグ用*//
+
+    DrawFormatString(0, 0, 0x00ffff, "%d", g_WaitTime);
+    ////////////////////////////////////////////////////////////
 }
 
 /***********************************************

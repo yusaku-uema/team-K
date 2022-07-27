@@ -1009,8 +1009,8 @@ int LoadImages()
     if ((g_DrawStageImages1 = LoadGraph("images/doukutu1 .png")) == -1)return -1;
 
     //˜L‰º‚Ì‰æ‘œ
-    if ((g_RoadImage = LoadGraph("images/road3.png")) == -1)return -1;
-    if ((g_RoadImage2 = LoadGraph("images/road4.png")) == -1)return -1;
+    if ((g_RoadImage = LoadGraph("images/road7.png")) == -1)return -1;
+    if ((g_RoadImage2 = LoadGraph("images/road8.png")) == -1)return -1;
 
     //ƒGƒ“ƒh‰æ–Ê”wŒi
     if ((g_EndImage = LoadGraph("images/EndImage.png")) == -1)return -1;

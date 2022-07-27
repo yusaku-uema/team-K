@@ -7,5 +7,37 @@ http://wine.sinfonia-wld.com/?eid=1158689
 宝箱(予定)
 https://www.illust-box.jp/site_policy/
 
-敵キャラ
-https://pipoya.net/sozai/terms-of-use/#%E5%88%A9%E7%94%A8%E7%AF%84%E5%9B%B2%E3%81%AB%E3%81%A4%E3%81%84%E3%81%A6
+タイトルBGM：Flutter
+https://dova-s.jp/bgm/play1552.html
+製作者：かずち 様
+https://dova-s.jp/_contents/author/profile055.html
+
+廊下BGM：see
+https://dova-s.jp/bgm/play1923.html
+製作者：F3（フフフ）様
+https://dova-s.jp/_contents/author/profile045.html
+
+エンドBGM：ワクワクアリクイ
+https://dova-s.jp/bgm/play3347.html
+製作者：かずち 様
+https://dova-s.jp/_contents/author/profile055.html
+
+階層移動SE：お金・財宝・アイテムゲット
+https://dova-s.jp/se/play1322.html
+製作者：Causality Sound （コーザリティ サウンド）様
+https://dova-s.jp/_contents/author/profile285.html
+
+ダメージSE：レトロアクション_3
+https://dova-s.jp/se/play1444.html
+製作者：稿屋 隆 （ワラヤ タカシ）様
+https://dova-s.jp/_contents/author/profile000.html
+
+ミミックSE：ポップな爆発
+https://dova-s.jp/se/play480.html
+製作者：チョコミント 様
+https://dova-s.jp/_contents/author/profile220.html
+
+回復SE：HP回復
+https://dova-s.jp/se/play641.html
+製作者：Make a field Music （メイクアフィールドミュージック）
+https://dova-s.jp/_contents/author/profile164.html

@@ -22,6 +22,8 @@ const int TREASUREBOX_MAX = 7;
 //プレイヤーのやつ
 const int PLAYER_SPEED = 3;
 const int PLAYER_IMAGE_TIME = 8;
+//const int PLAYER_WIDTH = 30;
+//const int PLAYER_HEIGHT = 40;
 
 //背景のやつ
 const int STAGE_NO = 0; //背景の廊下の長さ
@@ -66,7 +68,10 @@ int Time;   // 現在時間
 
 int g_TakaraBako[3]; //宝箱の画像
 int g_Player[16];
+
+
 int g_EnemyImage[4][6];
+
 int g_Arrow;  //プレイヤーの矢印の画像
 int g_Applec; //タイトルカーソル変数　消さないで
 
@@ -127,10 +132,13 @@ struct ENEMY
     int type;
 };
 struct ENEMY g_enemy[ENEMY_MAX];
+
+
 struct ENEMY g_enemy0 = { 0, 0, 50, 50, TRUE, 3, ENEMY_IMAGE_TIME, 0, 0 };
 struct ENEMY g_enemy1 = { 0, 0, 50, 50, TRUE, 3, ENEMY_IMAGE_TIME, 0, 1 };
 struct ENEMY g_enemy2 = { 0, 0, 57, 60, TRUE, 3, ENEMY_IMAGE_TIME, 0, 2 };
 struct ENEMY g_enemy3 = { 0, 0, 48, 60, TRUE, 3, ENEMY_IMAGE_TIME, 0, 3 };
+
 
 //廊下の背景画像の構造体（神里が使う）
 struct STAGE
@@ -331,6 +339,11 @@ void GameInit(void)
     //現在の経過時間を得る
     g_StartTime = GetNowCount();
 
+
+    //プレイヤー初期処理
+    g_player = { 290, 400, 70, 90, 13, PLAYER_IMAGE_TIME, PLAYER_HP, TRUE };
+
+
     //ステージごとの初期処理
     StageInit();
 
@@ -365,7 +378,7 @@ void StageInit(void)
     g_Blinking = TRUE;  //FALSEの時はプレイヤーを表示しない（点滅の時に使用）
 
     //プレイヤー初期処理
-    g_player = { 290, 400, 70, 90, 13, PLAYER_IMAGE_TIME, PLAYER_HP, TRUE };
+    g_player = { 290, 400, 70, 90, 13, PLAYER_IMAGE_TIME, g_player.hp, TRUE };
 
     g_EnemyQuantity = GetRand(ENEMY_MAX);
     int g_EnemyType = GetRand(3);
@@ -376,8 +389,6 @@ void StageInit(void)
         if (g_EnemyType == 1)g_enemy[i] = g_enemy1;
         if (g_EnemyType == 2)g_enemy[i] = g_enemy2;
         if (g_EnemyType == 3)g_enemy[i] = g_enemy3;
-
-        
 
         g_enemy[i].x = GetRand(290) + 145;
         g_enemy[i].y = -200 + ((GetRand(10) * 50));
@@ -398,7 +409,8 @@ void StageInit(void)
  ***********************************************/
 void GameMain(void)
 {
-    switch (g_GameMode) {
+    switch (g_GameMode)
+    {
     case 0:
         DrawStage();
         break;
@@ -562,7 +574,15 @@ void EnemyControl()
         if (HitBoxPlayer(&g_player, &g_enemy[i]) == TRUE)
         {
             if (g_player.flg == TRUE)g_player.hp--;
+
+            if (g_player.hp <= 0)
+            {
+                g_WaitTime = 0;
+                g_GameState = 6;
+            }
+                
             if (g_player.hp <= 0)g_GameState = 6;
+
             if (g_player.flg == TRUE)g_AcceptKey = FALSE; //マリオみたいに一瞬止める
             g_player.flg = FALSE;
 
@@ -730,7 +750,6 @@ void ArrowControl()
         /*g_arrow.x = g_treasurebox[g_arrow.no].x;*/
         DrawString(150, 400, "どれにしようかな？", 0xffffff, TRUE);
     }
-
     g_arrow.x = g_treasurebox[g_arrow.no].x;
 
     for (int i = 0; i < g_player.hp; i++)
@@ -790,6 +809,7 @@ void OpenTreasureBox()
 
             DrawString(160, 400, "ミッ、ミミックだ！", 0xffffff, TRUE);
         }
+
         else if (g_treasurebox[g_OpenBox].flg == FALSE)
         {
             DrawString(160, 400, "触るときけんだ！", 0xffffff, TRUE);
@@ -806,11 +826,12 @@ void OpenTreasureBox()
             SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
             DrawGraph(180, 100, g_HeartImage1, TRUE);  //ハートの画像を表示
 
-            DrawString(160, 400, "HPが１回復した!", 0xffffff, TRUE);
+            if(g_player.hp < PLAYER_HP)DrawString(160, 400, "HPが１回復した!", 0xffffff, TRUE);
+            else DrawString(220, 400, "HPはMAXだ！", 0xffffff, TRUE);
         }
         else if (g_treasurebox[g_OpenBox].flg == FALSE)
         {
-            DrawString(180, 400, "中身がからっぽだ！", 0xffffff, TRUE);
+            DrawString(180, 400, "中身はからっぽだ！", 0xffffff, TRUE);
         }
     }
 
@@ -822,10 +843,12 @@ void OpenTreasureBox()
             g_treasurebox[g_OpenBox].flg = FALSE;
             if (g_player.hp <= 0)g_GameState = 6;  //HPが0になった時ゲームオーバーにする
         }
-        else if (g_treasurebox[g_OpenBox].point == 1)
+        else if (g_treasurebox[g_OpenBox].point == 1) //ハートだった場合
         {
-            if (g_treasurebox[g_OpenBox].flg == TRUE)g_player.hp++; //プレイヤーのHPをプラス１する
-            if (g_player.hp > PLAYER_HP)g_player.hp = PLAYER_HP;
+            if (g_treasurebox[g_OpenBox].flg == TRUE)
+            {
+                if (g_player.hp < PLAYER_HP) g_player.hp++; //プレイヤーのHPをプラス１する
+            }
             g_treasurebox[g_OpenBox].flg = FALSE;
         }
         else //鍵を取った時はいろいろ初期化する
@@ -1001,6 +1024,7 @@ int LoadImages()
     if (LoadDivGraph("images/koumori.png", 6, 3, 2, 50, 50, g_EnemyImage[1]) == -1) return -1;
     if (LoadDivGraph("images/obake.png", 6, 3, 2, 57, 60, g_EnemyImage[2]) == -1) return -1;
     if (LoadDivGraph("images/hone.png", 6, 3, 2, 48, 60, g_EnemyImage[3]) == -1) return -1;
+
     //鍵の画像
     if ((g_KeyImage = LoadGraph("images/Key.png")) == -1)return -1;
     //ミミックの画像

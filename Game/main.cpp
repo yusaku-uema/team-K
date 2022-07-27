@@ -447,18 +447,18 @@ void DrawStage()
     if (g_NowStage <= 1)
     {
         DrawGraph(0, 0, g_DrawStageImages, FALSE);
-        ay = 170, by = 270;
+        ay = 170, by = 250;
     }
     else if (g_NowStage >= 2)
     {
         DrawGraph(0, 100, g_DrawStageImages1, FALSE);
-        ay = 40, by = 430;
+        ay = 40, by = 400;
     }
     SetFontSize(50);
     DrawFormatString(280, ay, GetColor(255, 255, 255), "%dŠK", g_NowStage);
     DrawFormatString(290, by, GetColor(255, 255, 255), "~", g_NowStage);
     DrawFormatString(360, by, GetColor(255, 255, 255), "%d", g_player.hp);
-    DrawGraph(230, by, g_HeartImage, TRUE);
+    DrawGraph(220, by - 15, g_HeartImage, TRUE);
 
     if (++g_WaitTime > 100 || g_KeyFlg & PAD_INPUT_A)
     {
@@ -694,14 +694,14 @@ void PlayerControl()
     DrawFormatString(0, 60, 0x111FFF, "%d", g_WalkOldKey);
 
     if (g_player.x > 440)g_player.x = 440;
-    if (g_player.x < 150)g_player.x = 150;
+    if (g_player.x < 145)g_player.x = 145;
     if (g_player.y > 400)g_player.y = 400;
     if (g_player.y < 59 && g_player.x >= 270 && g_player.x <= 320)g_GameMode = 2;
     if (g_player.y < 60)g_player.y = 60;
 
     for (int i = 0; i < g_player.hp; i++)
     {
-        DrawGraph(55 * i, 10, g_HeartImage, TRUE);
+        DrawGraph(22, 10 + 80 * i, g_HeartImage, TRUE);
     }
 
     DrawFormatString(0, 0, 0x111FFF, "ƒLƒƒƒ‰‰æ‘œ = %d", g_player.img);
@@ -753,7 +753,7 @@ void ArrowControl()
 
     for (int i = 0; i < g_player.hp; i++)
     {
-        DrawGraph(55 * i, 10, g_HeartImage, TRUE);
+        DrawGraph(22 + 80 * i, 10, g_HeartImage, TRUE);
     }
 
     DrawGraph(g_arrow.x, g_arrow.y, g_Arrow, TRUE);

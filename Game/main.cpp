@@ -326,7 +326,7 @@ void DrawGameTitle(void) {
     DrawBox(160, 245, 480, 450, GetColor(0, 0, 0), FALSE); //透明なボックスに黒い線を追加
     SetFontSize(40);
     //ゲームタイトルを載せる予定
-    DrawStringToHandle(100, 130, "ゲームタイトル予定", GetColor(255, 255, 255), Font1);
+    DrawStringToHandle(60, 130, "アケロ☆だんじょん君", GetColor(255, 255, 255), Font1);
 
     DrawStringToHandle(210, 255, "ゲームスタート", GetColor(255, 0, 0), Font);
     DrawStringToHandle(240, 305, "ランキング", GetColor(255, 0, 0), Font);

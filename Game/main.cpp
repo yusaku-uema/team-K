@@ -67,7 +67,7 @@ int Time;   // 現在時間
 
 int g_TakaraBako[3]; //宝箱の画像
 int g_Player[16];
-
+int g_Gradation; //透過率
 
 int g_EnemyImage[4][6];
 
@@ -365,6 +365,9 @@ void GameInit(void)
 
     //SE初期処理
     SE_flg = false;
+
+    //透過率初期化
+    g_Gradation = 0;
 
     //ゲームメイン処理へ
     g_GameState = 5;
@@ -856,8 +859,10 @@ void OpenTreasureBox()
 
             DrawString(160, 400, "ミッ、ミミックだ！", 0xffffff, TRUE);
             g_IconNo = 2;
-
-                SetDrawBlendMode(DX_BLENDMODE_ALPHA, 150);        //ブレンドモードをα(128/255)に設定
+            if (g_Gradation <= 150) {
+                g_Gradation += 5;
+            }
+                SetDrawBlendMode(DX_BLENDMODE_ALPHA, g_Gradation);        //ブレンドモードをα(128/255)に設定
                 DrawBox(0, 100, 640, 380, GetColor(255, 0, 0), TRUE);
                 SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
         }
@@ -946,6 +951,7 @@ void OpenTreasureBox()
 
        
         SE_flg = false;
+        g_Gradation = 0;
     }
 }
 
